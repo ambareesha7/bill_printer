@@ -1,0 +1,11 @@
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          # store_date_time_values_as_text: false # (default)
+          # To use ISO 8601 strings
+          store_date_time_values_as_text: true
+          databases:
+            # Required: A name for the database and its path
+            my_database: lib/core/database.dart
