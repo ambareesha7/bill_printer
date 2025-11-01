@@ -1,5 +1,11 @@
 import 'package:bill_printer/core/database.dart';
 import 'package:drift/drift.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final dbUtilsProvider = Provider<DBUtils>((ref) {
+  return DBUtils.instance;
+});
 
 class DBUtils {
   DBUtils._internal();
@@ -21,15 +27,15 @@ class DBUtils {
   }
 
   Future<void> insertCategory({required String name}) async {
-    final categoryCompanion = CategoriesCompanion(
-      name: Value(name),
+    final categoryCompanion = CategoriesCompanion.insert(
+      name: name,
       createdAt: Value(DateTime.now()),
       updatedAt: Value(DateTime.now()),
     );
     try {
       await db.into(db.categories).insert(categoryCompanion);
     } catch (e) {
-      print("Error inserting category: $e");
+      debugPrint("Error inserting category: $e");
     }
   }
 

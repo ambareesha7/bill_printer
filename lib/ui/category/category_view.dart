@@ -1,5 +1,5 @@
-import 'package:bill_printer/core/database.dart';
-import 'package:bill_printer/core/db_utils.dart';
+import 'package:bill_printer/models/app_enums.dart';
+import 'package:bill_printer/ui/category/category_provider.dart';
 import 'package:bill_printer/ui/widgets/grid_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,53 +11,158 @@ class CategoryView extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _CategoryViewState();
 }
 
-class _CategoryViewState extends ConsumerState<CategoryView> {
-  final DBUtils dbUtils = DBUtils.instance;
-  final TextEditingController categoryController = TextEditingController();
-  List<Category> categories = [];
+class _CategoryViewState extends ConsumerState<CategoryView>
+    with SingleTickerProviderStateMixin {
+  final TextEditingController cateEditingController = TextEditingController();
+  TabController? _tabController;
+  final int _tabCount = 2;
+  String? errorText(int textLength, int minTextLength, int maxTextLength) {
+    if (textLength > maxTextLength) {
+      return "Name max length should be $maxTextLength";
+    } else if (textLength < minTextLength) {
+      return "Name minimum length should be $minTextLength";
+    } else {
+      return null;
+    }
+  }
+
   // create dialog
-  // TODO: implement error handling for duplicate category names, name length
-  // TODO: implement update category
-  addCategory() {
+  addCategory({required OperationType operationType, int? id}) {
+    int minTextLength = 2;
+    int maxTextLength = 35;
+    ref
+        .read(textLengthProvider.notifier)
+        .updateLength(cateEditingController.text.length);
+    // calling this to update error text if any
+    ref.watch(textLengthProvider);
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
-        return AlertDialog(
-          title: Text("Add Category"),
-          content: TextField(
-            decoration: InputDecoration(hintText: "Category Name"),
-            controller: categoryController,
+        final tabIndex = ref.watch(tabIndexProvider);
+        String itemType = tabIndex == 0 ? "Category" : "Product";
+        return Dialog(
+          insetPadding: EdgeInsets.all(20),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "${operationType.name} $itemType",
+                  style: TextStyle(fontSize: 18),
+                ),
+                SizedBox(height: 10),
+                Consumer(
+                  builder: (context, ref, child) {
+                    return TextField(
+                      decoration: InputDecoration(
+                        hintText: "$itemType name",
+                        errorText: errorText(
+                          ref.watch(textLengthProvider),
+                          minTextLength,
+                          maxTextLength,
+                        ),
+                      ),
+                      controller: cateEditingController,
+                      onChanged: (value) {
+                        ref
+                            .read(textLengthProvider.notifier)
+                            .updateLength(value.length);
+                      },
+                    );
+                  },
+                ),
+                SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        cateEditingController.clear();
+                        ref.read(textLengthProvider.notifier).updateLength(0);
+                        Navigator.pop(context);
+                      },
+                      style: ButtonStyle(),
+                      child: Text("Cancel"),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (cateEditingController.text.isEmpty) return;
+                        if (cateEditingController.text.length > maxTextLength) {
+                          return;
+                        }
+                        if (cateEditingController.text.length < minTextLength) {
+                          return;
+                        }
+
+                        if (tabIndex == 0) {
+                          if (operationType == OperationType.add) {
+                            ref
+                                .read(categoryListProvider.notifier)
+                                .addCategory(cateEditingController.text);
+                          } else if (operationType == OperationType.edit &&
+                              id != null) {
+                            ref
+                                .read(categoryListProvider.notifier)
+                                .updateCategory(id, cateEditingController.text);
+                          }
+                        } else {
+                          // ref
+                          //     .read(tabIndexProvider.notifier)
+                          //     .addCategory(cateEditingController.text);
+                        }
+
+                        cateEditingController.clear();
+
+                        Navigator.pop(context);
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.all(
+                          Colors.green[500],
+                        ),
+                      ),
+                      child: Text(
+                        "Save",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                categoryController.clear();
-                Navigator.pop(context);
-              },
-              child: Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (categoryController.text.isNotEmpty) {
-                  dbUtils.insertCategory(name: categoryController.text);
-                  categoryController.clear();
-                }
-                // dbUtils.insertCategory(name: categoryController.text);
-                Navigator.pop(context);
-              },
-              child: Text("Add"),
-            ),
-          ],
         );
       },
     );
   }
 
   @override
+  void initState() {
+    super.initState();
+    // WidgetsBinding.instance.addPostFrameCallback((_) {});
+    // add tab controller listener
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController?.addListener(() {
+      ref.read(tabIndexProvider.notifier).updateTabIndex(_tabController!.index);
+      // ref.watch(categoryListProvider);
+      ref.read(categoryListProvider.notifier).getCategories();
+    });
+    ref.read(categoryListProvider.notifier).getCategories();
+  }
+
+  @override
+  void dispose() {
+    _tabController?.dispose();
+    cateEditingController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
-      // initialIndex: 1,
+      length: _tabCount,
+      initialIndex: ref.watch(tabIndexProvider),
       child: Scaffold(
         appBar: AppBar(
           title: Text("Category/Products"),
@@ -65,13 +170,25 @@ class _CategoryViewState extends ConsumerState<CategoryView> {
             ElevatedButton(onPressed: () {}, child: Text("ItemWise Bill")),
           ],
           bottom: TabBar(
-            // isScrollable: true,
+            controller: _tabController,
             onTap: (value) {
               debugPrint(value.toString());
             },
             tabs: [
-              Tab(text: "Categories"),
-              Tab(text: "Products"),
+              // using this Consumer widget to rebuild only the Tab when tabs are changed
+              // otherwise riverpod will dispose the categoryListProvider when not in use
+              Consumer(
+                builder: (context, ref, child) {
+                  ref.watch(categoryListProvider);
+                  return Tab(text: "Categories");
+                },
+              ),
+              Consumer(
+                builder: (context, ref, child) {
+                  final tabIndex = ref.watch(tabIndexProvider);
+                  return Tab(text: "Products $tabIndex");
+                },
+              ),
             ],
           ),
         ),
@@ -80,19 +197,13 @@ class _CategoryViewState extends ConsumerState<CategoryView> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               ElevatedButton.icon(
-                onPressed: () async {
-                  final categories1 = await dbUtils.getCategories();
-                  print("categories................");
-                  print(categories.toString());
-                  categories = categories1;
-                  setState(() {});
-                },
+                onPressed: () {},
                 icon: Icon(Icons.import_export),
                 label: Text("Export"),
               ),
               FloatingActionButton(
                 onPressed: () {
-                  addCategory();
+                  addCategory(operationType: OperationType.add);
                 },
                 child: Icon(Icons.add),
               ),
@@ -100,29 +211,38 @@ class _CategoryViewState extends ConsumerState<CategoryView> {
           ),
         ),
         body: TabBarView(
+          controller: _tabController,
           children: [
-            // Categories Tab
-            GridView.builder(
-              itemCount: categories.length,
-              padding: EdgeInsets.all(8),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 1.5,
-              ),
-              itemBuilder: (context, index) {
-                return GridCard(
-                  text: categories[index].name,
-                  // price: index,
-                  editFunc: () {
-                    categoryController.text = categories[index].name;
-                    addCategory();
-                    // dbUtils.updateCategory(
-                    //   categories[index].id,
-                    //   "Updated ${categories[index].name}",
-                    // );
-                  },
-                  deleteFunc: () {
-                    dbUtils.deleteCategory(categories[index].id);
+            Consumer(
+              builder: (context, ref, child) {
+                final categories = ref.watch(categoryListProvider);
+                if (categories.isEmpty) {
+                  return Center(child: Text("No categories added yet."));
+                }
+                return GridView.builder(
+                  itemCount: categories.length,
+                  padding: EdgeInsets.all(8),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 1.5,
+                  ),
+                  itemBuilder: (context, index) {
+                    final category = categories[index];
+                    return GridCard(
+                      text: category.name,
+                      editFunc: () {
+                        cateEditingController.text = categories[index].name;
+                        addCategory(
+                          operationType: OperationType.edit,
+                          id: category.id,
+                        );
+                      },
+                      deleteFunc: () {
+                        ref
+                            .read(categoryListProvider.notifier)
+                            .deleteCategory(category.id!);
+                      },
+                    );
                   },
                 );
               },
