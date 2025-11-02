@@ -26,6 +26,13 @@ class DBUtils {
     _db = null;
   }
 
+  /// USE FOR DEBUGGING PURPOSES ONLY
+  ///
+  /// deletes all tables and recreates them
+  /// USE WITH CAUTION - this will delete all data in the database
+  Future<void> reCreateDB() async => await db.reCreateDB();
+
+  // ======================== Category CRUD operations =====================
   Future<void> insertCategory({required String name}) async {
     final categoryCompanion = CategoriesCompanion.insert(
       name: name,
@@ -54,5 +61,77 @@ class DBUtils {
 
   Future<List<Category>> getCategories() async {
     return await db.select(db.categories).get();
+  }
+
+  // ======================== Product CRUD operations =====================
+  Future<void> insertProduct({
+    required String name,
+    required int categoryId,
+    required String price,
+    int priority = 1,
+  }) async {
+    final productCompanion = ProductsCompanion.insert(
+      name: name,
+      createdAt: Value(DateTime.now()),
+      updatedAt: Value(DateTime.now()),
+      categoryId: categoryId,
+      price: price,
+      priority: priority,
+    );
+    try {
+      await db.into(db.products).insert(productCompanion);
+    } catch (e) {
+      debugPrint("Error inserting product: $e");
+    }
+  }
+
+  Future<void> updateProduct({
+    required int id,
+    String? name,
+    int? categoryId,
+    String? price,
+    int? priority,
+  }) async {
+    final productCompanion = ProductsCompanion(
+      id: Value(id),
+      name: name != null ? Value(name) : const Value.absent(),
+      updatedAt: Value(DateTime.now()),
+      categoryId: categoryId != null ? Value(categoryId) : const Value.absent(),
+      price: price != null ? Value(price) : const Value.absent(),
+      priority: priority != null ? Value(priority) : const Value.absent(),
+    );
+    try {
+      await db.update(db.products).replace(productCompanion);
+    } catch (e) {
+      debugPrint("Error updating product: $e");
+    }
+  }
+
+  Future<void> deleteProduct(int id) async {
+    try {
+      await (db.delete(db.products)..where((tbl) => tbl.id.equals(id))).go();
+    } catch (e) {
+      debugPrint("Error deleting product: $e");
+    }
+  }
+
+  Future<List<Product>> getProducts() async {
+    try {
+      return await db.select(db.products).get();
+    } catch (e) {
+      debugPrint("Error fetching products: $e");
+      return [];
+    }
+  }
+
+  Future<List<Product>> getProductsByCategory(int categoryId) async {
+    try {
+      return await (db.select(
+        db.products,
+      )..where((tbl) => tbl.categoryId.equals(categoryId))).get();
+    } catch (e) {
+      debugPrint("Error fetching products by category: $e");
+      return [];
+    }
   }
 }

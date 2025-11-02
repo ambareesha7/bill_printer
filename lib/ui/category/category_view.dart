@@ -1,5 +1,6 @@
 import 'package:bill_printer/models/app_enums.dart';
 import 'package:bill_printer/ui/category/category_provider.dart';
+import 'package:bill_printer/ui/category/product_provider.dart';
 import 'package:bill_printer/ui/widgets/grid_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +17,7 @@ class _CategoryViewState extends ConsumerState<CategoryView>
   final TextEditingController cateEditingController = TextEditingController();
   TabController? _tabController;
   final int _tabCount = 2;
+
   String? errorText(int textLength, int minTextLength, int maxTextLength) {
     if (textLength > maxTextLength) {
       return "Name max length should be $maxTextLength";
@@ -55,7 +57,8 @@ class _CategoryViewState extends ConsumerState<CategoryView>
                 SizedBox(height: 10),
                 Consumer(
                   builder: (context, ref, child) {
-                    return TextField(
+                    // TODO: add input validator and remove provider
+                    return TextFormField(
                       decoration: InputDecoration(
                         hintText: "$itemType name",
                         errorText: errorText(
@@ -96,21 +99,15 @@ class _CategoryViewState extends ConsumerState<CategoryView>
                           return;
                         }
 
-                        if (tabIndex == 0) {
-                          if (operationType == OperationType.add) {
-                            ref
-                                .read(categoryListProvider.notifier)
-                                .addCategory(cateEditingController.text);
-                          } else if (operationType == OperationType.edit &&
-                              id != null) {
-                            ref
-                                .read(categoryListProvider.notifier)
-                                .updateCategory(id, cateEditingController.text);
-                          }
-                        } else {
-                          // ref
-                          //     .read(tabIndexProvider.notifier)
-                          //     .addCategory(cateEditingController.text);
+                        if (operationType == OperationType.add) {
+                          ref
+                              .read(categoryListProvider.notifier)
+                              .addCategory(cateEditingController.text);
+                        } else if (operationType == OperationType.edit &&
+                            id != null) {
+                          ref
+                              .read(categoryListProvider.notifier)
+                              .updateCategory(id, cateEditingController.text);
                         }
 
                         cateEditingController.clear();
@@ -145,7 +142,6 @@ class _CategoryViewState extends ConsumerState<CategoryView>
     _tabController = TabController(length: 2, vsync: this);
     _tabController?.addListener(() {
       ref.read(tabIndexProvider.notifier).updateTabIndex(_tabController!.index);
-      // ref.watch(categoryListProvider);
       ref.read(categoryListProvider.notifier).getCategories();
     });
     ref.read(categoryListProvider.notifier).getCategories();
@@ -165,7 +161,7 @@ class _CategoryViewState extends ConsumerState<CategoryView>
       initialIndex: ref.watch(tabIndexProvider),
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Category/Products"),
+          title: Text("Category/Products", style: TextStyle(fontSize: 16)),
           actions: [
             ElevatedButton(onPressed: () {}, child: Text("ItemWise Bill")),
           ],
@@ -175,7 +171,7 @@ class _CategoryViewState extends ConsumerState<CategoryView>
               debugPrint(value.toString());
             },
             tabs: [
-              // using this Consumer widget to rebuild only the Tab when tabs are changed
+              // using this Consumer widgets to rebuild only the Tab when tabs are changed
               // otherwise riverpod will dispose the categoryListProvider when not in use
               Consumer(
                 builder: (context, ref, child) {
@@ -185,8 +181,9 @@ class _CategoryViewState extends ConsumerState<CategoryView>
               ),
               Consumer(
                 builder: (context, ref, child) {
-                  final tabIndex = ref.watch(tabIndexProvider);
-                  return Tab(text: "Products $tabIndex");
+                  ref.watch(tabIndexProvider);
+                  ref.watch(productsListProvider);
+                  return Tab(text: "Products");
                 },
               ),
             ],
@@ -197,13 +194,24 @@ class _CategoryViewState extends ConsumerState<CategoryView>
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  // ref.read(productsListProvider.notifier).initializeProducts();
+                },
                 icon: Icon(Icons.import_export),
                 label: Text("Export"),
               ),
               FloatingActionButton(
                 onPressed: () {
-                  addCategory(operationType: OperationType.add);
+                  if (ref.watch(tabIndexProvider) == 0) {
+                    addCategory(operationType: OperationType.add);
+                  } else {
+                    ref
+                        .read(productsListProvider.notifier)
+                        .openProductDialog(
+                          context: context,
+                          operationType: OperationType.add,
+                        );
+                  }
                 },
                 child: Icon(Icons.add),
               ),
@@ -247,36 +255,51 @@ class _CategoryViewState extends ConsumerState<CategoryView>
                 );
               },
             ),
-            Column(
-              children: [
-                Row(
+            Consumer(
+              builder: (context, ref, child) {
+                final productsList = ref.watch(productsListProvider);
+                return Column(
                   children: [
-                    ElevatedButton(onPressed: () {}, child: Text("All")),
-                    ElevatedButton(
-                      onPressed: () {},
-                      child: Text("not implemented yet"),
+                    Row(
+                      children: [
+                        ElevatedButton(onPressed: () {}, child: Text("All")),
+                      ],
+                    ),
+                    Expanded(
+                      child: GridView.builder(
+                        itemCount: productsList.length,
+                        padding: EdgeInsets.all(8),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 1.5,
+                        ),
+                        itemBuilder: (context, index) {
+                          return GridCard(
+                            text: productsList[index].name ?? "",
+                            price: productsList[index].price ?? "0",
+                            editFunc: () {
+                              if (productsList[index].id != null) {
+                                ref
+                                    .read(productsListProvider.notifier)
+                                    .openProductDialog(
+                                      context: context,
+                                      operationType: OperationType.edit,
+                                      product: productsList[index],
+                                    );
+                              }
+                            },
+                            deleteFunc: () {
+                              ref
+                                  .read(productsListProvider.notifier)
+                                  .deleteProduct(productsList[index].id!);
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ],
-                ),
-                Expanded(
-                  child: GridView.builder(
-                    itemCount: 3,
-                    padding: EdgeInsets.all(8),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 1.5,
-                    ),
-                    itemBuilder: (context, index) {
-                      return GridCard(
-                        text: "name",
-                        price: index,
-                        editFunc: () {},
-                        deleteFunc: () {},
-                      );
-                    },
-                  ),
-                ),
-              ],
+                );
+              },
             ),
           ],
         ),

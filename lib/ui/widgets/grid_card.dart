@@ -9,7 +9,7 @@ class GridCard extends StatelessWidget {
     required this.deleteFunc,
   });
   final String text;
-  final int? price;
+  final String? price;
   final void Function() editFunc;
   final void Function() deleteFunc;
 
