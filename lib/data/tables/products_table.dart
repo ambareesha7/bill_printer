@@ -1,4 +1,4 @@
-import 'package:bill_printer/core/tables/categories_table.dart';
+import 'package:bill_printer/data/tables/categories_table.dart';
 import 'package:drift/drift.dart';
 
 class Products extends Table {

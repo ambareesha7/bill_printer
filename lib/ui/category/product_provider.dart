@@ -1,9 +1,10 @@
-import 'package:bill_printer/core/db_utils.dart';
-import 'package:bill_printer/models/app_enums.dart';
-import 'package:bill_printer/models/category_model.dart';
-import 'package:bill_printer/models/product_model.dart';
+import 'package:bill_printer/data/db_utils.dart';
+import 'package:bill_printer/data/app_enums.dart';
+import 'package:bill_printer/data/models/category_model.dart';
+import 'package:bill_printer/data/models/product_model.dart';
 import 'package:bill_printer/ui/category/category_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'product_provider.g.dart';
@@ -144,8 +145,8 @@ class ProductsList extends _$ProductsList {
     ProductModel? product,
   }) {
     CategoryModel? selectedCate;
-    final categoryList = ref.watch(categoryListProvider);
     if (operationType == OperationType.edit) {
+      final categoryList = ref.watch(categoryListProvider);
       productEditController.text = product?.name ?? "";
       priceEditController.text = product?.price ?? "0";
       priorityEditController.text = product?.priority?.toString() ?? "1";
@@ -158,8 +159,8 @@ class ProductsList extends _$ProductsList {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        final tabIndex = ref.watch(tabIndexProvider);
-        String itemType = tabIndex == 0 ? "Category" : "Product";
+        // final tabIndex = ref.watch(tabIndexProvider);
+        // String itemType = tabIndex == 0 ? "Category" : "Product";
         return Dialog(
           insetPadding: const EdgeInsets.all(20),
           child: Padding(
@@ -170,32 +171,41 @@ class ProductsList extends _$ProductsList {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "${operationType.name} $itemType",
+                    "${operationType.name} Product",
                     style: TextStyle(fontSize: 18),
                   ),
                   SizedBox(height: 10),
-                  DropdownButtonFormField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue, width: 2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      hintText: "Select category",
-                    ),
-                    validator: (value) =>
-                        value == null ? "Select a category" : null,
-                    initialValue: selectedCate,
-                    onChanged: (value) {
-                      selectedCate = value;
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final categoryList = ref.watch(categoryListProvider);
+                      print("cats............. $categoryList");
+                      return DropdownButtonFormField(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.blue,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          hintText: "Select category",
+                        ),
+                        validator: (value) =>
+                            value == null ? "Select a category" : null,
+                        initialValue: selectedCate,
+                        onChanged: (value) {
+                          selectedCate = value;
+                        },
+                        items: List.generate(
+                          categoryList.length,
+                          (index) => DropdownMenuItem(
+                            value: categoryList[index],
+                            // label: categoryList[index].name,
+                            child: Text(categoryList[index].name),
+                          ),
+                        ),
+                      );
                     },
-                    items: List.generate(
-                      categoryList.length,
-                      (index) => DropdownMenuItem(
-                        value: categoryList[index],
-                        // label: categoryList[index].name,
-                        child: Text(categoryList[index].name),
-                      ),
-                    ),
                   ),
                   SizedBox(height: 8),
                   TextFormField(
@@ -259,7 +269,7 @@ class ProductsList extends _$ProductsList {
                           if (_formKey.currentState!.validate()) {
                             // If the form is valid, display a snackbar. In the real world,
                             // you'd often call a server or save the information in a database.
-                           
+
                             String name = productEditController.text;
                             String price = priceEditController.text;
                             int categoryId = selectedCate!.id!;

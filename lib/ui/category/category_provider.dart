@@ -1,5 +1,5 @@
-import 'package:bill_printer/core/db_utils.dart';
-import 'package:bill_printer/models/category_model.dart';
+import 'package:bill_printer/data/db_utils.dart';
+import 'package:bill_printer/data/models/category_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'category_provider.g.dart';
 
@@ -7,6 +7,7 @@ part 'category_provider.g.dart';
 class CategoryList extends _$CategoryList {
   @override
   List<CategoryModel> build() {
+    getCategories();
     return [];
   }
 

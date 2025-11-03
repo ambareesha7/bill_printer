@@ -41,7 +41,7 @@ final class CategoryListProvider
   }
 }
 
-String _$categoryListHash() => r'ca29d1a71509dd01afa1a2c2a0af025b4932d317';
+String _$categoryListHash() => r'68574e4688c08737a83e7e6cf437fb4dbaafff5e';
 
 abstract class _$CategoryList extends $Notifier<List<CategoryModel>> {
   List<CategoryModel> build();

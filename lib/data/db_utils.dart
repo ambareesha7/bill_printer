@@ -1,4 +1,4 @@
-import 'package:bill_printer/core/database.dart';
+import 'package:bill_printer/data/database.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

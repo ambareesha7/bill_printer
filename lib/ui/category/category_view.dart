@@ -1,4 +1,4 @@
-import 'package:bill_printer/models/app_enums.dart';
+import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/ui/category/category_provider.dart';
 import 'package:bill_printer/ui/category/product_provider.dart';
 import 'package:bill_printer/ui/widgets/grid_card.dart';

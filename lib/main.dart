@@ -1,5 +1,5 @@
-import 'package:bill_printer/core/db_utils.dart';
-import 'package:bill_printer/ui/bill_view.dart';
+import 'package:bill_printer/data/db_utils.dart';
+import 'package:bill_printer/ui/bill_views/bill_view.dart';
 import 'package:bill_printer/ui/category/category_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

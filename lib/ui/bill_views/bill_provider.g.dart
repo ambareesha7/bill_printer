@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'product_provider.dart';
+part of 'bill_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,52 +9,52 @@ part of 'product_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(ProductsList)
-const productsListProvider = ProductsListProvider._();
+@ProviderFor(BillList)
+const billListProvider = BillListProvider._();
 
-final class ProductsListProvider
-    extends $NotifierProvider<ProductsList, List<ProductModel>> {
-  const ProductsListProvider._()
+final class BillListProvider
+    extends $NotifierProvider<BillList, List<BillItemModel>> {
+  const BillListProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'productsListProvider',
+        name: r'billListProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$productsListHash();
+  String debugGetCreateSourceHash() => _$billListHash();
 
   @$internal
   @override
-  ProductsList create() => ProductsList();
+  BillList create() => BillList();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(List<ProductModel> value) {
+  Override overrideWithValue(List<BillItemModel> value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<List<ProductModel>>(value),
+      providerOverride: $SyncValueProvider<List<BillItemModel>>(value),
     );
   }
 }
 
-String _$productsListHash() => r'28e25d00fc81fe7c81d8a4ab24f57f78718b1077';
+String _$billListHash() => r'9769968309b84cbe959c9ca909012fb64225fdd9';
 
-abstract class _$ProductsList extends $Notifier<List<ProductModel>> {
-  List<ProductModel> build();
+abstract class _$BillList extends $Notifier<List<BillItemModel>> {
+  List<BillItemModel> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<List<ProductModel>, List<ProductModel>>;
+    final ref = this.ref as $Ref<List<BillItemModel>, List<BillItemModel>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<List<ProductModel>, List<ProductModel>>,
-              List<ProductModel>,
+              AnyNotifier<List<BillItemModel>, List<BillItemModel>>,
+              List<BillItemModel>,
               Object?,
               Object?
             >;

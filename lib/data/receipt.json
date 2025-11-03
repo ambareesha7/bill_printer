@@ -1,0 +1,13 @@
+{
+    "id": "uuid",
+    "customer": null,
+    "prepared_by": "",
+    "bill_items": [{
+            "name": "",
+            "rate": "",
+            "quantity": 12
+        }],
+    "total_amount": 12,
+    "created_at": "datetime",
+    "updated_at": "datetime"
+}

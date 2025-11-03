@@ -1,5 +1,5 @@
-import 'package:bill_printer/core/tables/categories_table.dart';
-import 'package:bill_printer/core/tables/products_table.dart';
+import 'package:bill_printer/data/tables/categories_table.dart';
+import 'package:bill_printer/data/tables/products_table.dart';
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter/foundation.dart';
