@@ -56,15 +56,17 @@ class _BillViewState extends ConsumerState<BillView> {
                         return ListView.builder(
                           itemCount: ref.watch(billListProvider).length,
                           itemBuilder: (context, index) {
-                            // ref.watch(billListProvider);
                             return BillRow(
                               item: ref.watch(billListProvider)[index],
                               onTap: () {
-                                // ref
-                                //     .read(billListProvider.notifier)
-                                //     .removeItem(
-                                //       ref.watch(billListProvider)[index],
-                                //     );
+                                ref.watch(billItemProvider);
+
+                                ref
+                                    .read(billItemProvider.notifier)
+                                    .openItemDialog(
+                                      context: context,
+                                      item: ref.watch(billListProvider)[index],
+                                    );
                               },
                             );
                           },

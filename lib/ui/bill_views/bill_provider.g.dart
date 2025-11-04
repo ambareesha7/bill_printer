@@ -41,7 +41,7 @@ final class BillListProvider
   }
 }
 
-String _$billListHash() => r'9769968309b84cbe959c9ca909012fb64225fdd9';
+String _$billListHash() => r'4918e64311286d74ddc3f62641c2095679109a4c';
 
 abstract class _$BillList extends $Notifier<List<BillItemModel>> {
   List<BillItemModel> build();
@@ -55,6 +55,59 @@ abstract class _$BillList extends $Notifier<List<BillItemModel>> {
             as $ClassProviderElement<
               AnyNotifier<List<BillItemModel>, List<BillItemModel>>,
               List<BillItemModel>,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}
+
+@ProviderFor(BillItem)
+const billItemProvider = BillItemProvider._();
+
+final class BillItemProvider
+    extends $NotifierProvider<BillItem, BillItemModel> {
+  const BillItemProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'billItemProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$billItemHash();
+
+  @$internal
+  @override
+  BillItem create() => BillItem();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(BillItemModel value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<BillItemModel>(value),
+    );
+  }
+}
+
+String _$billItemHash() => r'aaa1346eaf3cb6e4e935d95ddba635a10df7ac30';
+
+abstract class _$BillItem extends $Notifier<BillItemModel> {
+  BillItemModel build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<BillItemModel, BillItemModel>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<BillItemModel, BillItemModel>,
+              BillItemModel,
               Object?,
               Object?
             >;

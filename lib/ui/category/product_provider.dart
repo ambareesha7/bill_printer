@@ -178,7 +178,6 @@ class ProductsList extends _$ProductsList {
                   Consumer(
                     builder: (context, ref, child) {
                       final categoryList = ref.watch(categoryListProvider);
-                      print("cats............. $categoryList");
                       return DropdownButtonFormField(
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
