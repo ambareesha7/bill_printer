@@ -4,6 +4,7 @@ import 'package:bill_printer/ui/bill_views/bill_provider.dart';
 import 'package:bill_printer/ui/category/product_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_simple_calculator/flutter_simple_calculator.dart';
 
 class BillView extends ConsumerStatefulWidget {
   const BillView({super.key});
@@ -14,23 +15,31 @@ class BillView extends ConsumerStatefulWidget {
 
 class _BillViewState extends ConsumerState<BillView> {
   final double btnPadding = 4;
+  final double bodyPadding = 8;
+
   @override
   Widget build(BuildContext context) {
     final itemHeadStyle = TextStyle(fontWeight: FontWeight.bold);
     return Scaffold(
       appBar: AppBar(title: Text("Itemwise Bill")),
+      resizeToAvoidBottomInset: true,
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.only(
+          left: bodyPadding,
+          right: bodyPadding,
+          bottom: bodyPadding,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // _buildBillTable(),
+            // Build Bill Table
             Expanded(
+              flex: 6,
               child: Column(
                 children: [
                   Container(
                     color: Colors.orange,
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(4),
                     child: Row(
                       children: [
                         Expanded(
@@ -46,7 +55,10 @@ class _BillViewState extends ConsumerState<BillView> {
                           child: Text('RATE', style: itemHeadStyle),
                         ),
                         // Expanded(child: ),
-                        Text('TOTAL', style: itemHeadStyle),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: Text('TOTAL', style: itemHeadStyle),
+                        ),
                       ],
                     ),
                   ),
@@ -93,16 +105,15 @@ class _BillViewState extends ConsumerState<BillView> {
               },
             ),
             _buildActionButtons(),
-            _buildCategories(),
-
-            // _buildProductGrid(),
+            buildCategories(),
+            //======== build product cards =========
             Expanded(
+              flex: 6,
               child: Consumer(
                 builder: (context, ref, child) {
                   final productsList = ref.watch(productsListProvider);
                   return GridView.builder(
                     itemCount: productsList.length,
-                    padding: EdgeInsets.all(8),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       childAspectRatio: 1.2,
@@ -129,11 +140,9 @@ class _BillViewState extends ConsumerState<BillView> {
     );
   }
 
-  // Add this method after _buildBillTable()
-
   Widget _buildActionButtons() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
       child: Row(
         children: [
           AppBtn1(
@@ -158,13 +167,30 @@ class _BillViewState extends ConsumerState<BillView> {
           SizedBox(width: btnPadding),
           AppBtn1(name: "Print", onPressed: () {}),
           AppBtn1(name: "Save", onPressed: () {}),
-          SizedBox(width: btnPadding),
+          IconButton(
+            icon: Row(
+              children: [
+                Icon(Icons.calculate),
+                Text(
+                  "Cals",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+
+            onPressed: () {
+              _openCalculator();
+            },
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildCategories() {
+  Widget buildCategories() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -181,9 +207,25 @@ class _BillViewState extends ConsumerState<BillView> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Chip(
-        label: Text(label),
+        visualDensity: VisualDensity(horizontal: -4, vertical: -4),
+        label: Text(label, style: TextStyle(color: Colors.white)),
         backgroundColor: isSelected ? Colors.orange : Colors.grey[800],
       ),
+    );
+  }
+
+  _openCalculator() {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height * 0.48,
+          child: SimpleCalculator(
+            theme: const CalculatorThemeData(equalColor: Colors.orange),
+          ),
+        );
+      },
     );
   }
 }
@@ -247,9 +289,13 @@ class AppBtn1 extends StatelessWidget {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: bgColor,
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+        visualDensity: VisualDensity(horizontal: -2, vertical: -2),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.all(Radius.circular(6)),
+        ),
       ),
-      child: Text(name, style: TextStyle(color: textColor)),
+      child: Text(name, style: TextStyle(color: textColor ?? Colors.white)),
     );
   }
 }
@@ -264,15 +310,10 @@ class TotalSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.blueGrey,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text("Total"),
-          // SizedBox.expand(),
-          Text(items),
-          Text('₹$total'),
-        ],
+        children: [Text("Total"), Text(items), Text('₹$total')],
       ),
     );
   }
