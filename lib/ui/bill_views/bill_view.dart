@@ -180,12 +180,25 @@ class _BillViewState extends ConsumerState<BillView> {
                   .read(billListProvider.notifier)
                   .getTotalAmount(billItems);
               if (amount > 0) {
-                BankAccountModel primAccount = await getPrimeryUPI();
-                _openQRcode(primAccount: primAccount, amount: amount);
+                List<BankAccountModel> bankAccounts = await dbUtils
+                    .parseBankAccounts();
+                if (bankAccounts.isEmpty) {
+                  UIUtils.showSnackBar(
+                    // ignore: use_build_context_synchronously
+                    context: context,
+                    text: "Please add bank account to generate QR code",
+                    bgColor: Colors.red,
+                  );
+                } else {
+                  BankAccountModel primAccount = getPrimeryUPI(bankAccounts);
+                  _openQRcode(primAccount: primAccount, amount: amount);
+                }
               } else {
                 UIUtils.showSnackBar(
-                  context,
-                  "Total amount is $amount, Please add some billable items to generate QR code",
+                  context: context,
+                  text:
+                      "Total amount is $amount, Please add some billable items to generate QR code",
+                  bgColor: Colors.red,
                 );
               }
             },
@@ -263,9 +276,11 @@ class _BillViewState extends ConsumerState<BillView> {
     );
   }
 
-  Future<BankAccountModel> getPrimeryUPI() async {
-    List<BankAccountModel> bankAccounts = await dbUtils.parseBankAccounts();
-    return bankAccounts.firstWhere((el) => el.isPrime);
+  BankAccountModel getPrimeryUPI(List<BankAccountModel> bankAccounts) {
+    return bankAccounts.firstWhere(
+      (el) => el.isPrime,
+      orElse: () => bankAccounts.first,
+    );
   }
 
   _openQRcode({

@@ -59,6 +59,7 @@ class _CategoryViewState extends ConsumerState<CategoryView>
                   builder: (context, ref, child) {
                     // TODO: add input validator and remove provider
                     return TextFormField(
+                      textCapitalization: TextCapitalization.words,
                       decoration: InputDecoration(
                         hintText: "$itemType name",
                         errorText: errorText(

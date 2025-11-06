@@ -38,6 +38,7 @@
         "ifsc": "",
         "upi_id": "",
         "note": "",
+        "isPrime": false,
         "created_at": "datetime",
        "updated_at": "datetime"
     

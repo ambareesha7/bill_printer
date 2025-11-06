@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 
 class UIUtils {
-  static showSnackBar(BuildContext context, String text) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+  static showSnackBar({
+    required BuildContext context,
+    required String text,
+    Color? bgColor,
+  }) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(text), backgroundColor: bgColor));
   }
 
   static confirmDialog({
