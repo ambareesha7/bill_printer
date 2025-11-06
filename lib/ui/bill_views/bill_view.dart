@@ -202,22 +202,21 @@ class _BillViewState extends ConsumerState<BillView> {
                     color: Colors.white,
                   ),
                 ),
-                AppBtn1(
-                  name: "Change bank",
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BankAccountView(),
-                      ),
-                    );
-                  },
-                ),
               ],
             ),
 
             onPressed: () {
               _openCalculator();
+            },
+          ),
+          AppBtn1(
+            name: "Change bank",
+            bgColor: Colors.orange,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => BankAccountView()),
+              );
             },
           ),
         ],
