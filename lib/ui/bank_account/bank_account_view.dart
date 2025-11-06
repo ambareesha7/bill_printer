@@ -32,9 +32,7 @@ class BankAccountView extends StatelessWidget {
             itemBuilder: (context, index) {
               BankAccountModel bankAccount = bankList[index];
               return Card(
-                color: (index % 2 == 0)
-                    ? Colors.blueGrey[400]
-                    : Colors.blueGrey[700],
+                color: Colors.blueGrey,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
@@ -57,6 +55,52 @@ class BankAccountView extends StatelessWidget {
                               SelectableText("IFSC: ${bankAccount.ifsc}"),
                             if (bankAccount.note != null)
                               SelectableText("Note: ${bankAccount.note}"),
+                            if (bankAccount.isPrime)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Prime Account ",
+                                    style: TextStyle(
+                                      color: Colors.lightGreen,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.check_circle_outline,
+                                    color: Colors.green,
+                                  ),
+                                ],
+                              ),
+                            if (!bankAccount.isPrime)
+                              InkWell(
+                                onTap: () {
+                                  if (bankAccount.isPrime) return;
+                                  bankAccount = bankAccount.copyWith(
+                                    isPrime: true,
+                                  );
+                                  ref
+                                      .read(bankListProvider.notifier)
+                                      .updatePrimeAccount(
+                                        primeAccount: bankAccount,
+                                      );
+                                },
+                                child: Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 6,
+                                        horizontal: 2,
+                                      ),
+                                      child: Text(
+                                        "Set as prime",
+                                        style: TextStyle(color: Colors.orange),
+                                      ),
+                                    ),
+                                    Icon(Icons.circle_outlined),
+                                  ],
+                                ),
+                              ),
                           ],
                         ),
                       ),

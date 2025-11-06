@@ -11,7 +11,7 @@ class BankList extends _$BankList {
 
   @override
   List<BankAccountModel> build() {
-    getBankAccounts();
+    updateState();
     return [];
   }
 
@@ -22,8 +22,9 @@ class BankList extends _$BankList {
       accountNo: account.accountNumber,
       ifsc: account.ifsc,
       note: account.note,
+      isPrime: account.isPrime,
     );
-    getBankAccounts();
+    updateState();
   }
 
   Future<void> updateBankAccount({required BankAccountModel account}) async {
@@ -34,31 +35,18 @@ class BankList extends _$BankList {
       accountNo: account.accountNumber,
       ifsc: account.ifsc,
       note: account.note,
+      isPrime: account.isPrime,
     );
-    getBankAccounts();
+    updateState();
   }
 
   deleteBankAccounts(int id) async {
     await dbUtils.deleteBankAccounts(id);
-    getBankAccounts();
+    updateState();
   }
 
-  Future getBankAccounts() async {
-    List<BankAccount> accounts = await dbUtils.getBankAccounts();
-    state = accounts
-        .map(
-          (b) => BankAccountModel(
-            id: b.id,
-            name: b.name,
-            upiId: b.upiId,
-            accountNumber: b.accountNumber,
-            ifsc: b.ifsc,
-            note: b.note,
-            createdAt: b.createdAt,
-            updatedAt: b.updatedAt,
-          ),
-        )
-        .toList();
+  Future updateState() async {
+    state = await dbUtils.parseBankAccounts();
   }
 
   Future<BankAccountModel?> getBankAccountByUpiID(String upiId) async {
@@ -72,11 +60,24 @@ class BankList extends _$BankList {
         accountNumber: acc.accountNumber,
         ifsc: acc.ifsc,
         note: acc.note,
+        isPrime: acc.isPrime,
         createdAt: acc.createdAt,
         updatedAt: acc.updatedAt,
       );
     } else {
       return null;
     }
+  }
+
+  updatePrimeAccount({required BankAccountModel primeAccount}) async {
+    List<BankAccountModel> oldPrimeAccountsList = [...state];
+    for (var i in oldPrimeAccountsList) {
+      if (i.isPrime) {
+        i = i.copyWith(isPrime: false);
+        await updateBankAccount(account: i);
+      }
+    }
+    await updateBankAccount(account: primeAccount);
+    await updateState();
   }
 }

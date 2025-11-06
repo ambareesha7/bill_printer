@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$BankAccountModel {
 
- int? get id; String get name; int? get accountNumber; String? get ifsc; String? get upiId; String? get note; DateTime? get createdAt; DateTime? get updatedAt;
+ int? get id; String get name; bool get isPrime; String? get upiId; int? get accountNumber; String? get ifsc; String? get note; DateTime? get createdAt; DateTime? get updatedAt;
 /// Create a copy of BankAccountModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $BankAccountModelCopyWith<BankAccountModel> get copyWith => _$BankAccountModelCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BankAccountModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.accountNumber, accountNumber) || other.accountNumber == accountNumber)&&(identical(other.ifsc, ifsc) || other.ifsc == ifsc)&&(identical(other.upiId, upiId) || other.upiId == upiId)&&(identical(other.note, note) || other.note == note)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BankAccountModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.isPrime, isPrime) || other.isPrime == isPrime)&&(identical(other.upiId, upiId) || other.upiId == upiId)&&(identical(other.accountNumber, accountNumber) || other.accountNumber == accountNumber)&&(identical(other.ifsc, ifsc) || other.ifsc == ifsc)&&(identical(other.note, note) || other.note == note)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,accountNumber,ifsc,upiId,note,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,name,isPrime,upiId,accountNumber,ifsc,note,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'BankAccountModel(id: $id, name: $name, accountNumber: $accountNumber, ifsc: $ifsc, upiId: $upiId, note: $note, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'BankAccountModel(id: $id, name: $name, isPrime: $isPrime, upiId: $upiId, accountNumber: $accountNumber, ifsc: $ifsc, note: $note, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $BankAccountModelCopyWith<$Res>  {
   factory $BankAccountModelCopyWith(BankAccountModel value, $Res Function(BankAccountModel) _then) = _$BankAccountModelCopyWithImpl;
 @useResult
 $Res call({
- int? id, String name, int? accountNumber, String? ifsc, String? upiId, String? note, DateTime? createdAt, DateTime? updatedAt
+ int? id, String name, bool isPrime, String? upiId, int? accountNumber, String? ifsc, String? note, DateTime? createdAt, DateTime? updatedAt
 });
 
 
@@ -65,13 +65,14 @@ class _$BankAccountModelCopyWithImpl<$Res>
 
 /// Create a copy of BankAccountModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = null,Object? accountNumber = freezed,Object? ifsc = freezed,Object? upiId = freezed,Object? note = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = null,Object? isPrime = null,Object? upiId = freezed,Object? accountNumber = freezed,Object? ifsc = freezed,Object? note = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,accountNumber: freezed == accountNumber ? _self.accountNumber : accountNumber // ignore: cast_nullable_to_non_nullable
+as String,isPrime: null == isPrime ? _self.isPrime : isPrime // ignore: cast_nullable_to_non_nullable
+as bool,upiId: freezed == upiId ? _self.upiId : upiId // ignore: cast_nullable_to_non_nullable
+as String?,accountNumber: freezed == accountNumber ? _self.accountNumber : accountNumber // ignore: cast_nullable_to_non_nullable
 as int?,ifsc: freezed == ifsc ? _self.ifsc : ifsc // ignore: cast_nullable_to_non_nullable
-as String?,upiId: freezed == upiId ? _self.upiId : upiId // ignore: cast_nullable_to_non_nullable
 as String?,note: freezed == note ? _self.note : note // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
@@ -160,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String name,  int? accountNumber,  String? ifsc,  String? upiId,  String? note,  DateTime? createdAt,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String name,  bool isPrime,  String? upiId,  int? accountNumber,  String? ifsc,  String? note,  DateTime? createdAt,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _BankAccountModel() when $default != null:
-return $default(_that.id,_that.name,_that.accountNumber,_that.ifsc,_that.upiId,_that.note,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.name,_that.isPrime,_that.upiId,_that.accountNumber,_that.ifsc,_that.note,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -181,10 +182,10 @@ return $default(_that.id,_that.name,_that.accountNumber,_that.ifsc,_that.upiId,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String name,  int? accountNumber,  String? ifsc,  String? upiId,  String? note,  DateTime? createdAt,  DateTime? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String name,  bool isPrime,  String? upiId,  int? accountNumber,  String? ifsc,  String? note,  DateTime? createdAt,  DateTime? updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _BankAccountModel():
-return $default(_that.id,_that.name,_that.accountNumber,_that.ifsc,_that.upiId,_that.note,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.name,_that.isPrime,_that.upiId,_that.accountNumber,_that.ifsc,_that.note,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -201,10 +202,10 @@ return $default(_that.id,_that.name,_that.accountNumber,_that.ifsc,_that.upiId,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String name,  int? accountNumber,  String? ifsc,  String? upiId,  String? note,  DateTime? createdAt,  DateTime? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String name,  bool isPrime,  String? upiId,  int? accountNumber,  String? ifsc,  String? note,  DateTime? createdAt,  DateTime? updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _BankAccountModel() when $default != null:
-return $default(_that.id,_that.name,_that.accountNumber,_that.ifsc,_that.upiId,_that.note,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.name,_that.isPrime,_that.upiId,_that.accountNumber,_that.ifsc,_that.note,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -216,14 +217,15 @@ return $default(_that.id,_that.name,_that.accountNumber,_that.ifsc,_that.upiId,_
 @JsonSerializable()
 
 class _BankAccountModel implements BankAccountModel {
-  const _BankAccountModel({this.id, required this.name, this.accountNumber, this.ifsc, this.upiId, this.note, this.createdAt, this.updatedAt});
+  const _BankAccountModel({this.id, required this.name, this.isPrime = false, this.upiId, this.accountNumber, this.ifsc, this.note, this.createdAt, this.updatedAt});
   factory _BankAccountModel.fromJson(Map<String, dynamic> json) => _$BankAccountModelFromJson(json);
 
 @override final  int? id;
 @override final  String name;
+@override@JsonKey() final  bool isPrime;
+@override final  String? upiId;
 @override final  int? accountNumber;
 @override final  String? ifsc;
-@override final  String? upiId;
 @override final  String? note;
 @override final  DateTime? createdAt;
 @override final  DateTime? updatedAt;
@@ -241,16 +243,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BankAccountModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.accountNumber, accountNumber) || other.accountNumber == accountNumber)&&(identical(other.ifsc, ifsc) || other.ifsc == ifsc)&&(identical(other.upiId, upiId) || other.upiId == upiId)&&(identical(other.note, note) || other.note == note)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BankAccountModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.isPrime, isPrime) || other.isPrime == isPrime)&&(identical(other.upiId, upiId) || other.upiId == upiId)&&(identical(other.accountNumber, accountNumber) || other.accountNumber == accountNumber)&&(identical(other.ifsc, ifsc) || other.ifsc == ifsc)&&(identical(other.note, note) || other.note == note)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,accountNumber,ifsc,upiId,note,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,name,isPrime,upiId,accountNumber,ifsc,note,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'BankAccountModel(id: $id, name: $name, accountNumber: $accountNumber, ifsc: $ifsc, upiId: $upiId, note: $note, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'BankAccountModel(id: $id, name: $name, isPrime: $isPrime, upiId: $upiId, accountNumber: $accountNumber, ifsc: $ifsc, note: $note, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -261,7 +263,7 @@ abstract mixin class _$BankAccountModelCopyWith<$Res> implements $BankAccountMod
   factory _$BankAccountModelCopyWith(_BankAccountModel value, $Res Function(_BankAccountModel) _then) = __$BankAccountModelCopyWithImpl;
 @override @useResult
 $Res call({
- int? id, String name, int? accountNumber, String? ifsc, String? upiId, String? note, DateTime? createdAt, DateTime? updatedAt
+ int? id, String name, bool isPrime, String? upiId, int? accountNumber, String? ifsc, String? note, DateTime? createdAt, DateTime? updatedAt
 });
 
 
@@ -278,13 +280,14 @@ class __$BankAccountModelCopyWithImpl<$Res>
 
 /// Create a copy of BankAccountModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = null,Object? accountNumber = freezed,Object? ifsc = freezed,Object? upiId = freezed,Object? note = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = null,Object? isPrime = null,Object? upiId = freezed,Object? accountNumber = freezed,Object? ifsc = freezed,Object? note = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_BankAccountModel(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,accountNumber: freezed == accountNumber ? _self.accountNumber : accountNumber // ignore: cast_nullable_to_non_nullable
+as String,isPrime: null == isPrime ? _self.isPrime : isPrime // ignore: cast_nullable_to_non_nullable
+as bool,upiId: freezed == upiId ? _self.upiId : upiId // ignore: cast_nullable_to_non_nullable
+as String?,accountNumber: freezed == accountNumber ? _self.accountNumber : accountNumber // ignore: cast_nullable_to_non_nullable
 as int?,ifsc: freezed == ifsc ? _self.ifsc : ifsc // ignore: cast_nullable_to_non_nullable
-as String?,upiId: freezed == upiId ? _self.upiId : upiId // ignore: cast_nullable_to_non_nullable
 as String?,note: freezed == note ? _self.note : note // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable

@@ -8,9 +8,10 @@ abstract class BankAccountModel with _$BankAccountModel {
   const factory BankAccountModel({
     int? id,
     required String name,
+    @Default(false) bool isPrime,
+    String? upiId,
     int? accountNumber,
     String? ifsc,
-    String? upiId,
     String? note,
     DateTime? createdAt,
     DateTime? updatedAt,

@@ -41,7 +41,7 @@ final class BankListProvider
   }
 }
 
-String _$bankListHash() => r'42879998b2bd7443d0535e2e091b8e49414d9b5d';
+String _$bankListHash() => r'7d089e4fd5d257eea08b40f70e4887a54c0015ee';
 
 abstract class _$BankList extends $Notifier<List<BankAccountModel>> {
   List<BankAccountModel> build();

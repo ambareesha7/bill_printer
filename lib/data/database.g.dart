@@ -778,6 +778,31 @@ class $BankAccountsTable extends BankAccounts
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _upiIdMeta = const VerificationMeta('upiId');
+  @override
+  late final GeneratedColumn<String> upiId = GeneratedColumn<String>(
+    'upi_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _isPrimeMeta = const VerificationMeta(
+    'isPrime',
+  );
+  @override
+  late final GeneratedColumn<bool> isPrime = GeneratedColumn<bool>(
+    'is_prime',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_prime" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _accountNumberMeta = const VerificationMeta(
     'accountNumber',
   );
@@ -797,16 +822,6 @@ class $BankAccountsTable extends BankAccounts
     true,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
-  );
-  static const VerificationMeta _upiIdMeta = const VerificationMeta('upiId');
-  @override
-  late final GeneratedColumn<String> upiId = GeneratedColumn<String>(
-    'upi_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
   );
   static const VerificationMeta _noteMeta = const VerificationMeta('note');
   @override
@@ -845,9 +860,10 @@ class $BankAccountsTable extends BankAccounts
   List<GeneratedColumn> get $columns => [
     id,
     name,
+    upiId,
+    isPrime,
     accountNumber,
     ifsc,
-    upiId,
     note,
     createdAt,
     updatedAt,
@@ -875,6 +891,20 @@ class $BankAccountsTable extends BankAccounts
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('upi_id')) {
+      context.handle(
+        _upiIdMeta,
+        upiId.isAcceptableOrUnknown(data['upi_id']!, _upiIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_upiIdMeta);
+    }
+    if (data.containsKey('is_prime')) {
+      context.handle(
+        _isPrimeMeta,
+        isPrime.isAcceptableOrUnknown(data['is_prime']!, _isPrimeMeta),
+      );
+    }
     if (data.containsKey('account_number')) {
       context.handle(
         _accountNumberMeta,
@@ -889,14 +919,6 @@ class $BankAccountsTable extends BankAccounts
         _ifscMeta,
         ifsc.isAcceptableOrUnknown(data['ifsc']!, _ifscMeta),
       );
-    }
-    if (data.containsKey('upi_id')) {
-      context.handle(
-        _upiIdMeta,
-        upiId.isAcceptableOrUnknown(data['upi_id']!, _upiIdMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_upiIdMeta);
     }
     if (data.containsKey('note')) {
       context.handle(
@@ -933,6 +955,14 @@ class $BankAccountsTable extends BankAccounts
         DriftSqlType.string,
         data['${effectivePrefix}name'],
       )!,
+      upiId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}upi_id'],
+      )!,
+      isPrime: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_prime'],
+      )!,
       accountNumber: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}account_number'],
@@ -941,10 +971,6 @@ class $BankAccountsTable extends BankAccounts
         DriftSqlType.string,
         data['${effectivePrefix}ifsc'],
       ),
-      upiId: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}upi_id'],
-      )!,
       note: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}note'],
@@ -969,18 +995,20 @@ class $BankAccountsTable extends BankAccounts
 class BankAccount extends DataClass implements Insertable<BankAccount> {
   final int id;
   final String name;
+  final String upiId;
+  final bool isPrime;
   final int? accountNumber;
   final String? ifsc;
-  final String upiId;
   final String? note;
   final DateTime createdAt;
   final DateTime updatedAt;
   const BankAccount({
     required this.id,
     required this.name,
+    required this.upiId,
+    required this.isPrime,
     this.accountNumber,
     this.ifsc,
-    required this.upiId,
     this.note,
     required this.createdAt,
     required this.updatedAt,
@@ -990,13 +1018,14 @@ class BankAccount extends DataClass implements Insertable<BankAccount> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
+    map['upi_id'] = Variable<String>(upiId);
+    map['is_prime'] = Variable<bool>(isPrime);
     if (!nullToAbsent || accountNumber != null) {
       map['account_number'] = Variable<int>(accountNumber);
     }
     if (!nullToAbsent || ifsc != null) {
       map['ifsc'] = Variable<String>(ifsc);
     }
-    map['upi_id'] = Variable<String>(upiId);
     if (!nullToAbsent || note != null) {
       map['note'] = Variable<String>(note);
     }
@@ -1009,11 +1038,12 @@ class BankAccount extends DataClass implements Insertable<BankAccount> {
     return BankAccountsCompanion(
       id: Value(id),
       name: Value(name),
+      upiId: Value(upiId),
+      isPrime: Value(isPrime),
       accountNumber: accountNumber == null && nullToAbsent
           ? const Value.absent()
           : Value(accountNumber),
       ifsc: ifsc == null && nullToAbsent ? const Value.absent() : Value(ifsc),
-      upiId: Value(upiId),
       note: note == null && nullToAbsent ? const Value.absent() : Value(note),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
@@ -1028,9 +1058,10 @@ class BankAccount extends DataClass implements Insertable<BankAccount> {
     return BankAccount(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
+      upiId: serializer.fromJson<String>(json['upiId']),
+      isPrime: serializer.fromJson<bool>(json['isPrime']),
       accountNumber: serializer.fromJson<int?>(json['accountNumber']),
       ifsc: serializer.fromJson<String?>(json['ifsc']),
-      upiId: serializer.fromJson<String>(json['upiId']),
       note: serializer.fromJson<String?>(json['note']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -1042,9 +1073,10 @@ class BankAccount extends DataClass implements Insertable<BankAccount> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
+      'upiId': serializer.toJson<String>(upiId),
+      'isPrime': serializer.toJson<bool>(isPrime),
       'accountNumber': serializer.toJson<int?>(accountNumber),
       'ifsc': serializer.toJson<String?>(ifsc),
-      'upiId': serializer.toJson<String>(upiId),
       'note': serializer.toJson<String?>(note),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -1054,20 +1086,22 @@ class BankAccount extends DataClass implements Insertable<BankAccount> {
   BankAccount copyWith({
     int? id,
     String? name,
+    String? upiId,
+    bool? isPrime,
     Value<int?> accountNumber = const Value.absent(),
     Value<String?> ifsc = const Value.absent(),
-    String? upiId,
     Value<String?> note = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => BankAccount(
     id: id ?? this.id,
     name: name ?? this.name,
+    upiId: upiId ?? this.upiId,
+    isPrime: isPrime ?? this.isPrime,
     accountNumber: accountNumber.present
         ? accountNumber.value
         : this.accountNumber,
     ifsc: ifsc.present ? ifsc.value : this.ifsc,
-    upiId: upiId ?? this.upiId,
     note: note.present ? note.value : this.note,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -1076,11 +1110,12 @@ class BankAccount extends DataClass implements Insertable<BankAccount> {
     return BankAccount(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
+      upiId: data.upiId.present ? data.upiId.value : this.upiId,
+      isPrime: data.isPrime.present ? data.isPrime.value : this.isPrime,
       accountNumber: data.accountNumber.present
           ? data.accountNumber.value
           : this.accountNumber,
       ifsc: data.ifsc.present ? data.ifsc.value : this.ifsc,
-      upiId: data.upiId.present ? data.upiId.value : this.upiId,
       note: data.note.present ? data.note.value : this.note,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -1092,9 +1127,10 @@ class BankAccount extends DataClass implements Insertable<BankAccount> {
     return (StringBuffer('BankAccount(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('upiId: $upiId, ')
+          ..write('isPrime: $isPrime, ')
           ..write('accountNumber: $accountNumber, ')
           ..write('ifsc: $ifsc, ')
-          ..write('upiId: $upiId, ')
           ..write('note: $note, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -1106,9 +1142,10 @@ class BankAccount extends DataClass implements Insertable<BankAccount> {
   int get hashCode => Object.hash(
     id,
     name,
+    upiId,
+    isPrime,
     accountNumber,
     ifsc,
-    upiId,
     note,
     createdAt,
     updatedAt,
@@ -1119,9 +1156,10 @@ class BankAccount extends DataClass implements Insertable<BankAccount> {
       (other is BankAccount &&
           other.id == this.id &&
           other.name == this.name &&
+          other.upiId == this.upiId &&
+          other.isPrime == this.isPrime &&
           other.accountNumber == this.accountNumber &&
           other.ifsc == this.ifsc &&
-          other.upiId == this.upiId &&
           other.note == this.note &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -1130,18 +1168,20 @@ class BankAccount extends DataClass implements Insertable<BankAccount> {
 class BankAccountsCompanion extends UpdateCompanion<BankAccount> {
   final Value<int> id;
   final Value<String> name;
+  final Value<String> upiId;
+  final Value<bool> isPrime;
   final Value<int?> accountNumber;
   final Value<String?> ifsc;
-  final Value<String> upiId;
   final Value<String?> note;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   const BankAccountsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
+    this.upiId = const Value.absent(),
+    this.isPrime = const Value.absent(),
     this.accountNumber = const Value.absent(),
     this.ifsc = const Value.absent(),
-    this.upiId = const Value.absent(),
     this.note = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -1149,9 +1189,10 @@ class BankAccountsCompanion extends UpdateCompanion<BankAccount> {
   BankAccountsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
+    required String upiId,
+    this.isPrime = const Value.absent(),
     this.accountNumber = const Value.absent(),
     this.ifsc = const Value.absent(),
-    required String upiId,
     this.note = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -1160,9 +1201,10 @@ class BankAccountsCompanion extends UpdateCompanion<BankAccount> {
   static Insertable<BankAccount> custom({
     Expression<int>? id,
     Expression<String>? name,
+    Expression<String>? upiId,
+    Expression<bool>? isPrime,
     Expression<int>? accountNumber,
     Expression<String>? ifsc,
-    Expression<String>? upiId,
     Expression<String>? note,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -1170,9 +1212,10 @@ class BankAccountsCompanion extends UpdateCompanion<BankAccount> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
+      if (upiId != null) 'upi_id': upiId,
+      if (isPrime != null) 'is_prime': isPrime,
       if (accountNumber != null) 'account_number': accountNumber,
       if (ifsc != null) 'ifsc': ifsc,
-      if (upiId != null) 'upi_id': upiId,
       if (note != null) 'note': note,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -1182,9 +1225,10 @@ class BankAccountsCompanion extends UpdateCompanion<BankAccount> {
   BankAccountsCompanion copyWith({
     Value<int>? id,
     Value<String>? name,
+    Value<String>? upiId,
+    Value<bool>? isPrime,
     Value<int?>? accountNumber,
     Value<String?>? ifsc,
-    Value<String>? upiId,
     Value<String?>? note,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
@@ -1192,9 +1236,10 @@ class BankAccountsCompanion extends UpdateCompanion<BankAccount> {
     return BankAccountsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
+      upiId: upiId ?? this.upiId,
+      isPrime: isPrime ?? this.isPrime,
       accountNumber: accountNumber ?? this.accountNumber,
       ifsc: ifsc ?? this.ifsc,
-      upiId: upiId ?? this.upiId,
       note: note ?? this.note,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -1210,14 +1255,17 @@ class BankAccountsCompanion extends UpdateCompanion<BankAccount> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
+    if (upiId.present) {
+      map['upi_id'] = Variable<String>(upiId.value);
+    }
+    if (isPrime.present) {
+      map['is_prime'] = Variable<bool>(isPrime.value);
+    }
     if (accountNumber.present) {
       map['account_number'] = Variable<int>(accountNumber.value);
     }
     if (ifsc.present) {
       map['ifsc'] = Variable<String>(ifsc.value);
-    }
-    if (upiId.present) {
-      map['upi_id'] = Variable<String>(upiId.value);
     }
     if (note.present) {
       map['note'] = Variable<String>(note.value);
@@ -1236,9 +1284,10 @@ class BankAccountsCompanion extends UpdateCompanion<BankAccount> {
     return (StringBuffer('BankAccountsCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('upiId: $upiId, ')
+          ..write('isPrime: $isPrime, ')
           ..write('accountNumber: $accountNumber, ')
           ..write('ifsc: $ifsc, ')
-          ..write('upiId: $upiId, ')
           ..write('note: $note, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -1916,9 +1965,10 @@ typedef $$BankAccountsTableCreateCompanionBuilder =
     BankAccountsCompanion Function({
       Value<int> id,
       required String name,
+      required String upiId,
+      Value<bool> isPrime,
       Value<int?> accountNumber,
       Value<String?> ifsc,
-      required String upiId,
       Value<String?> note,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -1927,9 +1977,10 @@ typedef $$BankAccountsTableUpdateCompanionBuilder =
     BankAccountsCompanion Function({
       Value<int> id,
       Value<String> name,
+      Value<String> upiId,
+      Value<bool> isPrime,
       Value<int?> accountNumber,
       Value<String?> ifsc,
-      Value<String> upiId,
       Value<String?> note,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -1954,6 +2005,16 @@ class $$BankAccountsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get upiId => $composableBuilder(
+    column: $table.upiId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isPrime => $composableBuilder(
+    column: $table.isPrime,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<int> get accountNumber => $composableBuilder(
     column: $table.accountNumber,
     builder: (column) => ColumnFilters(column),
@@ -1961,11 +2022,6 @@ class $$BankAccountsTableFilterComposer
 
   ColumnFilters<String> get ifsc => $composableBuilder(
     column: $table.ifsc,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get upiId => $composableBuilder(
-    column: $table.upiId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2004,6 +2060,16 @@ class $$BankAccountsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get upiId => $composableBuilder(
+    column: $table.upiId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isPrime => $composableBuilder(
+    column: $table.isPrime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get accountNumber => $composableBuilder(
     column: $table.accountNumber,
     builder: (column) => ColumnOrderings(column),
@@ -2011,11 +2077,6 @@ class $$BankAccountsTableOrderingComposer
 
   ColumnOrderings<String> get ifsc => $composableBuilder(
     column: $table.ifsc,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get upiId => $composableBuilder(
-    column: $table.upiId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -2050,6 +2111,12 @@ class $$BankAccountsTableAnnotationComposer
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
 
+  GeneratedColumn<String> get upiId =>
+      $composableBuilder(column: $table.upiId, builder: (column) => column);
+
+  GeneratedColumn<bool> get isPrime =>
+      $composableBuilder(column: $table.isPrime, builder: (column) => column);
+
   GeneratedColumn<int> get accountNumber => $composableBuilder(
     column: $table.accountNumber,
     builder: (column) => column,
@@ -2057,9 +2124,6 @@ class $$BankAccountsTableAnnotationComposer
 
   GeneratedColumn<String> get ifsc =>
       $composableBuilder(column: $table.ifsc, builder: (column) => column);
-
-  GeneratedColumn<String> get upiId =>
-      $composableBuilder(column: $table.upiId, builder: (column) => column);
 
   GeneratedColumn<String> get note =>
       $composableBuilder(column: $table.note, builder: (column) => column);
@@ -2104,18 +2168,20 @@ class $$BankAccountsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
+                Value<String> upiId = const Value.absent(),
+                Value<bool> isPrime = const Value.absent(),
                 Value<int?> accountNumber = const Value.absent(),
                 Value<String?> ifsc = const Value.absent(),
-                Value<String> upiId = const Value.absent(),
                 Value<String?> note = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
               }) => BankAccountsCompanion(
                 id: id,
                 name: name,
+                upiId: upiId,
+                isPrime: isPrime,
                 accountNumber: accountNumber,
                 ifsc: ifsc,
-                upiId: upiId,
                 note: note,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -2124,18 +2190,20 @@ class $$BankAccountsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 required String name,
+                required String upiId,
+                Value<bool> isPrime = const Value.absent(),
                 Value<int?> accountNumber = const Value.absent(),
                 Value<String?> ifsc = const Value.absent(),
-                required String upiId,
                 Value<String?> note = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
               }) => BankAccountsCompanion.insert(
                 id: id,
                 name: name,
+                upiId: upiId,
+                isPrime: isPrime,
                 accountNumber: accountNumber,
                 ifsc: ifsc,
-                upiId: upiId,
                 note: note,
                 createdAt: createdAt,
                 updatedAt: updatedAt,

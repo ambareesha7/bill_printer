@@ -1,10 +1,16 @@
 import 'package:bill_printer/data/app_enums.dart';
+import 'package:bill_printer/data/db_utils.dart';
 import 'package:bill_printer/data/models/bill_item_model.dart';
-import 'package:bill_printer/ui/bill_views/bill_provider.dart';
+import 'package:bill_printer/ui/bill_views/providers/bill_provider.dart';
 import 'package:bill_printer/ui/category/product_provider.dart';
+import 'package:bill_printer/ui/utils/ui_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_simple_calculator/flutter_simple_calculator.dart';
+import 'package:pretty_qr_code/pretty_qr_code.dart';
+
+import '../../data/models/bank_account/bank_account_model.dart';
+import '../bank_account/bank_account_view.dart';
 
 class BillView extends ConsumerStatefulWidget {
   const BillView({super.key});
@@ -16,7 +22,7 @@ class BillView extends ConsumerStatefulWidget {
 class _BillViewState extends ConsumerState<BillView> {
   final double btnPadding = 4;
   final double bodyPadding = 8;
-
+  DBUtils dbUtils = DBUtils.instance;
   @override
   Widget build(BuildContext context) {
     final itemHeadStyle = TextStyle(fontWeight: FontWeight.bold);
@@ -166,14 +172,22 @@ class _BillViewState extends ConsumerState<BillView> {
           ),
           SizedBox(width: btnPadding),
           AppBtn1(
-            name: "Print",
-            onPressed: () {
-              // List<BillItemModel> billItems = ref.watch(billListProvider);
-              // int amount = ref
-              //     .read(billListProvider.notifier)
-              //     .getTotalAmount(billItems);
-              // String upi = "upi://pay?pa=ambi7@kotak&pn=ambi&cu=INR&am=1";
-              // _openQRcode(date: upi);
+            name: "QR Code",
+            bgColor: Colors.green[400],
+            onPressed: () async {
+              List<BillItemModel> billItems = ref.watch(billListProvider);
+              int amount = ref
+                  .read(billListProvider.notifier)
+                  .getTotalAmount(billItems);
+              if (amount > 0) {
+                BankAccountModel primAccount = await getPrimeryUPI();
+                _openQRcode(primAccount: primAccount, amount: amount);
+              } else {
+                UIUtils.showSnackBar(
+                  context,
+                  "Total amount is $amount, Please add some billable items to generate QR code",
+                );
+              }
             },
           ),
           AppBtn1(name: "Save", onPressed: () {}),
@@ -187,6 +201,17 @@ class _BillViewState extends ConsumerState<BillView> {
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
+                ),
+                AppBtn1(
+                  name: "Change bank",
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BankAccountView(),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -239,25 +264,53 @@ class _BillViewState extends ConsumerState<BillView> {
     );
   }
 
-  // _openQRcode({required String date}) {
-  //   showModalBottomSheet(
-  //     isScrollControlled: true,
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return SizedBox(
-  //         height: MediaQuery.of(context).size.height * 0.7,
-  //         child: PrettyQrView.data(
-  //           data: date,
-  //           decoration: const PrettyQrDecoration(
-  //             shape: PrettyQrSmoothSymbol(),
-  //             background: Colors.white,
-  //             quietZone: PrettyQrQuietZone.standart,
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
+  Future<BankAccountModel> getPrimeryUPI() async {
+    List<BankAccountModel> bankAccounts = await dbUtils.parseBankAccounts();
+    return bankAccounts.firstWhere((el) => el.isPrime);
+  }
+
+  _openQRcode({
+    required BankAccountModel primAccount,
+    required int amount,
+  }) async {
+    String upi =
+        "upi://pay?pa=${primAccount.upiId}&pn=${primAccount.name}&cu=INR&am=$amount";
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height * 0.7,
+          child: Column(
+            children: [
+              PrettyQrView.data(
+                data: upi,
+                decoration: const PrettyQrDecoration(
+                  shape: PrettyQrSmoothSymbol(),
+                  background: Colors.white,
+                  quietZone: PrettyQrQuietZone.standart,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: Text(
+                  "Bill amount: ₹$amount",
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+              AppBtn1(
+                name: "Close",
+                bgColor: Colors.red,
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
 
 class ProductCard extends StatelessWidget {

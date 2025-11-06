@@ -3,6 +3,8 @@ import 'package:drift/drift.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'models/bank_account/bank_account_model.dart';
+
 final dbUtilsProvider = Provider<DBUtils>((ref) {
   return DBUtils.instance;
 });
@@ -142,6 +144,7 @@ class DBUtils {
     int? accountNo,
     String? ifsc,
     String? note,
+    bool? isPrime,
   }) async {
     final bankAccountCompanion = BankAccountsCompanion.insert(
       name: name,
@@ -149,6 +152,7 @@ class DBUtils {
       accountNumber: Value(accountNo),
       ifsc: Value(ifsc),
       note: Value(note),
+      isPrime: Value(isPrime ?? false),
       createdAt: Value(DateTime.now()),
       updatedAt: Value(DateTime.now()),
     );
@@ -166,6 +170,7 @@ class DBUtils {
     String? upiId,
     String? ifsc,
     String? note,
+    bool? isPrime,
   }) async {
     final bankAccountCompanion = BankAccountsCompanion(
       id: Value(id),
@@ -177,6 +182,7 @@ class DBUtils {
       upiId: upiId != null ? Value(upiId) : const Value.absent(),
       ifsc: ifsc != null ? Value(ifsc) : const Value.absent(),
       note: note != null ? Value(note) : const Value.absent(),
+      isPrime: Value(isPrime ?? false),
     );
     try {
       await db.update(db.bankAccounts).replace(bankAccountCompanion);
@@ -202,6 +208,25 @@ class DBUtils {
       debugPrint("Error fetching bankAccounts: $e");
       return [];
     }
+  }
+
+  Future<List<BankAccountModel>> parseBankAccounts() async {
+    List<BankAccount> accounts = await getBankAccounts();
+    return accounts
+        .map(
+          (b) => BankAccountModel(
+            id: b.id,
+            name: b.name,
+            upiId: b.upiId,
+            accountNumber: b.accountNumber,
+            ifsc: b.ifsc,
+            note: b.note,
+            isPrime: b.isPrime,
+            createdAt: b.createdAt,
+            updatedAt: b.updatedAt,
+          ),
+        )
+        .toList();
   }
 
   Future<List<BankAccount>> getBankAccountByUpiID(String upi) async {
