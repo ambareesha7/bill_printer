@@ -1,3 +1,4 @@
+import 'package:bill_printer/data/tables/bank_accounts.dart';
 import 'package:bill_printer/data/tables/categories_table.dart';
 import 'package:bill_printer/data/tables/products_table.dart';
 import 'package:drift/drift.dart';
@@ -12,7 +13,7 @@ final databaseProvider = Provider<AppDatabase>((ref) {
   return AppDatabase();
 });
 
-@DriftDatabase(tables: [Categories, Products])
+@DriftDatabase(tables: [Categories, Products, BankAccounts])
 class AppDatabase extends _$AppDatabase {
   // After generating code, this class needs to define a `schemaVersion` getter
   // and a constructor telling drift where the database should be stored.
@@ -20,7 +21,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   /// USE FOR DEBUGGING PURPOSES ONLY, IT WORKS ONLY IN DEBUG MODE
   ///

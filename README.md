@@ -1,6 +1,27 @@
 # bill_printer
 
-A new Flutter project.
+
+Flutter app for creating bills, generating sales reports for hotels, restaurants, shops, and send bills to printers
+
+
+
+
+
+### TODO:
+[x] add category/product schemas
+
+[x] add category/product view
+
+[x] add option to add adhoc item into bill items
+
+[x] add calculator in bill view, useful while collecting money
+
+[] add QR code generator for payments
+
+[] add sales report(generate reports, feature to download, views)
+
+
+
 
 ## Getting Started
 

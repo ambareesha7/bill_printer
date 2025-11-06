@@ -41,7 +41,7 @@ final class BillListProvider
   }
 }
 
-String _$billListHash() => r'4918e64311286d74ddc3f62641c2095679109a4c';
+String _$billListHash() => r'07aaa42df66e75b35f070fe99a8fb405f8023213';
 
 abstract class _$BillList extends $Notifier<List<BillItemModel>> {
   List<BillItemModel> build();
@@ -94,7 +94,7 @@ final class BillItemProvider
   }
 }
 
-String _$billItemHash() => r'aaa1346eaf3cb6e4e935d95ddba635a10df7ac30';
+String _$billItemHash() => r'4e06738197d977ebb681b711663605299a366237';
 
 abstract class _$BillItem extends $Notifier<BillItemModel> {
   BillItemModel build();

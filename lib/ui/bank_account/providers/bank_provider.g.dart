@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'product_provider.dart';
+part of 'bank_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,52 +9,53 @@ part of 'product_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(ProductsList)
-const productsListProvider = ProductsListProvider._();
+@ProviderFor(BankList)
+const bankListProvider = BankListProvider._();
 
-final class ProductsListProvider
-    extends $NotifierProvider<ProductsList, List<ProductModel>> {
-  const ProductsListProvider._()
+final class BankListProvider
+    extends $NotifierProvider<BankList, List<BankAccountModel>> {
+  const BankListProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'productsListProvider',
+        name: r'bankListProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$productsListHash();
+  String debugGetCreateSourceHash() => _$bankListHash();
 
   @$internal
   @override
-  ProductsList create() => ProductsList();
+  BankList create() => BankList();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(List<ProductModel> value) {
+  Override overrideWithValue(List<BankAccountModel> value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<List<ProductModel>>(value),
+      providerOverride: $SyncValueProvider<List<BankAccountModel>>(value),
     );
   }
 }
 
-String _$productsListHash() => r'f99b1667875437e3b50af7778b51e5563fba09f4';
+String _$bankListHash() => r'42879998b2bd7443d0535e2e091b8e49414d9b5d';
 
-abstract class _$ProductsList extends $Notifier<List<ProductModel>> {
-  List<ProductModel> build();
+abstract class _$BankList extends $Notifier<List<BankAccountModel>> {
+  List<BankAccountModel> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<List<ProductModel>, List<ProductModel>>;
+    final ref =
+        this.ref as $Ref<List<BankAccountModel>, List<BankAccountModel>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<List<ProductModel>, List<ProductModel>>,
-              List<ProductModel>,
+              AnyNotifier<List<BankAccountModel>, List<BankAccountModel>>,
+              List<BankAccountModel>,
               Object?,
               Object?
             >;

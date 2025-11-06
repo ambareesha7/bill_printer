@@ -134,4 +134,84 @@ class DBUtils {
       return [];
     }
   }
+
+  // ======================== BankAccount CRUD operations =====================
+  Future<void> insertBankAccount({
+    required String name,
+    required String upiId,
+    int? accountNo,
+    String? ifsc,
+    String? note,
+  }) async {
+    final bankAccountCompanion = BankAccountsCompanion.insert(
+      name: name,
+      upiId: upiId,
+      accountNumber: Value(accountNo),
+      ifsc: Value(ifsc),
+      note: Value(note),
+      createdAt: Value(DateTime.now()),
+      updatedAt: Value(DateTime.now()),
+    );
+    try {
+      await db.into(db.bankAccounts).insert(bankAccountCompanion);
+    } catch (e) {
+      debugPrint("Error inserting bankAccounts: $e");
+    }
+  }
+
+  Future<void> updateBankAccount({
+    required int id,
+    String? name,
+    int? accountNo,
+    String? upiId,
+    String? ifsc,
+    String? note,
+  }) async {
+    final bankAccountCompanion = BankAccountsCompanion(
+      id: Value(id),
+      name: name != null ? Value(name) : const Value.absent(),
+      updatedAt: Value(DateTime.now()),
+      accountNumber: accountNo != null
+          ? Value(accountNo)
+          : const Value.absent(),
+      upiId: upiId != null ? Value(upiId) : const Value.absent(),
+      ifsc: ifsc != null ? Value(ifsc) : const Value.absent(),
+      note: note != null ? Value(note) : const Value.absent(),
+    );
+    try {
+      await db.update(db.bankAccounts).replace(bankAccountCompanion);
+    } catch (e) {
+      debugPrint("Error updating bankAccounts: $e");
+    }
+  }
+
+  Future<void> deleteBankAccounts(int id) async {
+    try {
+      await (db.delete(
+        db.bankAccounts,
+      )..where((tbl) => tbl.id.equals(id))).go();
+    } catch (e) {
+      debugPrint("Error deleting bankAccounts: $e");
+    }
+  }
+
+  Future<List<BankAccount>> getBankAccounts() async {
+    try {
+      return await db.select(db.bankAccounts).get();
+    } catch (e) {
+      debugPrint("Error fetching bankAccounts: $e");
+      return [];
+    }
+  }
+
+  Future<List<BankAccount>> getBankAccountByUpiID(String upi) async {
+    try {
+      return await (db.select(
+        db.bankAccounts,
+      )..where((tbl) => tbl.upiId.equals(upi))).get();
+    } catch (e) {
+      debugPrint("Error fetching account by UPI ID: $e");
+      return [];
+    }
+  }
 }

@@ -165,7 +165,17 @@ class _BillViewState extends ConsumerState<BillView> {
             },
           ),
           SizedBox(width: btnPadding),
-          AppBtn1(name: "Print", onPressed: () {}),
+          AppBtn1(
+            name: "Print",
+            onPressed: () {
+              // List<BillItemModel> billItems = ref.watch(billListProvider);
+              // int amount = ref
+              //     .read(billListProvider.notifier)
+              //     .getTotalAmount(billItems);
+              // String upi = "upi://pay?pa=ambi7@kotak&pn=ambi&cu=INR&am=1";
+              // _openQRcode(date: upi);
+            },
+          ),
           AppBtn1(name: "Save", onPressed: () {}),
           IconButton(
             icon: Row(
@@ -228,6 +238,26 @@ class _BillViewState extends ConsumerState<BillView> {
       },
     );
   }
+
+  // _openQRcode({required String date}) {
+  //   showModalBottomSheet(
+  //     isScrollControlled: true,
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return SizedBox(
+  //         height: MediaQuery.of(context).size.height * 0.7,
+  //         child: PrettyQrView.data(
+  //           data: date,
+  //           decoration: const PrettyQrDecoration(
+  //             shape: PrettyQrSmoothSymbol(),
+  //             background: Colors.white,
+  //             quietZone: PrettyQrQuietZone.standart,
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 }
 
 class ProductCard extends StatelessWidget {

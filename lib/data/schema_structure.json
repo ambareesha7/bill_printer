@@ -1,0 +1,45 @@
+{
+    "sale_receipt": {
+        "id": "uuid",
+        "customer": null,
+        "prepared_by": "",
+        "bill_items": [
+            {
+                "name": "",
+                "rate": "",
+                "quantity": 12
+            }
+        ],
+        "total_amount": 12,
+        "created_at": "datetime",
+        "updated_at": "datetime"
+    },
+    "category": {
+        "id": 12,
+        "name": "",
+        "created_at": "datetime",
+       "updated_at": "datetime"
+    
+   } ,
+   "product": {
+       "id": 12,
+       "name": "",
+       "price": "",
+       "priority": 1,
+       "category_id": 1,
+       "created_at": "datetime",
+       "updated_at": "datetime"
+       
+    }, 
+    "bank_accounts": {
+        "id": 12,
+        "name": "",
+        "account_number": 12,
+        "ifsc": "",
+        "upi_id": "",
+        "note": "",
+        "created_at": "datetime",
+       "updated_at": "datetime"
+    
+   } 
+}

@@ -1,3 +1,5 @@
+import 'package:bill_printer/ui/widgets/delete_btn.dart';
+import 'package:bill_printer/ui/widgets/edit_btn.dart';
 import 'package:flutter/material.dart';
 
 class GridCard extends StatelessWidget {
@@ -34,22 +36,8 @@ class GridCard extends StatelessWidget {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              MaterialButton(
-                onPressed: editFunc,
-                color: Colors.green,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(Icons.edit_document),
-                ),
-              ),
-              MaterialButton(
-                onPressed: deleteFunc,
-                color: Colors.red[700],
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(Icons.delete),
-                ),
-              ),
+              EditBtn(onTap: editFunc),
+              DeleteBtn(onTap: deleteFunc),
             ],
           ),
         ],

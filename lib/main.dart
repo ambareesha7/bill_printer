@@ -1,4 +1,5 @@
 import 'package:bill_printer/data/db_utils.dart';
+import 'package:bill_printer/ui/bank_account/bank_account_view.dart';
 import 'package:bill_printer/ui/bill_views/bill_view.dart';
 import 'package:bill_printer/ui/category/category_view.dart';
 import 'package:flutter/material.dart';
@@ -56,13 +57,21 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ElevatedButton(
               onPressed: () {
-                // navigate to CategoryView
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => CategoryView()),
                 );
               },
               child: Text("CategoryView"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => BankAccountView()),
+                );
+              },
+              child: Text("BankAccountView"),
             ),
           ],
         ),
