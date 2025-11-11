@@ -1,7 +1,12 @@
+import 'dart:convert';
+
+import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:bill_printer/data/database.dart';
+import 'package:bill_printer/data/models/bill_item_model.dart';
+import 'package:bill_printer/data/models/sale_receipts/sale_receipt_model.dart';
 import 'package:drift/drift.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/v7.dart';
 
 import 'models/bank_account/bank_account_model.dart';
 
@@ -44,7 +49,7 @@ class DBUtils {
     try {
       await db.into(db.categories).insert(categoryCompanion);
     } catch (e) {
-      debugPrint("Error inserting category: $e");
+      debugLog("Error inserting category: $e");
     }
   }
 
@@ -83,7 +88,7 @@ class DBUtils {
     try {
       await db.into(db.products).insert(productCompanion);
     } catch (e) {
-      debugPrint("Error inserting product: $e");
+      debugLog("Error inserting product: $e");
     }
   }
 
@@ -105,7 +110,7 @@ class DBUtils {
     try {
       await db.update(db.products).replace(productCompanion);
     } catch (e) {
-      debugPrint("Error updating product: $e");
+      debugLog("Error updating product: $e");
     }
   }
 
@@ -113,7 +118,7 @@ class DBUtils {
     try {
       await (db.delete(db.products)..where((tbl) => tbl.id.equals(id))).go();
     } catch (e) {
-      debugPrint("Error deleting product: $e");
+      debugLog("Error deleting product: $e");
     }
   }
 
@@ -121,7 +126,7 @@ class DBUtils {
     try {
       return await db.select(db.products).get();
     } catch (e) {
-      debugPrint("Error fetching products: $e");
+      debugLog("Error fetching products: $e");
       return [];
     }
   }
@@ -132,7 +137,7 @@ class DBUtils {
         db.products,
       )..where((tbl) => tbl.categoryId.equals(categoryId))).get();
     } catch (e) {
-      debugPrint("Error fetching products by category: $e");
+      debugLog("Error fetching products by category: $e");
       return [];
     }
   }
@@ -159,7 +164,7 @@ class DBUtils {
     try {
       await db.into(db.bankAccounts).insert(bankAccountCompanion);
     } catch (e) {
-      debugPrint("Error inserting bankAccounts: $e");
+      debugLog("Error inserting bankAccounts: $e");
     }
   }
 
@@ -187,7 +192,7 @@ class DBUtils {
     try {
       await db.update(db.bankAccounts).replace(bankAccountCompanion);
     } catch (e) {
-      debugPrint("Error updating bankAccounts: $e");
+      debugLog("Error updating bankAccounts: $e");
     }
   }
 
@@ -197,7 +202,7 @@ class DBUtils {
         db.bankAccounts,
       )..where((tbl) => tbl.id.equals(id))).go();
     } catch (e) {
-      debugPrint("Error deleting bankAccounts: $e");
+      debugLog("Error deleting bankAccounts: $e");
     }
   }
 
@@ -205,7 +210,7 @@ class DBUtils {
     try {
       return await db.select(db.bankAccounts).get();
     } catch (e) {
-      debugPrint("Error fetching bankAccounts: $e");
+      debugLog("Error fetching bankAccounts: $e");
       return [];
     }
   }
@@ -235,8 +240,100 @@ class DBUtils {
         db.bankAccounts,
       )..where((tbl) => tbl.upiId.equals(upi))).get();
     } catch (e) {
-      debugPrint("Error fetching account by UPI ID: $e");
+      debugLog("Error fetching account by UPI ID: $e");
       return [];
     }
+  }
+
+  // ======================== SaleReceipts CRUD operations =====================
+  Future<void> insertSaleReceipt({
+    required List<BillItemModel> billItems,
+    required int totalAmount,
+    String? customerName,
+    String? preparedBy,
+  }) async {
+    final saleReceipt = SaleReceiptsCompanion.insert(
+      id: UuidV7().generate(),
+      billItems: jsonEncode(billItems),
+      totalAmount: totalAmount,
+      customerName: Value(customerName),
+      preparedBy: Value(preparedBy),
+      createdAt: Value(DateTime.now()),
+      updatedAt: Value(DateTime.now()),
+    );
+    debugLog(saleReceipt, tag: "saleReceipts");
+    try {
+      await db.into(db.saleReceipts).insert(saleReceipt);
+    } catch (e) {
+      debugLog("Error inserting saleReceipt: $e");
+    }
+  }
+
+  Future<void> updateSaleReceipt({
+    required String id,
+    String? billItems,
+    int? totalAmount,
+    String? customerName,
+    String? preparedBy,
+  }) async {
+    final saleReceipt = SaleReceiptsCompanion(
+      id: Value(id),
+      billItems: billItems != null ? Value(billItems) : const Value.absent(),
+      totalAmount: totalAmount != null
+          ? Value(totalAmount)
+          : const Value.absent(),
+      customerName: customerName != null
+          ? Value(customerName)
+          : const Value.absent(),
+      preparedBy: preparedBy != null ? Value(preparedBy) : const Value.absent(),
+      updatedAt: Value(DateTime.now()),
+    );
+    try {
+      await db.update(db.saleReceipts).replace(saleReceipt);
+    } catch (e) {
+      debugLog("Error updating saleReceipt: $e");
+    }
+  }
+
+  Future<void> deleteSaleReceipt(String id) async {
+    try {
+      await (db.delete(
+        db.saleReceipts,
+      )..where((tbl) => tbl.id.equals(id))).go();
+    } catch (e) {
+      debugLog("Error deleting saleReceipt: $e");
+    }
+  }
+
+  Future<List<SaleReceipt>> getSaleReceipts() async {
+    try {
+      return await db.select(db.saleReceipts).get();
+    } catch (e) {
+      debugLog("Error fetching getSaleReceipts: $e");
+      return [];
+    }
+  }
+
+  Future<List<SaleReceiptModel>> parseSaleReceipts() async {
+    List<SaleReceipt> saleReceipts = await getSaleReceipts();
+    return saleReceipts
+        .map(
+          (b) => SaleReceiptModel(
+            id: b.id,
+            customerName: b.customerName,
+            preparedBy: b.preparedBy,
+            billItems: parseBillsFromJson(b.billItems),
+            totalAmount: b.totalAmount,
+            createdAt: b.createdAt,
+            updatedAt: b.updatedAt,
+          ),
+        )
+        .toList();
+  }
+
+  List<BillItemModel> parseBillsFromJson(String billItems) {
+    if (billItems.isEmpty) return [];
+    List decodedItems = jsonDecode(billItems);
+    return decodedItems.map((i) => BillItemModel.fromJson(i)).toList();
   }
 }

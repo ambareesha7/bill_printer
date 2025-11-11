@@ -203,7 +203,12 @@ class _BillViewState extends ConsumerState<BillView> {
               }
             },
           ),
-          AppBtn1(name: "Save", onPressed: () {}),
+          AppBtn1(
+            name: "Next bill",
+            onPressed: () {
+              saveNClearBill();
+            },
+          ),
           IconButton(
             icon: Row(
               children: [
@@ -261,6 +266,13 @@ class _BillViewState extends ConsumerState<BillView> {
     );
   }
 
+  saveNClearBill() async {
+    List<BillItemModel> billItems = ref.watch(billListProvider);
+    int amount = ref.read(billListProvider.notifier).getTotalAmount(billItems);
+    await dbUtils.insertSaleReceipt(billItems: billItems, totalAmount: amount);
+    ref.read(billListProvider.notifier).clearItems();
+  }
+
   _openCalculator() {
     showModalBottomSheet(
       isScrollControlled: true,
@@ -312,12 +324,25 @@ class _BillViewState extends ConsumerState<BillView> {
                   style: TextStyle(fontSize: 18),
                 ),
               ),
-              AppBtn1(
-                name: "Close",
-                bgColor: Colors.red,
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  AppBtn1(
+                    name: "Cancel",
+                    bgColor: Colors.red,
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  AppBtn1(
+                    name: "Next bill",
+                    bgColor: Colors.green,
+                    onPressed: () {
+                      Navigator.pop(context);
+                      saveNClearBill();
+                    },
+                  ),
+                ],
               ),
             ],
           ),
