@@ -251,6 +251,8 @@ class DBUtils {
     required int totalAmount,
     String? customerName,
     String? preparedBy,
+    String? paymentMode,
+    String? paymentRef,
   }) async {
     final saleReceipt = SaleReceiptsCompanion.insert(
       id: UuidV7().generate(),
@@ -258,6 +260,8 @@ class DBUtils {
       totalAmount: totalAmount,
       customerName: Value(customerName),
       preparedBy: Value(preparedBy),
+      paymentMode: paymentMode == null ? Value("cash") : Value(paymentMode),
+      paymentRef: Value(paymentRef),
       createdAt: Value(DateTime.now()),
       updatedAt: Value(DateTime.now()),
     );
@@ -270,26 +274,32 @@ class DBUtils {
   }
 
   Future<void> updateSaleReceipt({
-    required String id,
-    String? billItems,
-    int? totalAmount,
-    String? customerName,
-    String? preparedBy,
+    required SaleReceiptModel saleReceipt,
   }) async {
-    final saleReceipt = SaleReceiptsCompanion(
-      id: Value(id),
-      billItems: billItems != null ? Value(billItems) : const Value.absent(),
-      totalAmount: totalAmount != null
-          ? Value(totalAmount)
+    final saleRec = SaleReceiptsCompanion(
+      id: Value(saleReceipt.id!),
+      billItems: saleReceipt.billItems != null
+          ? Value(saleReceipt.billItems.toString())
           : const Value.absent(),
-      customerName: customerName != null
-          ? Value(customerName)
+      totalAmount: saleReceipt.totalAmount != null
+          ? Value(saleReceipt.totalAmount!)
           : const Value.absent(),
-      preparedBy: preparedBy != null ? Value(preparedBy) : const Value.absent(),
+      customerName: saleReceipt.customerName != null
+          ? Value(saleReceipt.customerName)
+          : const Value.absent(),
+      preparedBy: saleReceipt.preparedBy != null
+          ? Value(saleReceipt.preparedBy)
+          : const Value.absent(),
+      paymentMode: saleReceipt.paymentMode == null
+          ? Value("cash")
+          : Value(saleReceipt.paymentMode!),
+      paymentRef: saleReceipt.paymentRef != null
+          ? Value(saleReceipt.paymentRef)
+          : const Value.absent(),
       updatedAt: Value(DateTime.now()),
     );
     try {
-      await db.update(db.saleReceipts).replace(saleReceipt);
+      await db.update(db.saleReceipts).replace(saleRec);
     } catch (e) {
       debugLog("Error updating saleReceipt: $e");
     }
@@ -324,6 +334,8 @@ class DBUtils {
             preparedBy: b.preparedBy,
             billItems: parseBillsFromJson(b.billItems),
             totalAmount: b.totalAmount,
+            paymentMode: b.paymentMode,
+            paymentRef: b.paymentRef,
             createdAt: b.createdAt,
             updatedAt: b.updatedAt,
           ),

@@ -204,9 +204,9 @@ class _BillViewState extends ConsumerState<BillView> {
             },
           ),
           AppBtn1(
-            name: "Next bill",
+            name: "Paid",
             onPressed: () {
-              saveNClearBill();
+              saveNClearBill(paymentMode: PaymentMode.upi);
             },
           ),
           IconButton(
@@ -266,10 +266,14 @@ class _BillViewState extends ConsumerState<BillView> {
     );
   }
 
-  saveNClearBill() async {
+  saveNClearBill({required PaymentMode paymentMode}) async {
     List<BillItemModel> billItems = ref.watch(billListProvider);
     int amount = ref.read(billListProvider.notifier).getTotalAmount(billItems);
-    await dbUtils.insertSaleReceipt(billItems: billItems, totalAmount: amount);
+    await dbUtils.insertSaleReceipt(
+      billItems: billItems,
+      totalAmount: amount,
+      paymentMode: paymentMode.name,
+    );
     ref.read(billListProvider.notifier).clearItems();
   }
 
@@ -335,11 +339,11 @@ class _BillViewState extends ConsumerState<BillView> {
                     },
                   ),
                   AppBtn1(
-                    name: "Next bill",
+                    name: "Paid",
                     bgColor: Colors.green,
                     onPressed: () {
                       Navigator.pop(context);
-                      saveNClearBill();
+                      saveNClearBill(paymentMode: PaymentMode.upi);
                     },
                   ),
                 ],

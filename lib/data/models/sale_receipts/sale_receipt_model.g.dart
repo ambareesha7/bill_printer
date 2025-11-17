@@ -11,6 +11,8 @@ _SaleReceiptModel _$SaleReceiptModelFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String?,
       customerName: json['customerName'] as String?,
       preparedBy: json['preparedBy'] as String?,
+      paymentMode: json['paymentMode'] as String?,
+      paymentRef: json['paymentRef'] as String?,
       billItems: (json['billItems'] as List<dynamic>?)
           ?.map((e) => BillItemModel.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -28,6 +30,8 @@ Map<String, dynamic> _$SaleReceiptModelToJson(_SaleReceiptModel instance) =>
       'id': instance.id,
       'customerName': instance.customerName,
       'preparedBy': instance.preparedBy,
+      'paymentMode': instance.paymentMode,
+      'paymentRef': instance.paymentRef,
       'billItems': instance.billItems,
       'totalAmount': instance.totalAmount,
       'createdAt': instance.createdAt?.toIso8601String(),

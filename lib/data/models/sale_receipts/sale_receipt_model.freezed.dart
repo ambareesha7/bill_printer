@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SaleReceiptModel {
 
- String? get id; String? get customerName; String? get preparedBy; List<BillItemModel>? get billItems; int? get totalAmount; DateTime? get createdAt; DateTime? get updatedAt;
+ String? get id; String? get customerName; String? get preparedBy; String? get paymentMode; String? get paymentRef; List<BillItemModel>? get billItems; int? get totalAmount; DateTime? get createdAt; DateTime? get updatedAt;
 /// Create a copy of SaleReceiptModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $SaleReceiptModelCopyWith<SaleReceiptModel> get copyWith => _$SaleReceiptModelCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SaleReceiptModel&&(identical(other.id, id) || other.id == id)&&(identical(other.customerName, customerName) || other.customerName == customerName)&&(identical(other.preparedBy, preparedBy) || other.preparedBy == preparedBy)&&const DeepCollectionEquality().equals(other.billItems, billItems)&&(identical(other.totalAmount, totalAmount) || other.totalAmount == totalAmount)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SaleReceiptModel&&(identical(other.id, id) || other.id == id)&&(identical(other.customerName, customerName) || other.customerName == customerName)&&(identical(other.preparedBy, preparedBy) || other.preparedBy == preparedBy)&&(identical(other.paymentMode, paymentMode) || other.paymentMode == paymentMode)&&(identical(other.paymentRef, paymentRef) || other.paymentRef == paymentRef)&&const DeepCollectionEquality().equals(other.billItems, billItems)&&(identical(other.totalAmount, totalAmount) || other.totalAmount == totalAmount)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,customerName,preparedBy,const DeepCollectionEquality().hash(billItems),totalAmount,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,customerName,preparedBy,paymentMode,paymentRef,const DeepCollectionEquality().hash(billItems),totalAmount,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'SaleReceiptModel(id: $id, customerName: $customerName, preparedBy: $preparedBy, billItems: $billItems, totalAmount: $totalAmount, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'SaleReceiptModel(id: $id, customerName: $customerName, preparedBy: $preparedBy, paymentMode: $paymentMode, paymentRef: $paymentRef, billItems: $billItems, totalAmount: $totalAmount, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $SaleReceiptModelCopyWith<$Res>  {
   factory $SaleReceiptModelCopyWith(SaleReceiptModel value, $Res Function(SaleReceiptModel) _then) = _$SaleReceiptModelCopyWithImpl;
 @useResult
 $Res call({
- String? id, String? customerName, String? preparedBy, List<BillItemModel>? billItems, int? totalAmount, DateTime? createdAt, DateTime? updatedAt
+ String? id, String? customerName, String? preparedBy, String? paymentMode, String? paymentRef, List<BillItemModel>? billItems, int? totalAmount, DateTime? createdAt, DateTime? updatedAt
 });
 
 
@@ -65,11 +65,13 @@ class _$SaleReceiptModelCopyWithImpl<$Res>
 
 /// Create a copy of SaleReceiptModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? customerName = freezed,Object? preparedBy = freezed,Object? billItems = freezed,Object? totalAmount = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? customerName = freezed,Object? preparedBy = freezed,Object? paymentMode = freezed,Object? paymentRef = freezed,Object? billItems = freezed,Object? totalAmount = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,customerName: freezed == customerName ? _self.customerName : customerName // ignore: cast_nullable_to_non_nullable
 as String?,preparedBy: freezed == preparedBy ? _self.preparedBy : preparedBy // ignore: cast_nullable_to_non_nullable
+as String?,paymentMode: freezed == paymentMode ? _self.paymentMode : paymentMode // ignore: cast_nullable_to_non_nullable
+as String?,paymentRef: freezed == paymentRef ? _self.paymentRef : paymentRef // ignore: cast_nullable_to_non_nullable
 as String?,billItems: freezed == billItems ? _self.billItems : billItems // ignore: cast_nullable_to_non_nullable
 as List<BillItemModel>?,totalAmount: freezed == totalAmount ? _self.totalAmount : totalAmount // ignore: cast_nullable_to_non_nullable
 as int?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
@@ -159,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? customerName,  String? preparedBy,  List<BillItemModel>? billItems,  int? totalAmount,  DateTime? createdAt,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? customerName,  String? preparedBy,  String? paymentMode,  String? paymentRef,  List<BillItemModel>? billItems,  int? totalAmount,  DateTime? createdAt,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SaleReceiptModel() when $default != null:
-return $default(_that.id,_that.customerName,_that.preparedBy,_that.billItems,_that.totalAmount,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.customerName,_that.preparedBy,_that.paymentMode,_that.paymentRef,_that.billItems,_that.totalAmount,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -180,10 +182,10 @@ return $default(_that.id,_that.customerName,_that.preparedBy,_that.billItems,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? customerName,  String? preparedBy,  List<BillItemModel>? billItems,  int? totalAmount,  DateTime? createdAt,  DateTime? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? customerName,  String? preparedBy,  String? paymentMode,  String? paymentRef,  List<BillItemModel>? billItems,  int? totalAmount,  DateTime? createdAt,  DateTime? updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _SaleReceiptModel():
-return $default(_that.id,_that.customerName,_that.preparedBy,_that.billItems,_that.totalAmount,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.customerName,_that.preparedBy,_that.paymentMode,_that.paymentRef,_that.billItems,_that.totalAmount,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,10 +202,10 @@ return $default(_that.id,_that.customerName,_that.preparedBy,_that.billItems,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? customerName,  String? preparedBy,  List<BillItemModel>? billItems,  int? totalAmount,  DateTime? createdAt,  DateTime? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? customerName,  String? preparedBy,  String? paymentMode,  String? paymentRef,  List<BillItemModel>? billItems,  int? totalAmount,  DateTime? createdAt,  DateTime? updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _SaleReceiptModel() when $default != null:
-return $default(_that.id,_that.customerName,_that.preparedBy,_that.billItems,_that.totalAmount,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.customerName,_that.preparedBy,_that.paymentMode,_that.paymentRef,_that.billItems,_that.totalAmount,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -215,12 +217,14 @@ return $default(_that.id,_that.customerName,_that.preparedBy,_that.billItems,_th
 @JsonSerializable()
 
 class _SaleReceiptModel implements SaleReceiptModel {
-  const _SaleReceiptModel({this.id, this.customerName, this.preparedBy, final  List<BillItemModel>? billItems, this.totalAmount, this.createdAt, this.updatedAt}): _billItems = billItems;
+  const _SaleReceiptModel({this.id, this.customerName, this.preparedBy, this.paymentMode, this.paymentRef, final  List<BillItemModel>? billItems, this.totalAmount, this.createdAt, this.updatedAt}): _billItems = billItems;
   factory _SaleReceiptModel.fromJson(Map<String, dynamic> json) => _$SaleReceiptModelFromJson(json);
 
 @override final  String? id;
 @override final  String? customerName;
 @override final  String? preparedBy;
+@override final  String? paymentMode;
+@override final  String? paymentRef;
  final  List<BillItemModel>? _billItems;
 @override List<BillItemModel>? get billItems {
   final value = _billItems;
@@ -247,16 +251,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SaleReceiptModel&&(identical(other.id, id) || other.id == id)&&(identical(other.customerName, customerName) || other.customerName == customerName)&&(identical(other.preparedBy, preparedBy) || other.preparedBy == preparedBy)&&const DeepCollectionEquality().equals(other._billItems, _billItems)&&(identical(other.totalAmount, totalAmount) || other.totalAmount == totalAmount)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SaleReceiptModel&&(identical(other.id, id) || other.id == id)&&(identical(other.customerName, customerName) || other.customerName == customerName)&&(identical(other.preparedBy, preparedBy) || other.preparedBy == preparedBy)&&(identical(other.paymentMode, paymentMode) || other.paymentMode == paymentMode)&&(identical(other.paymentRef, paymentRef) || other.paymentRef == paymentRef)&&const DeepCollectionEquality().equals(other._billItems, _billItems)&&(identical(other.totalAmount, totalAmount) || other.totalAmount == totalAmount)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,customerName,preparedBy,const DeepCollectionEquality().hash(_billItems),totalAmount,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,customerName,preparedBy,paymentMode,paymentRef,const DeepCollectionEquality().hash(_billItems),totalAmount,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'SaleReceiptModel(id: $id, customerName: $customerName, preparedBy: $preparedBy, billItems: $billItems, totalAmount: $totalAmount, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'SaleReceiptModel(id: $id, customerName: $customerName, preparedBy: $preparedBy, paymentMode: $paymentMode, paymentRef: $paymentRef, billItems: $billItems, totalAmount: $totalAmount, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -267,7 +271,7 @@ abstract mixin class _$SaleReceiptModelCopyWith<$Res> implements $SaleReceiptMod
   factory _$SaleReceiptModelCopyWith(_SaleReceiptModel value, $Res Function(_SaleReceiptModel) _then) = __$SaleReceiptModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String? customerName, String? preparedBy, List<BillItemModel>? billItems, int? totalAmount, DateTime? createdAt, DateTime? updatedAt
+ String? id, String? customerName, String? preparedBy, String? paymentMode, String? paymentRef, List<BillItemModel>? billItems, int? totalAmount, DateTime? createdAt, DateTime? updatedAt
 });
 
 
@@ -284,11 +288,13 @@ class __$SaleReceiptModelCopyWithImpl<$Res>
 
 /// Create a copy of SaleReceiptModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? customerName = freezed,Object? preparedBy = freezed,Object? billItems = freezed,Object? totalAmount = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? customerName = freezed,Object? preparedBy = freezed,Object? paymentMode = freezed,Object? paymentRef = freezed,Object? billItems = freezed,Object? totalAmount = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_SaleReceiptModel(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,customerName: freezed == customerName ? _self.customerName : customerName // ignore: cast_nullable_to_non_nullable
 as String?,preparedBy: freezed == preparedBy ? _self.preparedBy : preparedBy // ignore: cast_nullable_to_non_nullable
+as String?,paymentMode: freezed == paymentMode ? _self.paymentMode : paymentMode // ignore: cast_nullable_to_non_nullable
+as String?,paymentRef: freezed == paymentRef ? _self.paymentRef : paymentRef // ignore: cast_nullable_to_non_nullable
 as String?,billItems: freezed == billItems ? _self._billItems : billItems // ignore: cast_nullable_to_non_nullable
 as List<BillItemModel>?,totalAmount: freezed == totalAmount ? _self.totalAmount : totalAmount // ignore: cast_nullable_to_non_nullable
 as int?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable

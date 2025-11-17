@@ -5,6 +5,8 @@ class SaleReceipts extends Table {
   TextColumn get customerName => text().nullable()();
   TextColumn get preparedBy => text().nullable()();
   TextColumn get billItems => text()();
+  TextColumn get paymentMode => text().withDefault(Constant("cash"))();
+  TextColumn get paymentRef => text().nullable()();
   IntColumn get totalAmount => integer()();
   DateTimeColumn get createdAt =>
       dateTime().clientDefault(() => DateTime.now())();
