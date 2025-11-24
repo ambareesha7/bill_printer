@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 class UIUtils {
+  static Size screenSize({required BuildContext context}) =>
+      MediaQuery.of(context).size;
+
   static showSnackBar({
     required BuildContext context,
     required String text,

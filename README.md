@@ -21,6 +21,16 @@ Flutter app for creating bills, generating sales reports for hotels, restaurants
 - [] add themeConfig and move all common UI colors style
 
 - [] add sales report(generate reports, feature to download, views)
+    [x] add tabs(weekly, monthly, yearly)
+    [x] add bar charts UI widgets
+    [] integrate real data
+    [x] add pie charts
+    [] integrate real data
+    [x] add monthly report UI
+    [] integrate with data
+    [] add yearly report
+    [] integrate with data
+    
 
 
 

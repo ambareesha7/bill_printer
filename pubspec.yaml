@@ -44,6 +44,9 @@ dependencies:
   freezed_annotation: ^3.1.0
   flutter_simple_calculator: ^2.4.0
   pretty_qr_code: ^3.5.0
+  fl_chart: ^1.1.1
+  month_picker_dialog: ^6.7.0
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:

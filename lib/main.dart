@@ -2,6 +2,8 @@ import 'package:bill_printer/data/db_utils.dart';
 import 'package:bill_printer/ui/bank_account/bank_account_view.dart';
 import 'package:bill_printer/ui/bill_views/bill_view.dart';
 import 'package:bill_printer/ui/category/category_view.dart';
+import 'package:bill_printer/ui/reports/report_view.dart';
+import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -43,37 +45,16 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const BillView()),
-                );
-              },
-              child: Text('BillView'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CategoryView()),
-                );
-              },
-              child: Text("CategoryView"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => BankAccountView()),
-                );
-              },
-              child: Text("BankAccountView"),
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              navigateBtn(context: context, page: BillView()),
+              navigateBtn(context: context, page: CategoryView()),
+              navigateBtn(context: context, page: BankAccountView()),
+              navigateBtn(context: context, page: ReportView()),
+            ],
+          ),
         ),
       ),
     );

@@ -58,9 +58,9 @@ class BillList extends _$BillList {
     return totalQty;
   }
 
-  int getTotalAmount(List<BillItemModel> items) {
+  int getTotalAmount() {
     int totalAmount = 0;
-    for (var i in items) {
+    for (var i in state) {
       totalAmount += i.rate * i.quantity;
     }
     return totalAmount;

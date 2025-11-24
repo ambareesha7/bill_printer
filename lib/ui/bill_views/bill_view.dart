@@ -3,6 +3,7 @@ import 'package:bill_printer/data/db_utils.dart';
 import 'package:bill_printer/data/models/bill_item_model.dart';
 import 'package:bill_printer/ui/bill_views/providers/bill_provider.dart';
 import 'package:bill_printer/ui/category/product_provider.dart';
+import 'package:bill_printer/ui/utils/app_colors.dart';
 import 'package:bill_printer/ui/utils/ui_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -105,7 +106,7 @@ class _BillViewState extends ConsumerState<BillView> {
                       .toString(),
                   total: ref
                       .read(billListProvider.notifier)
-                      .getTotalAmount(billItems)
+                      .getTotalAmount()
                       .toString(),
                 );
               },
@@ -175,10 +176,7 @@ class _BillViewState extends ConsumerState<BillView> {
             name: "QR Code",
             bgColor: Colors.green[400],
             onPressed: () async {
-              List<BillItemModel> billItems = ref.watch(billListProvider);
-              int amount = ref
-                  .read(billListProvider.notifier)
-                  .getTotalAmount(billItems);
+              int amount = ref.read(billListProvider.notifier).getTotalAmount();
               if (amount > 0) {
                 List<BankAccountModel> bankAccounts = await dbUtils
                     .parseBankAccounts();
@@ -204,9 +202,9 @@ class _BillViewState extends ConsumerState<BillView> {
             },
           ),
           AppBtn1(
-            name: "Paid",
+            name: "Cash Pay",
             onPressed: () {
-              saveNClearBill(paymentMode: PaymentMode.upi);
+              saveNClearBill(paymentMode: PaymentMode.cash);
             },
           ),
           IconButton(
@@ -268,7 +266,7 @@ class _BillViewState extends ConsumerState<BillView> {
 
   saveNClearBill({required PaymentMode paymentMode}) async {
     List<BillItemModel> billItems = ref.watch(billListProvider);
-    int amount = ref.read(billListProvider.notifier).getTotalAmount(billItems);
+    int amount = ref.read(billListProvider.notifier).getTotalAmount();
     await dbUtils.insertSaleReceipt(
       billItems: billItems,
       totalAmount: amount,
@@ -435,7 +433,7 @@ class TotalSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.blueGrey,
+      color: AppColors.blueGrey,
       padding: const EdgeInsets.all(8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
