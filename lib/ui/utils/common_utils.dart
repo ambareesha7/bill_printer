@@ -15,7 +15,17 @@ DateTime dateTimeNow() => DateTime.now();
 String dateFormat(DateTime date) =>
     DateFormat("dd-MM-yyyy hh:mm aaa").format(date);
 
-String monthFormat(DateTime date) => DateFormat("MMMM-yyyy").format(date);
+String monthFormat(DateTime date) => DateFormat("MMM-yyyy").format(date);
+
+({DateTime startDate, DateTime lastDate}) getDatesOfMonth(DateTime date) {
+  int lastDay = DateUtils.getDaysInMonth(date.year, date.month);
+
+  DateTime startDate = DateTime(date.year, date.month, 1);
+  DateTime lastDate = DateTime(date.year, date.month, lastDay);
+  // debugLog(startDate);
+  // debugLog(lastDate);
+  return (startDate: startDate, lastDate: lastDate);
+}
 
 Widget navigateBtn({required BuildContext context, required Widget page}) {
   return ElevatedButton(

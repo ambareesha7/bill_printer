@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 
-import '../../data/models/sale_receipts/sale_receipt_model.dart';
-
 class MonthlyReportWidget extends ConsumerStatefulWidget {
   const MonthlyReportWidget({super.key});
 
@@ -117,13 +115,5 @@ class _MonthlyReportWidgetState extends ConsumerState<MonthlyReportWidget> {
   String getItemNames(List<BillItemModel>? items) {
     if (items == null) return "";
     return items.map((i) => i.name).toList().join(", ");
-  }
-
-  int getTotalAmount(List<SaleReceiptModel> items) {
-    int total = 0;
-    for (var i in items) {
-      total += i.totalAmount ?? 0;
-    }
-    return total;
   }
 }

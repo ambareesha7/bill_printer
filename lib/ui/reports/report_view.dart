@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:bill_printer/ui/reports/monthly_report_widget.dart';
 import 'package:bill_printer/ui/reports/pie_chart1.dart';
+import 'package:bill_printer/ui/reports/providers/report_provider.dart';
 import 'package:bill_printer/ui/utils/app_colors.dart';
 import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -9,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
+
+import '../../data/models/sale_receipts/sale_receipt_model.dart';
 
 class ReportView extends ConsumerStatefulWidget {
   const ReportView({super.key});
@@ -22,11 +25,12 @@ class _ReportViewState extends ConsumerState<ReportView>
   final int tabLength = 3;
   TabController? _tabController;
   String selectedWeek = "W1";
-  String selectedMonth = monthFormat(DateTime.now());
-  int currentMonth = DateTime.now().month;
-  int selectedYear = DateTime.now().year;
+  DateTime selectedMonth = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+    1,
+  );
   int touchedIndex = -1;
-
   @override
   void initState() {
     super.initState();
@@ -79,36 +83,42 @@ class _ReportViewState extends ConsumerState<ReportView>
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ...renderWeekChip(),
+                  ...renderWeekChip(selectedMonth),
                   TextButton.icon(
                     onPressed: () {
                       showMonthPicker(
                         context: context,
                         initialDate: DateTime.now(),
-                        // selectableMonthPredicate: (DateTime val) =>
-                        //     val.month < DateTime.now().month,
-                        // selectableYearPredicate: (int year) =>
-                        //     year > DateTime.now().year,
                       ).then((date) {
                         if (date != null) {
-                          debugLog(date);
-                          selectedMonth = DateFormat("MMM-yy").format(date);
+                          selectedMonth = date;
+                          selectedWeek = "W1";
                           setState(() {});
                         }
                       });
                     },
-                    label: Text(selectedMonth),
+                    label: Text(monthFormat(selectedMonth)),
                     icon: Icon(Icons.unfold_more_sharp),
                     iconAlignment: IconAlignment.end,
                   ),
                 ],
               ),
-              // BarChartSample1(),
               PieChart1(),
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: BarChart(randomData()),
+                  child: Consumer(
+                    builder: (context, ref, child) {
+                      final items = ref.watch(monthlyReportProvider);
+                      return BarChart(
+                        randomData(
+                          items: items,
+                          date: selectedMonth,
+                          week: selectedWeek,
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
             ],
@@ -134,8 +144,8 @@ class _ReportViewState extends ConsumerState<ReportView>
   final Color barColor = AppColors.white;
   final Color touchedBarColor = AppColors.green;
 
-  List<Widget> renderWeekChip() {
-    List<String> weeks = ["W1", "W2", "W3", "W4"];
+  List<Widget> renderWeekChip(DateTime date) {
+    List<String> weeks = getWeeksInMonth(date);
     return List.generate(weeks.length, (int index) {
       String week = weeks[index];
       return FilterChip(
@@ -144,7 +154,6 @@ class _ReportViewState extends ConsumerState<ReportView>
         label: Text(week),
         backgroundColor: selectedWeek == week ? Colors.teal : null,
         onSelected: (bool v) {
-          debugLog(week);
           selectedWeek = week;
           setState(() {});
         },
@@ -171,54 +180,19 @@ class _ReportViewState extends ConsumerState<ReportView>
           borderSide: isTouched
               ? BorderSide(color: touchedBarColor)
               : const BorderSide(color: Colors.white, width: 0),
-          backDrawRodData: BackgroundBarChartRodData(
-            show: true,
-            toY: 20,
-            color: barBackgroundColor,
-          ),
         ),
       ],
       showingTooltipIndicators: showTooltips,
     );
   }
 
-  List<BarChartGroupData> showingGroups() => List.generate(
-    7,
-    (i) => switch (i) {
-      0 => makeGroupData(0, 5, isTouched: i == touchedIndex),
-      1 => makeGroupData(1, 6.5, isTouched: i == touchedIndex),
-      2 => makeGroupData(2, 5, isTouched: i == touchedIndex),
-      3 => makeGroupData(3, 7.5, isTouched: i == touchedIndex),
-      4 => makeGroupData(4, 9, isTouched: i == touchedIndex),
-      5 => makeGroupData(5, 11.5, isTouched: i == touchedIndex),
-      6 => makeGroupData(6, 6.5, isTouched: i == touchedIndex),
-      _ => throw Error(),
-    },
-  );
-  Widget getTitles(double value, TitleMeta meta) {
-    const style = TextStyle(
-      color: Colors.white,
-      fontWeight: FontWeight.bold,
-      fontSize: 14,
-    );
-    String text = switch (value.toInt()) {
-      0 => 'M',
-      1 => 'T',
-      2 => 'W',
-      3 => 'T',
-      4 => 'F',
-      5 => 'S',
-      6 => 'S',
-      _ => '',
-    };
-    return SideTitleWidget(
-      meta: meta,
-      space: 16,
-      child: Text(text, style: style),
-    );
-  }
-
-  BarChartData randomData() {
+  BarChartData randomData({
+    required List<SaleReceiptModel> items,
+    required DateTime date,
+    required String week,
+  }) {
+    int numOfBars = 7;
+    int days = getWeekDates(week: week, date: date) - 7;
     return BarChartData(
       barTouchData: const BarTouchData(enabled: false),
       titlesData: FlTitlesData(
@@ -226,27 +200,60 @@ class _ReportViewState extends ConsumerState<ReportView>
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            getTitlesWidget: getTitles,
+            getTitlesWidget: (v, m) {
+              DateTime localDate = DateTime(
+                date.year,
+                date.month,
+                days + v.toInt() + 1,
+              );
+              String weekDay = DateFormat(
+                "E",
+              ).format(localDate).substring(0, 1);
+              String localDay = DateFormat("dd").format(localDate);
+              return SideTitleWidget(
+                meta: m,
+                space: 15,
+                child: Text("$weekDay-$localDay"),
+              );
+            },
             reservedSize: 38,
           ),
         ),
         leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: true, reservedSize: 30),
+        topTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            reservedSize: 30,
+            getTitlesWidget: (value, meta) => SizedBox(
+              width: 60,
+              child: Text(
+                "₹${getDayTotal(items, DateTime(date.year, date.month, days + value.toInt() + 1))}",
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12),
+              ),
+            ),
+          ),
         ),
         rightTitles: const AxisTitles(
           sideTitles: SideTitles(showTitles: false),
         ),
       ),
       borderData: FlBorderData(show: false),
-      barGroups: List.generate(
-        7,
-        (i) => makeGroupData(
+      barGroups: List.generate(numOfBars, (i) {
+        int index = i + 1;
+        final ss = getDayTotal(
+          items,
+          DateTime(date.year, date.month, days + index),
+        );
+        return makeGroupData(
           i,
-          Random().nextInt(15).toDouble() + 6,
+          ss.toDouble(),
           barColor: availableColors[Random().nextInt(availableColors.length)],
-        ),
-      ),
+          isTouched: i == touchedIndex,
+        );
+      }),
       gridData: const FlGridData(show: false),
     );
   }

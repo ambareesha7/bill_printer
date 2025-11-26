@@ -315,7 +315,7 @@ class DBUtils {
     }
   }
 
-  Future<List<SaleReceipt>> getSaleReceipts() async {
+  Future<List<SaleReceipt>> getAllSaleReceipts() async {
     try {
       return await db.select(db.saleReceipts).get();
     } catch (e) {
@@ -324,8 +324,12 @@ class DBUtils {
     }
   }
 
-  Future<List<SaleReceiptModel>> parseSaleReceipts() async {
-    List<SaleReceipt> saleReceipts = await getSaleReceipts();
+  Future<List<SaleReceiptModel>> getNParseSaleReceipts() async {
+    List<SaleReceipt> saleReceipts = await getAllSaleReceipts();
+    return parseSaleReceipts(saleReceipts);
+  }
+
+  List<SaleReceiptModel> parseSaleReceipts(List<SaleReceipt> saleReceipts) {
     return saleReceipts
         .map(
           (b) => SaleReceiptModel(
@@ -347,5 +351,32 @@ class DBUtils {
     if (billItems.isEmpty) return [];
     List decodedItems = jsonDecode(billItems);
     return decodedItems.map((i) => BillItemModel.fromJson(i)).toList();
+  }
+
+  Future<List<SaleReceiptModel>> getNParseReport({
+    required DateTime startDate,
+    required DateTime lastDate,
+  }) async {
+    List<SaleReceipt> saleReceipts = await getSaleReportFromDB(
+      startDate: startDate,
+      lastDate: lastDate,
+    );
+    return parseSaleReceipts(saleReceipts);
+  }
+
+  Future<List<SaleReceipt>> getSaleReportFromDB({
+    required DateTime startDate,
+    required DateTime lastDate,
+  }) async {
+    try {
+      return await (db.select(
+            db.saleReceipts,
+          )..where((tbl) => tbl.createdAt.isBetweenValues(startDate, lastDate)))
+          .get();
+      // )..where((tbl) => tbl.createdAt.equals(date))).get();
+    } catch (e) {
+      debugLog("Error fetching getMonthlyreport: $e");
+      return [];
+    }
   }
 }
