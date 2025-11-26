@@ -1,6 +1,7 @@
 import 'dart:math';
 
-import 'package:bill_printer/ui/reports/monthly_report_widget.dart';
+import 'package:bill_printer/data/app_enums.dart';
+import 'package:bill_printer/ui/reports/report_widget.dart';
 import 'package:bill_printer/ui/reports/pie_chart1.dart';
 import 'package:bill_printer/ui/reports/providers/report_provider.dart';
 import 'package:bill_printer/ui/utils/app_colors.dart';
@@ -25,11 +26,6 @@ class _ReportViewState extends ConsumerState<ReportView>
   final int tabLength = 3;
   TabController? _tabController;
   String selectedWeek = "W1";
-  DateTime selectedMonth = DateTime(
-    DateTime.now().year,
-    DateTime.now().month,
-    1,
-  );
   int touchedIndex = -1;
   @override
   void initState() {
@@ -39,6 +35,12 @@ class _ReportViewState extends ConsumerState<ReportView>
 
   @override
   Widget build(BuildContext context) {
+    DateTime selectedMonth = ref.watch(weeklyDateProvider);
+    ref.watch(weeklyReportProvider);
+    ref.watch(monthlyReportProvider);
+    ref.watch(monthlyDateProvider);
+    ref.watch(yearlyReportProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Reports"),
@@ -91,8 +93,13 @@ class _ReportViewState extends ConsumerState<ReportView>
                         initialDate: DateTime.now(),
                       ).then((date) {
                         if (date != null) {
-                          selectedMonth = date;
+                          ref
+                              .read(weeklyDateProvider.notifier)
+                              .updateDate(date);
                           selectedWeek = "W1";
+                          ref
+                              .read(weeklyReportProvider.notifier)
+                              .getMonthlyTransactions(date);
                           setState(() {});
                         }
                       });
@@ -109,7 +116,7 @@ class _ReportViewState extends ConsumerState<ReportView>
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Consumer(
                     builder: (context, ref, child) {
-                      final items = ref.watch(monthlyReportProvider);
+                      final items = ref.watch(weeklyReportProvider);
                       return BarChart(
                         randomData(
                           items: items,
@@ -123,8 +130,8 @@ class _ReportViewState extends ConsumerState<ReportView>
               ),
             ],
           ),
-          MonthlyReportWidget(),
-          Center(child: Text("yearly")),
+          ReportWidget(ReportType.monthly),
+          ReportWidget(ReportType.yearly),
         ],
       ),
     );

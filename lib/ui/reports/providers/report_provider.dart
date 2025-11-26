@@ -3,7 +3,25 @@ import 'package:bill_printer/data/models/sale_receipts/sale_receipt_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../utils/common_utils.dart';
 part 'report_provider.g.dart';
+
+@riverpod
+class YearlyReport extends _$YearlyReport {
+  final DBUtils dbUtils = DBUtils.instance;
+  @override
+  List<SaleReceiptModel> build() {
+    getAllTransactions();
+    return [];
+  }
+
+  getAllTransactions() async {
+    final List<SaleReceiptModel> saleTrans = await dbUtils
+        .getNParseSaleReceipts();
+    state = [...saleTrans];
+  }
+}
 
 @riverpod
 class MonthlyReport extends _$MonthlyReport {
@@ -18,6 +36,52 @@ class MonthlyReport extends _$MonthlyReport {
     final List<SaleReceiptModel> saleTrans = await dbUtils
         .getNParseSaleReceipts();
     state = [...saleTrans];
+  }
+
+  getMonthlyTransactions(DateTime date) async {
+    final n = await getReport(date);
+    state = [...n];
+  }
+}
+
+@riverpod
+class WeeklyReport extends _$WeeklyReport {
+  final DBUtils dbUtils = DBUtils.instance;
+  @override
+  List<SaleReceiptModel> build() {
+    getMonthlyTransactions(
+      DateTime(DateTime.now().year, DateTime.now().month, 1),
+    );
+    return [];
+  }
+
+  getMonthlyTransactions(DateTime date) async {
+    final n = await getReport(date);
+    state = [...n];
+  }
+}
+
+@riverpod
+class MonthlyDate extends _$MonthlyDate {
+  @override
+  DateTime build() {
+    return DateTime(DateTime.now().year, DateTime.now().month, 1);
+  }
+
+  updateDate(DateTime date) {
+    state = date;
+  }
+}
+
+@riverpod
+class WeeklyDate extends _$WeeklyDate {
+  @override
+  DateTime build() {
+    return DateTime(DateTime.now().year, DateTime.now().month, 1);
+  }
+
+  updateDate(DateTime date) {
+    state = date;
   }
 }
 
@@ -43,22 +107,21 @@ int getDayTotal(List<SaleReceiptModel> items, DateTime date) {
   return total;
 }
 
-// getReport(DateTime date) async {
-//   ({DateTime startDate, DateTime lastDate}) dates = getDatesOfMonth(date);
-//   final l = await DBUtils.instance.getNParseReport(
-//     startDate: dates.startDate,
-//     lastDate: dates.lastDate,
-//   );
-//   // debugLog(l, tag: "report");
-// }
+Future<List<SaleReceiptModel>> getReport(DateTime date) async {
+  ({DateTime startDate, DateTime lastDate}) dates = getDatesOfMonth(date);
+  return await DBUtils.instance.getNParseReport(
+    startDate: dates.startDate,
+    lastDate: dates.lastDate,
+  );
+}
 
-// Future<List<SaleReceiptModel>> getDayReport(DateTime date) async {
-//   final List<SaleReceiptModel> l = await DBUtils.instance.getNParseReport(
-//     startDate: date,
-//     lastDate: date,
-//   );
-//   return l;
-// }
+Future<List<SaleReceiptModel>> getDayReport(DateTime date) async {
+  final List<SaleReceiptModel> l = await DBUtils.instance.getNParseReport(
+    startDate: date,
+    lastDate: date,
+  );
+  return l;
+}
 
 int getWeekDates({required String week, required DateTime date}) {
   int numOfDays = 0;

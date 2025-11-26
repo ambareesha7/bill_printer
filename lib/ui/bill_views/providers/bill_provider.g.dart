@@ -41,7 +41,7 @@ final class BillListProvider
   }
 }
 
-String _$billListHash() => r'07aaa42df66e75b35f070fe99a8fb405f8023213';
+String _$billListHash() => r'4b5c581f19eb86c2396855f0a28dd83f3acd6854';
 
 abstract class _$BillList extends $Notifier<List<BillItemModel>> {
   List<BillItemModel> build();

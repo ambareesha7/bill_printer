@@ -204,6 +204,7 @@ class _BillViewState extends ConsumerState<BillView> {
           AppBtn1(
             name: "Cash Pay",
             onPressed: () {
+              // TODO: add user name
               saveNClearBill(paymentMode: PaymentMode.cash);
             },
           ),
@@ -264,13 +265,19 @@ class _BillViewState extends ConsumerState<BillView> {
     );
   }
 
-  saveNClearBill({required PaymentMode paymentMode}) async {
+  saveNClearBill({
+    required PaymentMode paymentMode,
+    String? paymentRef,
+    String? preparedBy,
+  }) async {
     List<BillItemModel> billItems = ref.watch(billListProvider);
     int amount = ref.read(billListProvider.notifier).getTotalAmount();
     await dbUtils.insertSaleReceipt(
       billItems: billItems,
       totalAmount: amount,
       paymentMode: paymentMode.name,
+      paymentRef: paymentRef,
+      preparedBy: preparedBy,
     );
     ref.read(billListProvider.notifier).clearItems();
   }
@@ -303,6 +310,7 @@ class _BillViewState extends ConsumerState<BillView> {
   }) async {
     String upi =
         "upi://pay?pa=${primAccount.upiId}&pn=${primAccount.name}&cu=INR&am=$amount";
+    String ref = "UPI=${primAccount.upiId},Name=${primAccount.name}";
     showModalBottomSheet(
       isScrollControlled: true,
       context: context,
@@ -341,7 +349,10 @@ class _BillViewState extends ConsumerState<BillView> {
                     bgColor: Colors.green,
                     onPressed: () {
                       Navigator.pop(context);
-                      saveNClearBill(paymentMode: PaymentMode.upi);
+                      saveNClearBill(
+                        paymentMode: PaymentMode.upi,
+                        paymentRef: ref,
+                      );
                     },
                   ),
                 ],

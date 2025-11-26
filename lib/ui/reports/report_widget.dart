@@ -1,3 +1,4 @@
+import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/data/models/bill_item_model.dart';
 import 'package:bill_printer/ui/reports/providers/report_provider.dart';
 import 'package:bill_printer/ui/utils/app_colors.dart';
@@ -6,19 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 
-class MonthlyReportWidget extends ConsumerStatefulWidget {
-  const MonthlyReportWidget({super.key});
-
+class ReportWidget extends ConsumerWidget {
+  const ReportWidget(this.reportType, {super.key});
+  final ReportType reportType;
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      _MonthlyReportWidgetState();
-}
-
-class _MonthlyReportWidgetState extends ConsumerState<MonthlyReportWidget> {
-  String selectedMonth = monthFormat(DateTime.now());
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    String selectedMonth = monthFormat(ref.watch(monthlyDateProvider));
     return Column(
       children: [
         Row(
@@ -27,7 +21,11 @@ class _MonthlyReportWidgetState extends ConsumerState<MonthlyReportWidget> {
             Consumer(
               builder: (context, ref, child) {
                 int totalAmount = getTotalAmount(
-                  ref.watch(monthlyReportProvider),
+                  ref.watch(
+                    (reportType == ReportType.monthly)
+                        ? monthlyReportProvider
+                        : yearlyReportProvider,
+                  ),
                 );
                 return Row(
                   children: [
@@ -40,29 +38,40 @@ class _MonthlyReportWidgetState extends ConsumerState<MonthlyReportWidget> {
                 );
               },
             ),
-            TextButton.icon(
-              onPressed: () {
-                showMonthPicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                ).then((date) {
-                  if (date != null) {
-                    debugLog(date);
-                    selectedMonth = monthFormat(date);
-                    setState(() {});
-                  }
-                });
-              },
-              label: Text(selectedMonth),
-              icon: Icon(Icons.unfold_more_sharp),
-              iconAlignment: IconAlignment.end,
-            ),
+            if (reportType == ReportType.yearly)
+              Text(
+                "All transactions",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            if (reportType == ReportType.monthly)
+              TextButton.icon(
+                onPressed: () {
+                  showMonthPicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                  ).then((date) {
+                    if (date != null) {
+                      ref.read(monthlyDateProvider.notifier).updateDate(date);
+                      ref
+                          .read(monthlyReportProvider.notifier)
+                          .getMonthlyTransactions(date);
+                    }
+                  });
+                },
+                label: Text(selectedMonth),
+                icon: Icon(Icons.unfold_more_sharp),
+                iconAlignment: IconAlignment.end,
+              ),
           ],
         ),
         Expanded(
           child: Consumer(
             builder: (context, ref, child) {
-              final transList = ref.watch(monthlyReportProvider);
+              final transList = ref.watch(
+                (reportType == ReportType.monthly)
+                    ? monthlyReportProvider
+                    : yearlyReportProvider,
+              );
               return ListView.builder(
                 itemCount: transList.length,
                 itemBuilder: (context, index) {
@@ -75,7 +84,10 @@ class _MonthlyReportWidgetState extends ConsumerState<MonthlyReportWidget> {
                       children: [
                         Text(dateFormat(transaction.createdAt!.toLocal())),
                         SizedBox(width: 4),
-                        Text((transaction.paymentMode ?? "Cash").toUpperCase()),
+                        Text(
+                          (transaction.paymentMode ?? "Cash").toUpperCase(),
+                          style: TextStyle(color: AppColors.blue),
+                        ),
                         Text(
                           "₹${transaction.totalAmount}",
                           style: TextStyle(color: AppColors.orange),
@@ -92,7 +104,26 @@ class _MonthlyReportWidgetState extends ConsumerState<MonthlyReportWidget> {
                         width: 0.5,
                       ),
                     ),
-                    children: <Widget>[...renderSubItems(subItems)],
+                    childrenPadding: EdgeInsets.symmetric(horizontal: 8),
+                    children: <Widget>[
+                      if (transaction.preparedBy != null)
+                        Column(
+                          children: [
+                            Row(
+                              children: [
+                                Text(("Created by: ")),
+                                Text(
+                                  (transaction.preparedBy ?? ""),
+                                  style: TextStyle(color: AppColors.blue),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      if (transaction.paymentRef != null)
+                        Text(("Ref: ${transaction.paymentRef ?? ""}")),
+                      ...renderSubItems(subItems),
+                    ],
                   );
                 },
               );
