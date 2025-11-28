@@ -1,6 +1,9 @@
 import 'package:bill_printer/data/app_enums.dart';
+import 'package:bill_printer/ui/auth/providers/auth_provider.dart';
+import 'package:bill_printer/ui/auth/sign_up_view.dart';
 import 'package:bill_printer/ui/category/category_provider.dart';
 import 'package:bill_printer/ui/category/product_provider.dart';
+import 'package:bill_printer/ui/utils/ui_utils.dart';
 import 'package:bill_printer/ui/widgets/grid_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -166,7 +169,17 @@ class _CategoryViewState extends ConsumerState<CategoryView>
           actions: [
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).popAndPushNamed("/bill_view");
+                bool isLoggedIn = ref.watch(isUserLoggedInProvider);
+                // TODO: replace navigator with go router
+                if (isLoggedIn) {
+                  Navigator.of(context).popAndPushNamed("/bill_view");
+                } else {
+                  UIUtils.showSnackBar(
+                    context: context,
+                    text: "Please setup a User to create bills",
+                  );
+                  Navigator.of(context).popAndPushNamed("/sign_up_view");
+                }
               },
               child: Text("BillView"),
             ),

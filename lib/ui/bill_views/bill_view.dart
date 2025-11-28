@@ -242,6 +242,7 @@ class _BillViewState extends ConsumerState<BillView> {
             name: "Change bank",
             bgColor: Colors.orange,
             onPressed: () {
+              // TODO: replace navigator with go router
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => BankAccountView()),

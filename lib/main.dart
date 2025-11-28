@@ -34,8 +34,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData.dark(),
       home: MyHomePage(),
       routes: {
+        // TODO: replace navigator with go router
         '/home': (context) => MyHomePage(),
         "/bill_view": (context) => BillView(),
+        "/sign_up_view": (context) => SignUpView(),
       },
     );
   }

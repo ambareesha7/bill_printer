@@ -53,6 +53,7 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
           const SnackBar(content: Text('User created successful!')),
         );
         // Navigate to home or bill screen
+        // TODO: replace navigator with go router
         Navigator.of(context).pushReplacementNamed('/home');
       }
     } catch (e) {
@@ -85,6 +86,7 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
                   prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
                 ),
+                textCapitalization: TextCapitalization.words,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your full name';
