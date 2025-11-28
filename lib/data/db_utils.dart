@@ -265,7 +265,7 @@ class DBUtils {
       createdAt: Value(DateTime.now()),
       updatedAt: Value(DateTime.now()),
     );
-    debugLog(saleReceipt, tag: "saleReceipts");
+    // debugLog(saleReceipt, tag: "saleReceipts");
     try {
       await db.into(db.saleReceipts).insert(saleReceipt);
     } catch (e) {

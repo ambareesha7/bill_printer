@@ -149,7 +149,7 @@ final class WeeklyReportProvider
   }
 }
 
-String _$weeklyReportHash() => r'be6f7571b668fec5688c058c4c6f5c7f085dbc62';
+String _$weeklyReportHash() => r'd5e2f84cd7dda930aa5e2254539c5fee43988027';
 
 abstract class _$WeeklyReport extends $Notifier<List<SaleReceiptModel>> {
   List<SaleReceiptModel> build();
@@ -203,7 +203,7 @@ final class MonthlyDateProvider
   }
 }
 
-String _$monthlyDateHash() => r'589a2a2ba03c79374fbbd469d5f73c1924acd98c';
+String _$monthlyDateHash() => r'2aeada1e60c777495568c2afbc2c6dd9c954c054';
 
 abstract class _$MonthlyDate extends $Notifier<DateTime> {
   DateTime build();
@@ -255,7 +255,7 @@ final class WeeklyDateProvider extends $NotifierProvider<WeeklyDate, DateTime> {
   }
 }
 
-String _$weeklyDateHash() => r'3fbe2a1a327ef99748ba08df22e44470016884fb';
+String _$weeklyDateHash() => r'0105fe6a75b56ca28eba6cc5bb9f3f7e100e2a6f';
 
 abstract class _$WeeklyDate extends $Notifier<DateTime> {
   DateTime build();

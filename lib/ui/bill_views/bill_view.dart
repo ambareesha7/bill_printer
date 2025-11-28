@@ -1,6 +1,8 @@
 import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/data/db_utils.dart';
 import 'package:bill_printer/data/models/bill_item_model.dart';
+import 'package:bill_printer/data/models/users/user_model.dart';
+import 'package:bill_printer/ui/auth/providers/auth_provider.dart';
 import 'package:bill_printer/ui/bill_views/providers/bill_provider.dart';
 import 'package:bill_printer/ui/category/product_provider.dart';
 import 'package:bill_printer/ui/utils/app_colors.dart';
@@ -27,6 +29,8 @@ class _BillViewState extends ConsumerState<BillView> {
   @override
   Widget build(BuildContext context) {
     final itemHeadStyle = TextStyle(fontWeight: FontWeight.bold);
+    final user = ref.watch(authProvider);
+
     return Scaffold(
       appBar: AppBar(title: Text("Itemwise Bill")),
       resizeToAvoidBottomInset: true,
@@ -111,7 +115,7 @@ class _BillViewState extends ConsumerState<BillView> {
                 );
               },
             ),
-            _buildActionButtons(),
+            if (user != null) _buildActionButtons(user),
             buildCategories(),
             //======== build product cards =========
             Expanded(
@@ -147,7 +151,7 @@ class _BillViewState extends ConsumerState<BillView> {
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(UserModel user) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -189,13 +193,16 @@ class _BillViewState extends ConsumerState<BillView> {
                   );
                 } else {
                   BankAccountModel primAccount = getPrimeryUPI(bankAccounts);
-                  _openQRcode(primAccount: primAccount, amount: amount);
+                  _openQRcode(
+                    primAccount: primAccount,
+                    amount: amount,
+                    preparedBy: user.fullName,
+                  );
                 }
               } else {
                 UIUtils.showSnackBar(
                   context: context,
-                  text:
-                      "Total amount is $amount, Please add some billable items to generate QR code",
+                  text: "Please add some billable items to generate QR code",
                   bgColor: Colors.red,
                 );
               }
@@ -204,21 +211,26 @@ class _BillViewState extends ConsumerState<BillView> {
           AppBtn1(
             name: "Cash Pay",
             onPressed: () {
-              // TODO: add user name
-              saveNClearBill(paymentMode: PaymentMode.cash);
+              int amount = ref.read(billListProvider.notifier).getTotalAmount();
+              if (amount > 0) {
+                saveNClearBill(
+                  paymentMode: PaymentMode.cash,
+                  preparedBy: user.fullName,
+                );
+              } else {
+                UIUtils.showSnackBar(
+                  context: context,
+                  text: "Please add some billable items",
+                  bgColor: Colors.red,
+                );
+              }
             },
           ),
           IconButton(
             icon: Row(
               children: [
                 Icon(Icons.calculate),
-                Text(
-                  "Cals",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                Text("Cals", style: TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
 
@@ -307,6 +319,7 @@ class _BillViewState extends ConsumerState<BillView> {
   _openQRcode({
     required BankAccountModel primAccount,
     required int amount,
+    String? preparedBy,
   }) async {
     String upi =
         "upi://pay?pa=${primAccount.upiId}&pn=${primAccount.name}&cu=INR&am=$amount";
@@ -327,11 +340,18 @@ class _BillViewState extends ConsumerState<BillView> {
                   quietZone: PrettyQrQuietZone.standart,
                 ),
               ),
+              Text("UPI ID: ${primAccount.upiId}"),
               Padding(
                 padding: const EdgeInsets.all(18.0),
-                child: Text(
-                  "Bill amount: ₹$amount",
-                  style: TextStyle(fontSize: 18),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Bill amount: ", style: TextStyle(fontSize: 18)),
+                    Text(
+                      "₹$amount",
+                      style: TextStyle(fontSize: 18, color: AppColors.orange),
+                    ),
+                  ],
                 ),
               ),
               Row(
@@ -352,6 +372,7 @@ class _BillViewState extends ConsumerState<BillView> {
                       saveNClearBill(
                         paymentMode: PaymentMode.upi,
                         paymentRef: ref,
+                        preparedBy: preparedBy,
                       );
                     },
                   ),
@@ -382,7 +403,6 @@ class ProductCard extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Card(
-        color: Colors.grey[900],
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -430,7 +450,7 @@ class AppBtn1 extends StatelessWidget {
           borderRadius: BorderRadiusGeometry.all(Radius.circular(6)),
         ),
       ),
-      child: Text(name, style: TextStyle(color: textColor ?? Colors.white)),
+      child: Text(name, style: TextStyle(color: textColor)),
     );
   }
 }

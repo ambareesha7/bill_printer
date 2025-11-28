@@ -164,7 +164,12 @@ class _CategoryViewState extends ConsumerState<CategoryView>
         appBar: AppBar(
           title: Text("Category/Products", style: TextStyle(fontSize: 16)),
           actions: [
-            ElevatedButton(onPressed: () {}, child: Text("ItemWise Bill")),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).popAndPushNamed("/bill_view");
+              },
+              child: Text("BillView"),
+            ),
           ],
           bottom: TabBar(
             controller: _tabController,
