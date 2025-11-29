@@ -1,3 +1,5 @@
+import 'package:bill_printer/data/app_enums.dart';
+import 'package:bill_printer/data/db_utils.dart';
 import 'package:bill_printer/data/models/bill_item_model.dart';
 import 'package:bill_printer/data/models/product_model.dart';
 import 'package:bill_printer/ui/widgets/icon_btn.dart';
@@ -5,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'bill_provider.g.dart';
+
+DBUtils dbUtils = DBUtils.instance;
 
 @riverpod
 class BillList extends _$BillList {
@@ -75,6 +79,23 @@ class BillList extends _$BillList {
       newItem.add(i);
     }
     return newItem;
+  }
+
+  saveOrder({
+    required PaymentMode paymentMode,
+    required String orderNo,
+    String? paymentRef,
+    String? preparedBy,
+  }) async {
+    int amount = getTotalAmount();
+    await dbUtils.insertSaleReceipt(
+      billItems: state,
+      totalAmount: amount,
+      paymentMode: paymentMode.name,
+      paymentRef: paymentRef,
+      preparedBy: preparedBy,
+      orderNo: orderNo,
+    );
   }
 }
 

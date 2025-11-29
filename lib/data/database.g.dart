@@ -1333,6 +1333,17 @@ class $SaleReceiptsTable extends SaleReceipts
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _orederNoMeta = const VerificationMeta(
+    'orederNo',
+  );
+  @override
+  late final GeneratedColumn<String> orederNo = GeneratedColumn<String>(
+    'oreder_no',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _billItemsMeta = const VerificationMeta(
     'billItems',
   );
@@ -1407,6 +1418,7 @@ class $SaleReceiptsTable extends SaleReceipts
     id,
     customerName,
     preparedBy,
+    orederNo,
     billItems,
     paymentMode,
     paymentRef,
@@ -1445,6 +1457,14 @@ class $SaleReceiptsTable extends SaleReceipts
         _preparedByMeta,
         preparedBy.isAcceptableOrUnknown(data['prepared_by']!, _preparedByMeta),
       );
+    }
+    if (data.containsKey('oreder_no')) {
+      context.handle(
+        _orederNoMeta,
+        orederNo.isAcceptableOrUnknown(data['oreder_no']!, _orederNoMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_orederNoMeta);
     }
     if (data.containsKey('bill_items')) {
       context.handle(
@@ -1513,6 +1533,10 @@ class $SaleReceiptsTable extends SaleReceipts
         DriftSqlType.string,
         data['${effectivePrefix}prepared_by'],
       ),
+      orederNo: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}oreder_no'],
+      )!,
       billItems: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}bill_items'],
@@ -1550,6 +1574,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
   final String id;
   final String? customerName;
   final String? preparedBy;
+  final String orederNo;
   final String billItems;
   final String paymentMode;
   final String? paymentRef;
@@ -1560,6 +1585,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
     required this.id,
     this.customerName,
     this.preparedBy,
+    required this.orederNo,
     required this.billItems,
     required this.paymentMode,
     this.paymentRef,
@@ -1577,6 +1603,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
     if (!nullToAbsent || preparedBy != null) {
       map['prepared_by'] = Variable<String>(preparedBy);
     }
+    map['oreder_no'] = Variable<String>(orederNo);
     map['bill_items'] = Variable<String>(billItems);
     map['payment_mode'] = Variable<String>(paymentMode);
     if (!nullToAbsent || paymentRef != null) {
@@ -1597,6 +1624,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
       preparedBy: preparedBy == null && nullToAbsent
           ? const Value.absent()
           : Value(preparedBy),
+      orederNo: Value(orederNo),
       billItems: Value(billItems),
       paymentMode: Value(paymentMode),
       paymentRef: paymentRef == null && nullToAbsent
@@ -1617,6 +1645,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
       id: serializer.fromJson<String>(json['id']),
       customerName: serializer.fromJson<String?>(json['customerName']),
       preparedBy: serializer.fromJson<String?>(json['preparedBy']),
+      orederNo: serializer.fromJson<String>(json['orederNo']),
       billItems: serializer.fromJson<String>(json['billItems']),
       paymentMode: serializer.fromJson<String>(json['paymentMode']),
       paymentRef: serializer.fromJson<String?>(json['paymentRef']),
@@ -1632,6 +1661,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
       'id': serializer.toJson<String>(id),
       'customerName': serializer.toJson<String?>(customerName),
       'preparedBy': serializer.toJson<String?>(preparedBy),
+      'orederNo': serializer.toJson<String>(orederNo),
       'billItems': serializer.toJson<String>(billItems),
       'paymentMode': serializer.toJson<String>(paymentMode),
       'paymentRef': serializer.toJson<String?>(paymentRef),
@@ -1645,6 +1675,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
     String? id,
     Value<String?> customerName = const Value.absent(),
     Value<String?> preparedBy = const Value.absent(),
+    String? orederNo,
     String? billItems,
     String? paymentMode,
     Value<String?> paymentRef = const Value.absent(),
@@ -1655,6 +1686,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
     id: id ?? this.id,
     customerName: customerName.present ? customerName.value : this.customerName,
     preparedBy: preparedBy.present ? preparedBy.value : this.preparedBy,
+    orederNo: orederNo ?? this.orederNo,
     billItems: billItems ?? this.billItems,
     paymentMode: paymentMode ?? this.paymentMode,
     paymentRef: paymentRef.present ? paymentRef.value : this.paymentRef,
@@ -1671,6 +1703,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
       preparedBy: data.preparedBy.present
           ? data.preparedBy.value
           : this.preparedBy,
+      orederNo: data.orederNo.present ? data.orederNo.value : this.orederNo,
       billItems: data.billItems.present ? data.billItems.value : this.billItems,
       paymentMode: data.paymentMode.present
           ? data.paymentMode.value
@@ -1692,6 +1725,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
           ..write('id: $id, ')
           ..write('customerName: $customerName, ')
           ..write('preparedBy: $preparedBy, ')
+          ..write('orederNo: $orederNo, ')
           ..write('billItems: $billItems, ')
           ..write('paymentMode: $paymentMode, ')
           ..write('paymentRef: $paymentRef, ')
@@ -1707,6 +1741,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
     id,
     customerName,
     preparedBy,
+    orederNo,
     billItems,
     paymentMode,
     paymentRef,
@@ -1721,6 +1756,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
           other.id == this.id &&
           other.customerName == this.customerName &&
           other.preparedBy == this.preparedBy &&
+          other.orederNo == this.orederNo &&
           other.billItems == this.billItems &&
           other.paymentMode == this.paymentMode &&
           other.paymentRef == this.paymentRef &&
@@ -1733,6 +1769,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
   final Value<String> id;
   final Value<String?> customerName;
   final Value<String?> preparedBy;
+  final Value<String> orederNo;
   final Value<String> billItems;
   final Value<String> paymentMode;
   final Value<String?> paymentRef;
@@ -1744,6 +1781,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
     this.id = const Value.absent(),
     this.customerName = const Value.absent(),
     this.preparedBy = const Value.absent(),
+    this.orederNo = const Value.absent(),
     this.billItems = const Value.absent(),
     this.paymentMode = const Value.absent(),
     this.paymentRef = const Value.absent(),
@@ -1756,6 +1794,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
     required String id,
     this.customerName = const Value.absent(),
     this.preparedBy = const Value.absent(),
+    required String orederNo,
     required String billItems,
     this.paymentMode = const Value.absent(),
     this.paymentRef = const Value.absent(),
@@ -1764,12 +1803,14 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
+       orederNo = Value(orederNo),
        billItems = Value(billItems),
        totalAmount = Value(totalAmount);
   static Insertable<SaleReceipt> custom({
     Expression<String>? id,
     Expression<String>? customerName,
     Expression<String>? preparedBy,
+    Expression<String>? orederNo,
     Expression<String>? billItems,
     Expression<String>? paymentMode,
     Expression<String>? paymentRef,
@@ -1782,6 +1823,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
       if (id != null) 'id': id,
       if (customerName != null) 'customer_name': customerName,
       if (preparedBy != null) 'prepared_by': preparedBy,
+      if (orederNo != null) 'oreder_no': orederNo,
       if (billItems != null) 'bill_items': billItems,
       if (paymentMode != null) 'payment_mode': paymentMode,
       if (paymentRef != null) 'payment_ref': paymentRef,
@@ -1796,6 +1838,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
     Value<String>? id,
     Value<String?>? customerName,
     Value<String?>? preparedBy,
+    Value<String>? orederNo,
     Value<String>? billItems,
     Value<String>? paymentMode,
     Value<String?>? paymentRef,
@@ -1808,6 +1851,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
       id: id ?? this.id,
       customerName: customerName ?? this.customerName,
       preparedBy: preparedBy ?? this.preparedBy,
+      orederNo: orederNo ?? this.orederNo,
       billItems: billItems ?? this.billItems,
       paymentMode: paymentMode ?? this.paymentMode,
       paymentRef: paymentRef ?? this.paymentRef,
@@ -1829,6 +1873,9 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
     }
     if (preparedBy.present) {
       map['prepared_by'] = Variable<String>(preparedBy.value);
+    }
+    if (orederNo.present) {
+      map['oreder_no'] = Variable<String>(orederNo.value);
     }
     if (billItems.present) {
       map['bill_items'] = Variable<String>(billItems.value);
@@ -1860,6 +1907,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
           ..write('id: $id, ')
           ..write('customerName: $customerName, ')
           ..write('preparedBy: $preparedBy, ')
+          ..write('orederNo: $orederNo, ')
           ..write('billItems: $billItems, ')
           ..write('paymentMode: $paymentMode, ')
           ..write('paymentRef: $paymentRef, ')
@@ -3331,6 +3379,7 @@ typedef $$SaleReceiptsTableCreateCompanionBuilder =
       required String id,
       Value<String?> customerName,
       Value<String?> preparedBy,
+      required String orederNo,
       required String billItems,
       Value<String> paymentMode,
       Value<String?> paymentRef,
@@ -3344,6 +3393,7 @@ typedef $$SaleReceiptsTableUpdateCompanionBuilder =
       Value<String> id,
       Value<String?> customerName,
       Value<String?> preparedBy,
+      Value<String> orederNo,
       Value<String> billItems,
       Value<String> paymentMode,
       Value<String?> paymentRef,
@@ -3374,6 +3424,11 @@ class $$SaleReceiptsTableFilterComposer
 
   ColumnFilters<String> get preparedBy => $composableBuilder(
     column: $table.preparedBy,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get orederNo => $composableBuilder(
+    column: $table.orederNo,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3432,6 +3487,11 @@ class $$SaleReceiptsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get orederNo => $composableBuilder(
+    column: $table.orederNo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get billItems => $composableBuilder(
     column: $table.billItems,
     builder: (column) => ColumnOrderings(column),
@@ -3484,6 +3544,9 @@ class $$SaleReceiptsTableAnnotationComposer
     column: $table.preparedBy,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get orederNo =>
+      $composableBuilder(column: $table.orederNo, builder: (column) => column);
 
   GeneratedColumn<String> get billItems =>
       $composableBuilder(column: $table.billItems, builder: (column) => column);
@@ -3544,6 +3607,7 @@ class $$SaleReceiptsTableTableManager
                 Value<String> id = const Value.absent(),
                 Value<String?> customerName = const Value.absent(),
                 Value<String?> preparedBy = const Value.absent(),
+                Value<String> orederNo = const Value.absent(),
                 Value<String> billItems = const Value.absent(),
                 Value<String> paymentMode = const Value.absent(),
                 Value<String?> paymentRef = const Value.absent(),
@@ -3555,6 +3619,7 @@ class $$SaleReceiptsTableTableManager
                 id: id,
                 customerName: customerName,
                 preparedBy: preparedBy,
+                orederNo: orederNo,
                 billItems: billItems,
                 paymentMode: paymentMode,
                 paymentRef: paymentRef,
@@ -3568,6 +3633,7 @@ class $$SaleReceiptsTableTableManager
                 required String id,
                 Value<String?> customerName = const Value.absent(),
                 Value<String?> preparedBy = const Value.absent(),
+                required String orederNo,
                 required String billItems,
                 Value<String> paymentMode = const Value.absent(),
                 Value<String?> paymentRef = const Value.absent(),
@@ -3579,6 +3645,7 @@ class $$SaleReceiptsTableTableManager
                 id: id,
                 customerName: customerName,
                 preparedBy: preparedBy,
+                orederNo: orederNo,
                 billItems: billItems,
                 paymentMode: paymentMode,
                 paymentRef: paymentRef,

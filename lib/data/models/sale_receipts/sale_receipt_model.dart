@@ -12,6 +12,7 @@ abstract class SaleReceiptModel with _$SaleReceiptModel {
     String? preparedBy,
     String? paymentMode,
     String? paymentRef,
+    String? orederNo,
     List<BillItemModel>? billItems,
     int? totalAmount,
     DateTime? createdAt,

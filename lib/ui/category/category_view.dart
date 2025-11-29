@@ -1,6 +1,5 @@
 import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/ui/auth/providers/auth_provider.dart';
-import 'package:bill_printer/ui/auth/sign_up_view.dart';
 import 'package:bill_printer/ui/category/category_provider.dart';
 import 'package:bill_printer/ui/category/product_provider.dart';
 import 'package:bill_printer/ui/utils/ui_utils.dart';

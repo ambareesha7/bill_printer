@@ -17,6 +17,8 @@ String dateFormat(DateTime date) =>
 
 String monthFormat(DateTime date) => DateFormat("MMM-yyyy").format(date);
 
+String getYearMonthDay(DateTime date) => DateFormat("yyyy-MM-dd").format(date);
+
 ({DateTime startDate, DateTime lastDate}) getDatesOfMonth(DateTime date) {
   int lastDay = DateUtils.getDaysInMonth(date.year, date.month);
 

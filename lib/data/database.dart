@@ -50,9 +50,9 @@ class AppDatabase extends _$AppDatabase {
         if (details.wasCreated) {
           // Create a bunch of default values so the app doesn't look too empty
           // on the first start.
-          // await batch((b) {
-          //   b.insert(categories, CategoriesCompanion.insert(name: "Category1"));
-          // });
+          await batch((b) {
+            b.insert(categories, CategoriesCompanion.insert(name: "Category1"));
+          });
         }
       },
 

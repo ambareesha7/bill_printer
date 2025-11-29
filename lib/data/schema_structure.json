@@ -1,6 +1,7 @@
 {
     "sale_receipt": {
         "id": "uuid",
+        "order_no": "",
         "customer": null,
         "prepared_by": "",
         "bill_items": [

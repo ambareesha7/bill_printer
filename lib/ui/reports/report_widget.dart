@@ -83,7 +83,7 @@ class ReportWidget extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Text(dateFormat(transaction.createdAt!.toLocal())),
-                        SizedBox(width: 4),
+                        Text("No: ${transaction.orederNo ?? ""}"),
                         Text(
                           (transaction.paymentMode ?? "Cash").toUpperCase(),
                           style: TextStyle(color: AppColors.blue),

@@ -4,6 +4,7 @@ import 'package:bill_printer/data/models/bill_item_model.dart';
 import 'package:bill_printer/data/models/users/user_model.dart';
 import 'package:bill_printer/ui/auth/providers/auth_provider.dart';
 import 'package:bill_printer/ui/bill_views/providers/bill_provider.dart';
+import 'package:bill_printer/ui/bill_views/providers/order_num_provider.dart';
 import 'package:bill_printer/ui/category/product_provider.dart';
 import 'package:bill_printer/ui/utils/app_colors.dart';
 import 'package:bill_printer/ui/utils/ui_utils.dart';
@@ -30,7 +31,6 @@ class _BillViewState extends ConsumerState<BillView> {
   Widget build(BuildContext context) {
     final itemHeadStyle = TextStyle(fontWeight: FontWeight.bold);
     final user = ref.watch(authProvider);
-
     return Scaffold(
       appBar: AppBar(title: Text("Itemwise Bill")),
       resizeToAvoidBottomInset: true,
@@ -41,8 +41,16 @@ class _BillViewState extends ConsumerState<BillView> {
           bottom: bodyPadding,
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Consumer(
+              builder: (context, ref, child) {
+                final orderNo = ref.watch(orderNumProvider);
+                return Text(
+                  "Order No: $orderNo",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                );
+              },
+            ),
             // Build Bill Table
             Expanded(
               flex: 6,
@@ -116,7 +124,7 @@ class _BillViewState extends ConsumerState<BillView> {
               },
             ),
             if (user != null) _buildActionButtons(user),
-            buildCategories(),
+            Row(children: [buildCategories()]),
             //======== build product cards =========
             Expanded(
               flex: 6,
@@ -152,6 +160,7 @@ class _BillViewState extends ConsumerState<BillView> {
   }
 
   Widget _buildActionButtons(UserModel user) {
+    String orderNo = ref.watch(orderNumProvider);
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -197,6 +206,7 @@ class _BillViewState extends ConsumerState<BillView> {
                     primAccount: primAccount,
                     amount: amount,
                     preparedBy: user.fullName,
+                    orderNo: orderNo,
                   );
                 }
               } else {
@@ -216,6 +226,7 @@ class _BillViewState extends ConsumerState<BillView> {
                 saveNClearBill(
                   paymentMode: PaymentMode.cash,
                   preparedBy: user.fullName,
+                  orderNo: orderNo,
                 );
               } else {
                 UIUtils.showSnackBar(
@@ -226,21 +237,25 @@ class _BillViewState extends ConsumerState<BillView> {
               }
             },
           ),
-          IconButton(
-            icon: Row(
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+              visualDensity: VisualDensity(horizontal: -2, vertical: -2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadiusGeometry.all(Radius.circular(6)),
+              ),
+              backgroundColor: AppColors.purple,
+            ),
+            onPressed: () => _openCalculator(),
+            child: Row(
               children: [
                 Icon(Icons.calculate),
                 Text("Cals", style: TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
-
-            onPressed: () {
-              _openCalculator();
-            },
           ),
           AppBtn1(
             name: "Change bank",
-            bgColor: Colors.orange,
             onPressed: () {
               // TODO: replace navigator with go router
               Navigator.push(
@@ -280,19 +295,20 @@ class _BillViewState extends ConsumerState<BillView> {
 
   saveNClearBill({
     required PaymentMode paymentMode,
+    required String orderNo,
     String? paymentRef,
     String? preparedBy,
   }) async {
-    List<BillItemModel> billItems = ref.watch(billListProvider);
-    int amount = ref.read(billListProvider.notifier).getTotalAmount();
-    await dbUtils.insertSaleReceipt(
-      billItems: billItems,
-      totalAmount: amount,
-      paymentMode: paymentMode.name,
-      paymentRef: paymentRef,
-      preparedBy: preparedBy,
-    );
+    await ref
+        .read(billListProvider.notifier)
+        .saveOrder(
+          paymentMode: paymentMode,
+          orderNo: orderNo,
+          paymentRef: paymentRef,
+          preparedBy: preparedBy,
+        );
     ref.read(billListProvider.notifier).clearItems();
+    ref.read(orderNumProvider.notifier).updateOrderNo();
   }
 
   _openCalculator() {
@@ -320,6 +336,7 @@ class _BillViewState extends ConsumerState<BillView> {
   _openQRcode({
     required BankAccountModel primAccount,
     required int amount,
+    required String orderNo,
     String? preparedBy,
   }) async {
     String upi =
@@ -374,6 +391,7 @@ class _BillViewState extends ConsumerState<BillView> {
                         paymentMode: PaymentMode.upi,
                         paymentRef: ref,
                         preparedBy: preparedBy,
+                        orderNo: orderNo,
                       );
                     },
                   ),

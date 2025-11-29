@@ -249,6 +249,7 @@ class DBUtils {
   Future<void> insertSaleReceipt({
     required List<BillItemModel> billItems,
     required int totalAmount,
+    required String orderNo,
     String? customerName,
     String? preparedBy,
     String? paymentMode,
@@ -260,6 +261,7 @@ class DBUtils {
       totalAmount: totalAmount,
       customerName: Value(customerName),
       preparedBy: Value(preparedBy),
+      orederNo: orderNo,
       paymentMode: paymentMode == null ? Value("cash") : Value(paymentMode),
       paymentRef: Value(paymentRef),
       createdAt: Value(DateTime.now()),
@@ -340,6 +342,7 @@ class DBUtils {
             totalAmount: b.totalAmount,
             paymentMode: b.paymentMode,
             paymentRef: b.paymentRef,
+            orederNo: b.orederNo,
             createdAt: b.createdAt,
             updatedAt: b.updatedAt,
           ),
@@ -375,8 +378,21 @@ class DBUtils {
           .get();
       // )..where((tbl) => tbl.createdAt.equals(date))).get();
     } catch (e) {
-      debugLog("Error fetching getMonthlyreport: $e");
+      debugLog("Error getSaleReportFromDB: $e");
       return [];
+    }
+  }
+
+  Future<SaleReceipt?> getLastBillFromDB() async {
+    try {
+      final query = db.select(db.saleReceipts)
+        ..orderBy([(t) => OrderingTerm.desc(t.createdAt)])
+        ..limit(1);
+
+      return await query.getSingleOrNull();
+    } catch (e) {
+      debugLog("Error getLastBillFromDB: $e");
+      return null;
     }
   }
 }
