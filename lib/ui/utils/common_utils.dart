@@ -29,11 +29,6 @@ String getYearMonthDay(DateTime date) => DateFormat("yyyy-MM-dd").format(date);
   return (startDate: startDate, lastDate: lastDate);
 }
 
-Widget navigateBtn({required BuildContext context, required Widget page}) {
-  return ElevatedButton(
-    onPressed: () {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => page));
-    },
-    child: Text(page.toString()),
-  );
+String capitalize(String text) {
+  return "${text.substring(0, 1).toUpperCase()}${text.substring(1)}";
 }

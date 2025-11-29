@@ -43,7 +43,8 @@ class _ReportViewState extends ConsumerState<ReportView>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Reports"),
+        title:const Text("Reports"),
+        centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
           onTap: (value) {},

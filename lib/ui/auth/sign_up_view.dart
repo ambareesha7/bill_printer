@@ -2,6 +2,7 @@ import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:bill_printer/ui/widgets/bill_header_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'providers/auth_provider.dart';
 
 class SignUpView extends ConsumerStatefulWidget {
@@ -52,9 +53,7 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('User created successful!')),
         );
-        // Navigate to home or bill screen
-        // TODO: replace navigator with go router
-        Navigator.of(context).pushReplacementNamed('/home');
+        context.go("/");
       }
     } catch (e) {
       debugLog(e, tag: "Error in Sign up");
@@ -71,7 +70,7 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign Up')),
+      appBar: AppBar(title: const Text('Sign Up'), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(

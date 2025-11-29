@@ -13,7 +13,7 @@ class BankAccountView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Bank Accounts")),
+      appBar: AppBar(title: Text("Bank Accounts"), centerTitle: true),
       floatingActionButton: FloatingActionButton.extended(
         label: Text("Add new account"),
         onPressed: () {

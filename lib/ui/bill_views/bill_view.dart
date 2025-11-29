@@ -1,3 +1,4 @@
+import 'package:bill_printer/app_router.dart';
 import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/data/db_utils.dart';
 import 'package:bill_printer/data/models/bill_item_model.dart';
@@ -11,10 +12,11 @@ import 'package:bill_printer/ui/utils/ui_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_simple_calculator/flutter_simple_calculator.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 
 import '../../data/models/bank_account/bank_account_model.dart';
-import '../bank_account/bank_account_view.dart';
+import '../widgets/nav_btn.dart';
 
 class BillView extends ConsumerStatefulWidget {
   const BillView({super.key});
@@ -32,7 +34,11 @@ class _BillViewState extends ConsumerState<BillView> {
     final itemHeadStyle = TextStyle(fontWeight: FontWeight.bold);
     final user = ref.watch(authProvider);
     return Scaffold(
-      appBar: AppBar(title: Text("Itemwise Bill")),
+      appBar: AppBar(
+        title: const Text("Create Bill"),
+        centerTitle: true,
+        actions: [NavBtn(path: RouterPaths.reports.name)],
+      ),
       resizeToAvoidBottomInset: true,
       body: Padding(
         padding: EdgeInsets.only(
@@ -257,11 +263,7 @@ class _BillViewState extends ConsumerState<BillView> {
           AppBtn1(
             name: "Change bank",
             onPressed: () {
-              // TODO: replace navigator with go router
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => BankAccountView()),
-              );
+              context.push("/${RouterPaths.bankAccount.name}");
             },
           ),
         ],

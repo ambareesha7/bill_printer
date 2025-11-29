@@ -1,3 +1,4 @@
+import 'package:bill_printer/app_router.dart';
 import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/ui/auth/providers/auth_provider.dart';
 import 'package:bill_printer/ui/category/category_provider.dart';
@@ -6,6 +7,9 @@ import 'package:bill_printer/ui/utils/ui_utils.dart';
 import 'package:bill_printer/ui/widgets/grid_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../utils/common_utils.dart';
 
 class CategoryView extends ConsumerStatefulWidget {
   const CategoryView({super.key});
@@ -165,22 +169,22 @@ class _CategoryViewState extends ConsumerState<CategoryView>
       child: Scaffold(
         appBar: AppBar(
           title: Text("Category/Products", style: TextStyle(fontSize: 16)),
+          centerTitle: true,
           actions: [
             ElevatedButton(
               onPressed: () {
                 bool isLoggedIn = ref.watch(isUserLoggedInProvider);
-                // TODO: replace navigator with go router
                 if (isLoggedIn) {
-                  Navigator.of(context).popAndPushNamed("/bill_view");
+                  context.pushReplacement("/${RouterPaths.createBill.name}");
                 } else {
                   UIUtils.showSnackBar(
                     context: context,
                     text: "Please setup a User to create bills",
                   );
-                  Navigator.of(context).popAndPushNamed("/sign_up_view");
+                  context.pushReplacement("/${RouterPaths.signUp.name}");
                 }
               },
-              child: Text("BillView"),
+              child: Text(capitalize(RouterPaths.createBill.name)),
             ),
           ],
           bottom: TabBar(

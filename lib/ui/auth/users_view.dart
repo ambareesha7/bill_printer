@@ -1,5 +1,7 @@
 import 'package:bill_printer/ui/auth/providers/auth_provider.dart';
 import 'package:bill_printer/ui/auth/providers/users_provider.dart';
+import 'package:bill_printer/ui/utils/app_colors.dart';
+import 'package:bill_printer/ui/utils/ui_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -95,15 +97,21 @@ class _UsersViewState extends ConsumerState<UsersView> {
                       phoneNumber: phoneCtrl.text.trim(),
                     );
                 if (mounted) {
+                  // ignore: use_build_context_synchronously
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('User updated successfully')),
+                  UIUtils.showSnackBar(
+                    // ignore: use_build_context_synchronously
+                    context: context,
+                    text: "User updated successfully",
                   );
                 }
               } catch (e) {
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error: ${e.toString()}')),
+                  UIUtils.showSnackBar(
+                    // ignore: use_build_context_synchronously
+                    context: context,
+                    text: "Error: ${e.toString()}",
+                    bgColor: AppColors.red,
                   );
                 }
               }
@@ -190,6 +198,7 @@ class _UsersViewState extends ConsumerState<UsersView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Manage Users'),
+        centerTitle: true,
         actions: [
           IconButton(
             onPressed: () =>
