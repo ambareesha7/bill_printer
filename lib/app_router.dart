@@ -1,4 +1,4 @@
-import 'package:bill_printer/about/about_view.dart';
+import 'package:bill_printer/ui/about/about_view.dart';
 import 'package:bill_printer/ui/auth/sign_up_view.dart';
 import 'package:bill_printer/ui/auth/users_view.dart';
 import 'package:bill_printer/ui/bank_account/bank_account_view.dart';
