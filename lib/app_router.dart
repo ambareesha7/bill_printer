@@ -1,3 +1,4 @@
+import 'package:bill_printer/about/about_view.dart';
 import 'package:bill_printer/ui/auth/sign_up_view.dart';
 import 'package:bill_printer/ui/auth/users_view.dart';
 import 'package:bill_printer/ui/bank_account/bank_account_view.dart';
@@ -7,7 +8,15 @@ import 'package:bill_printer/ui/home/home_view.dart';
 import 'package:bill_printer/ui/reports/report_view.dart';
 import 'package:go_router/go_router.dart';
 
-enum RouterPaths { createBill, category, bankAccount, reports, signUp, users }
+enum RouterPaths {
+  createBill,
+  category,
+  bankAccount,
+  reports,
+  signUp,
+  users,
+  about,
+}
 
 // GoRouter configuration
 final appRouter = GoRouter(
@@ -39,6 +48,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: "/${RouterPaths.users.name}",
       builder: (context, state) => UsersView(),
+    ),
+    GoRoute(
+      path: "/${RouterPaths.about.name}",
+      builder: (context, state) => AboutView(),
     ),
   ],
 );
