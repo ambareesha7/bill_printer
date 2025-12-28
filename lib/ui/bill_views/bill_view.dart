@@ -243,6 +243,39 @@ class _BillViewState extends ConsumerState<BillView> {
               }
             },
           ),
+          AppBtn1(
+            name: "Received in Bank",
+            bgColor: AppColors.blueGrey,
+            onPressed: () async {
+              int amount = ref.read(billListProvider.notifier).getTotalAmount();
+              if (amount > 0) {
+                List<BankAccountModel> bankAccounts = await dbUtils
+                    .parseBankAccounts();
+                if (bankAccounts.isEmpty) {
+                  UIUtils.showSnackBar(
+                    // ignore: use_build_context_synchronously
+                    context: context,
+                    text: "Please add bank account",
+                    bgColor: Colors.red,
+                  );
+                } else {
+                  BankAccountModel primAccount = getPrimeryUPI(bankAccounts);
+                  saveNClearBill(
+                    paymentMode: PaymentMode.upi,
+                    preparedBy: user.fullName,
+                    orderNo: orderNo,
+                    paymentRef: primAccount.upiId,
+                  );
+                }
+              } else {
+                UIUtils.showSnackBar(
+                  context: context,
+                  text: "Please add some billable items",
+                  bgColor: Colors.red,
+                );
+              }
+            },
+          ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),

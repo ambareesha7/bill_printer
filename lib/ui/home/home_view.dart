@@ -46,6 +46,14 @@ class _MyHomePageState extends ConsumerState<HomeView> {
             NavBtn(path: RouterPaths.reports.name),
             NavBtn(path: RouterPaths.signUp.name),
             NavBtn(path: RouterPaths.users.name),
+
+            ElevatedButton.icon(
+              icon: const Icon(Icons.info_outline),
+              label: const Text('About'),
+              onPressed: () {
+                context.push("/${RouterPaths.about.name}");
+              },
+            ),
           ],
         ),
       ),

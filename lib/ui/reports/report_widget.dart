@@ -108,8 +108,10 @@ class ReportWidget extends ConsumerWidget {
                     children: <Widget>[
                       if (transaction.preparedBy != null)
                         Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text(("Created by: ")),
                                 Text(
@@ -121,7 +123,8 @@ class ReportWidget extends ConsumerWidget {
                           ],
                         ),
                       if (transaction.paymentRef != null)
-                        Text(("Ref: ${transaction.paymentRef ?? ""}")),
+                        Text("Bank Ref: ${transaction.paymentRef ?? ""}"),
+                      Text("ID: ${transaction.id ?? ""}"),
                       ...renderSubItems(subItems),
                     ],
                   );
@@ -138,7 +141,22 @@ class ReportWidget extends ConsumerWidget {
     List<Widget> list = [];
     if (items == null) [];
     for (BillItemModel i in items ?? []) {
-      list.add(Text("${i.name} - ₹${i.rate * i.quantity}"));
+      list.add(
+        Wrap(
+          children: [
+            Text("${i.name} ", style: TextStyle(color: AppColors.blueGrey)),
+            Text("Rate: "),
+            Text("${i.rate} ", style: TextStyle(color: AppColors.blueGrey)),
+            Text("Qty: "),
+            Text("${i.quantity} ", style: TextStyle(color: AppColors.blueGrey)),
+            Text("Amount: "),
+            Text(
+              "₹${i.rate * i.quantity}",
+              style: TextStyle(color: AppColors.blueGrey),
+            ),
+          ],
+        ),
+      );
     }
     return list;
   }
