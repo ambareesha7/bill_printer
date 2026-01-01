@@ -3,9 +3,12 @@ import 'package:bill_printer/data/models/bill_item_model.dart';
 import 'package:bill_printer/ui/reports/providers/report_provider.dart';
 import 'package:bill_printer/ui/utils/app_colors.dart';
 import 'package:bill_printer/ui/utils/common_utils.dart';
+import 'package:bill_printer/ui/utils/ui_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
+
+import '../../data/models/sale_receipts/sale_receipt_model.dart';
 
 class ReportWidget extends ConsumerWidget {
   const ReportWidget(this.reportType, {super.key});
@@ -13,6 +16,12 @@ class ReportWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     String selectedMonth = monthFormat(ref.watch(monthlyDateProvider));
+    final List<SaleReceiptModel> transList = ref.watch(
+      (reportType == ReportType.monthly)
+          ? monthlyReportProvider
+          : yearlyReportProvider,
+    );
+
     return Column(
       children: [
         Row(
@@ -67,11 +76,6 @@ class ReportWidget extends ConsumerWidget {
         Expanded(
           child: Consumer(
             builder: (context, ref, child) {
-              final transList = ref.watch(
-                (reportType == ReportType.monthly)
-                    ? monthlyReportProvider
-                    : yearlyReportProvider,
-              );
               return ListView.builder(
                 itemCount: transList.length,
                 itemBuilder: (context, index) {
@@ -126,6 +130,33 @@ class ReportWidget extends ConsumerWidget {
                         Text("Bank Ref: ${transaction.paymentRef ?? ""}"),
                       Text("ID: ${transaction.id ?? ""}"),
                       ...renderSubItems(subItems),
+                      Wrap(
+                        children: [
+                          // ElevatedButton(
+                          //   onPressed: () {
+                          //     // debugLog(transaction);
+                          //   },
+                          //   child: Text("Edit"),
+                          // ),
+                          IconButton(
+                            onPressed: () {
+                              UIUtils.confirmDialog(
+                                context: context,
+                                subTitle: "Are you sure you want to delete",
+                                title:
+                                    "Order no: ${transaction.orederNo}\n${getItemNames(transaction.billItems)}",
+                                rightFun: () {
+                                  ref
+                                      .read(monthlyReportProvider.notifier)
+                                      .delete(transaction.id!);
+                                },
+                              );
+                            },
+                            icon: Icon(Icons.delete),
+                            color: Colors.red,
+                          ),
+                        ],
+                      ),
                     ],
                   );
                 },

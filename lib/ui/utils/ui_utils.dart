@@ -51,7 +51,11 @@ class UIUtils {
                 // Title text
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(title, style: TextStyle(fontSize: 18)),
+                  child: Text(
+                    title,
+                    style: TextStyle(fontSize: 18),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
                 // subTitle text
                 if (subTitle != null) Text(subTitle),

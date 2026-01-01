@@ -42,6 +42,11 @@ class MonthlyReport extends _$MonthlyReport {
     final n = await getReport(date);
     state = [...n];
   }
+
+  delete(String id) async {
+    await dbUtils.deleteSaleReceipt(id);
+    getAllTransactions();
+  }
 }
 
 @riverpod
