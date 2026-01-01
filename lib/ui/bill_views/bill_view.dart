@@ -7,7 +7,9 @@ import 'package:bill_printer/ui/auth/providers/auth_provider.dart';
 import 'package:bill_printer/ui/bill_views/providers/bill_provider.dart';
 import 'package:bill_printer/ui/bill_views/providers/order_num_provider.dart';
 import 'package:bill_printer/ui/category/product_provider.dart';
+import 'package:bill_printer/ui/printer/providers/printer_provider.dart';
 import 'package:bill_printer/ui/utils/app_colors.dart';
+import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:bill_printer/ui/utils/ui_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,6 +35,8 @@ class _BillViewState extends ConsumerState<BillView> {
   Widget build(BuildContext context) {
     final itemHeadStyle = TextStyle(fontWeight: FontWeight.bold);
     final user = ref.watch(authProvider);
+    final orderNo = ref.watch(orderNumProvider);
+    ref.watch(printerProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Create Bill"),
@@ -50,7 +54,6 @@ class _BillViewState extends ConsumerState<BillView> {
           children: [
             Consumer(
               builder: (context, ref, child) {
-                final orderNo = ref.watch(orderNumProvider);
                 return Text(
                   "Order No: $orderNo",
                   style: TextStyle(fontWeight: FontWeight.bold),
@@ -130,7 +133,35 @@ class _BillViewState extends ConsumerState<BillView> {
               },
             ),
             if (user != null) _buildActionButtons(user),
-            Row(children: [buildCategories()]),
+            Row(
+              children: [
+                buildCategories(),
+                ElevatedButton(
+                  onPressed: () {
+                    final billItems = ref.watch(billListProvider);
+                    if (billItems.isEmpty) return;
+                    ref
+                        .read(printerProvider.notifier)
+                        .printBill(
+                          context: context,
+                          orderNo: orderNo,
+                          paymentMode: "Not paid",
+                          dateTime: dateFormat(dateTimeNow()),
+                          itemsList: billItems,
+                          totalItems: ref
+                              .read(billListProvider.notifier)
+                              .getTotalQuantity(billItems)
+                              .toString(),
+                          totalAmount: ref
+                              .read(billListProvider.notifier)
+                              .getTotalAmount()
+                              .toString(),
+                        );
+                  },
+                  child: Text("Print"),
+                ),
+              ],
+            ),
             //======== build product cards =========
             Expanded(
               flex: 6,
@@ -233,6 +264,7 @@ class _BillViewState extends ConsumerState<BillView> {
                   paymentMode: PaymentMode.cash,
                   preparedBy: user.fullName,
                   orderNo: orderNo,
+                  print: true,
                 );
               } else {
                 UIUtils.showSnackBar(
@@ -333,6 +365,7 @@ class _BillViewState extends ConsumerState<BillView> {
     required String orderNo,
     String? paymentRef,
     String? preparedBy,
+    bool print = false,
   }) async {
     await ref
         .read(billListProvider.notifier)
@@ -342,6 +375,26 @@ class _BillViewState extends ConsumerState<BillView> {
           paymentRef: paymentRef,
           preparedBy: preparedBy,
         );
+    if (print) {
+      final billItems = ref.watch(billListProvider);
+      ref
+          .read(printerProvider.notifier)
+          .printBill(
+            context: context,
+            orderNo: orderNo,
+            paymentMode: paymentMode.name,
+            dateTime: dateFormat(dateTimeNow()),
+            itemsList: billItems,
+            totalItems: ref
+                .read(billListProvider.notifier)
+                .getTotalQuantity(billItems)
+                .toString(),
+            totalAmount: ref
+                .read(billListProvider.notifier)
+                .getTotalAmount()
+                .toString(),
+          );
+    }
     ref.read(billListProvider.notifier).clearItems();
     ref.read(orderNumProvider.notifier).updateOrderNo();
   }
@@ -427,6 +480,7 @@ class _BillViewState extends ConsumerState<BillView> {
                         paymentRef: ref,
                         preparedBy: preparedBy,
                         orderNo: orderNo,
+                        print: true,
                       );
                     },
                   ),
