@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:bill_printer/app_router.dart';
 import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/data/db_utils.dart';
@@ -160,6 +162,18 @@ class _BillViewState extends ConsumerState<BillView> {
                   },
                   child: Text("Print"),
                 ),
+                SizedBox(width: btnPadding),
+                AppBtn1(
+                  name: "Add Product",
+                  onPressed: () {
+                    ref
+                        .read(productsListProvider.notifier)
+                        .openProductDialog(
+                          context: context,
+                          operationType: OperationType.add,
+                        );
+                  },
+                ),
               ],
             ),
             //======== build product cards =========
@@ -207,20 +221,9 @@ class _BillViewState extends ConsumerState<BillView> {
             onPressed: () {
               ref.read(billListProvider.notifier).clearItems();
             },
-            bgColor: Colors.red,
+            bgColor: AppColors.red,
           ),
-          SizedBox(width: btnPadding),
-          AppBtn1(
-            name: "Add Product",
-            onPressed: () {
-              ref
-                  .read(productsListProvider.notifier)
-                  .openProductDialog(
-                    context: context,
-                    operationType: OperationType.add,
-                  );
-            },
-          ),
+
           SizedBox(width: btnPadding),
           AppBtn1(
             name: "QR Code",
@@ -232,10 +235,9 @@ class _BillViewState extends ConsumerState<BillView> {
                     .parseBankAccounts();
                 if (bankAccounts.isEmpty) {
                   UIUtils.showSnackBar(
-                    // ignore: use_build_context_synchronously
                     context: context,
                     text: "Please add bank account to generate QR code",
-                    bgColor: Colors.red,
+                    bgColor: AppColors.red,
                   );
                 } else {
                   BankAccountModel primAccount = getPrimeryUPI(bankAccounts);
@@ -250,30 +252,23 @@ class _BillViewState extends ConsumerState<BillView> {
                 UIUtils.showSnackBar(
                   context: context,
                   text: "Please add some billable items to generate QR code",
-                  bgColor: Colors.red,
+                  bgColor: AppColors.red,
                 );
               }
             },
           ),
-          AppBtn1(
-            name: "Cash Pay",
-            onPressed: () {
-              int amount = ref.read(billListProvider.notifier).getTotalAmount();
-              if (amount > 0) {
-                saveNClearBill(
-                  paymentMode: PaymentMode.cash,
-                  preparedBy: user.fullName,
-                  orderNo: orderNo,
-                  print: true,
-                );
-              } else {
-                UIUtils.showSnackBar(
-                  context: context,
-                  text: "Please add some billable items",
-                  bgColor: Colors.red,
-                );
-              }
-            },
+          cashBtn(
+            user: user,
+            orderNo: orderNo,
+            btnName: "Cash",
+            billPrint: true,
+            bgColor: AppColors.blue,
+          ),
+          cashBtn(
+            user: user,
+            orderNo: orderNo,
+            btnName: "Cash no bill",
+            billPrint: false,
           ),
           AppBtn1(
             name: "Received in Bank",
@@ -285,10 +280,9 @@ class _BillViewState extends ConsumerState<BillView> {
                     .parseBankAccounts();
                 if (bankAccounts.isEmpty) {
                   UIUtils.showSnackBar(
-                    // ignore: use_build_context_synchronously
                     context: context,
                     text: "Please add bank account",
-                    bgColor: Colors.red,
+                    bgColor: AppColors.red,
                   );
                 } else {
                   BankAccountModel primAccount = getPrimeryUPI(bankAccounts);
@@ -303,7 +297,7 @@ class _BillViewState extends ConsumerState<BillView> {
                 UIUtils.showSnackBar(
                   context: context,
                   text: "Please add some billable items",
-                  bgColor: Colors.red,
+                  bgColor: AppColors.red,
                 );
               }
             },
@@ -333,6 +327,36 @@ class _BillViewState extends ConsumerState<BillView> {
           ),
         ],
       ),
+    );
+  }
+
+  AppBtn1 cashBtn({
+    required UserModel user,
+    required String orderNo,
+    required String btnName,
+    required bool billPrint,
+    Color? bgColor,
+  }) {
+    return AppBtn1(
+      name: btnName,
+      bgColor: bgColor,
+      onPressed: () {
+        int amount = ref.read(billListProvider.notifier).getTotalAmount();
+        if (amount > 0) {
+          saveNClearBill(
+            paymentMode: PaymentMode.cash,
+            preparedBy: user.fullName,
+            orderNo: orderNo,
+            print: billPrint,
+          );
+        } else {
+          UIUtils.showSnackBar(
+            context: context,
+            text: "Please add some billable items",
+            bgColor: AppColors.red,
+          );
+        }
+      },
     );
   }
 
@@ -465,7 +489,7 @@ class _BillViewState extends ConsumerState<BillView> {
                 children: [
                   AppBtn1(
                     name: "Cancel",
-                    bgColor: Colors.red,
+                    bgColor: AppColors.red,
                     onPressed: () {
                       Navigator.pop(context);
                     },
@@ -481,6 +505,20 @@ class _BillViewState extends ConsumerState<BillView> {
                         preparedBy: preparedBy,
                         orderNo: orderNo,
                         print: true,
+                      );
+                    },
+                  ),
+                  AppBtn1(
+                    name: "Paid No bill",
+                    bgColor: Colors.green,
+                    onPressed: () {
+                      Navigator.pop(context);
+                      saveNClearBill(
+                        paymentMode: PaymentMode.upi,
+                        paymentRef: ref,
+                        preparedBy: preparedBy,
+                        orderNo: orderNo,
+                        print: false,
                       );
                     },
                   ),

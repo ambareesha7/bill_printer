@@ -68,8 +68,8 @@ class Printer extends _$Printer {
       bool result = false;
       List<int> ticket = await billContent(
         businessName: "MoonLight Cafe",
-        subHeader1: "PayMode: $paymentMode",
-        shopID: "CartID: BTM-1",
+        // subHeader1: "PayMode: $paymentMode",
+        // shopID: "CartID: BTM-1",
         dateTime: dateTime,
         invoiceTitle: "Order no:",
         orderNo: orderNo,
@@ -175,18 +175,30 @@ class Printer extends _$Printer {
     );
     bytes += generator.hr();
     // Footer text1
-    bytes += generator.text(
-      footerText,
-      styles: const PosStyles(
-        height: PosTextSize.size1,
-        width: PosTextSize.size1,
-        bold: true,
-        align: PosAlign.center,
-      ),
-    );
+    // bytes += generator.text(
+    //   footerText,
+    //   styles: const PosStyles(
+    //     height: PosTextSize.size1,
+    //     width: PosTextSize.size1,
+    //     bold: true,
+    //     align: PosAlign.center,
+    //   ),
+    // );
 
-    bytes += generator.feed(2);
-    //bytes += generator.cut();
+    bytes += generator.feed(3);
+    // Invoice title
+    if (invoiceTitle != null) {
+      bytes += generator.text(
+        "$invoiceTitle ${orderNo ?? ""}",
+        styles: const PosStyles(
+          align: PosAlign.center,
+          bold: true,
+          height: PosTextSize.size2,
+          width: PosTextSize.size2,
+        ),
+      );
+    }
+    bytes += generator.feed(4);
     return bytes;
   }
 
