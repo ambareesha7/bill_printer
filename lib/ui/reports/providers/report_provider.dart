@@ -8,6 +8,55 @@ import '../../utils/common_utils.dart';
 part 'report_provider.g.dart';
 
 @riverpod
+class FiltersList extends _$FiltersList {
+  @override
+  List<String> build() {
+    return [];
+  }
+
+
+  Future<void> updateFilters(List<SaleReceiptModel> transList) async{
+    List<String> filters = await getFilters(transList);
+    state = filters;
+  }
+  Future<List<String>> getFilters(List<SaleReceiptModel> transList) async {
+    List<String> filters = await _getFilterNames(transList);
+    debugLog(filters.length, tag: "getFilters");
+    // state = [...filters];
+    return filters;
+  }
+
+  Future<List<String>> _getFilterNames(List<SaleReceiptModel> transList) async {
+    List<String> filters = [];
+    for (var i in transList) {
+      if (i.paymentMode != null && i.paymentMode!.isNotEmpty) {
+        filters.add(i.paymentMode!);
+      }
+      if (i.paymentRef != null && i.paymentRef!.isNotEmpty) {
+        String ss = i.paymentRef!.split(",").first.split("=").last;
+        filters.add(ss);
+      }
+    }
+    filters = filters.toSet().toList();
+    filters.sort();
+    debugLog(filters.length, tag: "_getFilterNames");
+    return filters;
+  }
+}
+
+@riverpod
+class AppliedFilters extends _$AppliedFilters {
+  @override
+  List<String> build() {
+    return [];
+  }
+
+  void updateAppliedFilters(List<String> filters) {
+    state = filters;
+  }
+}
+
+@riverpod
 class YearlyReport extends _$YearlyReport {
   final DBUtils dbUtils = DBUtils.instance;
   @override
@@ -120,6 +169,16 @@ Future<List<SaleReceiptModel>> getReport(DateTime date) async {
   );
 }
 
+Future<List<SaleReceiptModel>> getReport2({
+  required DateTime startDate,
+  required DateTime endDate,
+}) async {
+  return await DBUtils.instance.getNParseReport(
+    startDate: startDate,
+    lastDate: endDate,
+  );
+}
+
 Future<List<SaleReceiptModel>> getDayReport(DateTime date) async {
   final List<SaleReceiptModel> l = await DBUtils.instance.getNParseReport(
     startDate: date,
@@ -196,4 +255,23 @@ List<String> getWeeksInMonth(DateTime date) {
   }
   List.generate(numOfWeeks, (index) => weeks.add("W${index + 1}"));
   return weeks;
+}
+
+List<SaleReceiptModel> getFilterNameList({
+  required List<SaleReceiptModel> list,
+  required List<String> filterItems,
+}) {
+  List<SaleReceiptModel> transList = [];
+  for (var i in list) {
+    if (i.paymentMode != null &&
+        filterItems.contains(i.paymentMode?.toLowerCase())) {
+      transList.add(i);
+    } else if (i.paymentRef != null && i.paymentRef!.isNotEmpty) {
+      String ss = i.paymentRef!.split(",").first.split("=").last;
+      if (filterItems.contains(ss.toLowerCase())) {
+        transList.add(i);
+      }
+    }
+  }
+  return transList;
 }

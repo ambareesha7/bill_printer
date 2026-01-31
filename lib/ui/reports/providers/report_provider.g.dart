@@ -9,6 +9,112 @@ part of 'report_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
+@ProviderFor(FiltersList)
+const filtersListProvider = FiltersListProvider._();
+
+final class FiltersListProvider
+    extends $NotifierProvider<FiltersList, List<String>> {
+  const FiltersListProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'filtersListProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$filtersListHash();
+
+  @$internal
+  @override
+  FiltersList create() => FiltersList();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<String>>(value),
+    );
+  }
+}
+
+String _$filtersListHash() => r'ac3979a68cf2c3cca54a009928265a519ccbed4f';
+
+abstract class _$FiltersList extends $Notifier<List<String>> {
+  List<String> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<List<String>, List<String>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<List<String>, List<String>>,
+              List<String>,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}
+
+@ProviderFor(AppliedFilters)
+const appliedFiltersProvider = AppliedFiltersProvider._();
+
+final class AppliedFiltersProvider
+    extends $NotifierProvider<AppliedFilters, List<String>> {
+  const AppliedFiltersProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'appliedFiltersProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$appliedFiltersHash();
+
+  @$internal
+  @override
+  AppliedFilters create() => AppliedFilters();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<String>>(value),
+    );
+  }
+}
+
+String _$appliedFiltersHash() => r'4bab7637c0113ab14b691ebf56af6a159b95416b';
+
+abstract class _$AppliedFilters extends $Notifier<List<String>> {
+  List<String> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<List<String>, List<String>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<List<String>, List<String>>,
+              List<String>,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}
+
 @ProviderFor(YearlyReport)
 const yearlyReportProvider = YearlyReportProvider._();
 
@@ -95,7 +201,7 @@ final class MonthlyReportProvider
   }
 }
 
-String _$monthlyReportHash() => r'60b3e18331040ded144352075bbc3e538f66ac86';
+String _$monthlyReportHash() => r'b8aedff738952ab9e26c2cee38c71b6a5368a64a';
 
 abstract class _$MonthlyReport extends $Notifier<List<SaleReceiptModel>> {
   List<SaleReceiptModel> build();

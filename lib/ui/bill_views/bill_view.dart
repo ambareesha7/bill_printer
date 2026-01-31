@@ -267,7 +267,7 @@ class _BillViewState extends ConsumerState<BillView> {
           cashBtn(
             user: user,
             orderNo: orderNo,
-            btnName: "Cash no bill",
+            btnName: "Cash no print",
             billPrint: false,
           ),
           AppBtn1(
@@ -323,6 +323,21 @@ class _BillViewState extends ConsumerState<BillView> {
             name: "Change bank",
             onPressed: () {
               context.push("/${RouterPaths.bankAccount.name}");
+            },
+          ),
+          AppBtn1(
+            name: "Reset OrderNo",
+            bgColor: AppColors.purple,
+            onPressed: () {
+              UIUtils.confirmDialog(
+                context: context,
+                title: "Reset Oreder Number",
+                subTitle: "Are you sure",
+                rightBtnName: "Reset",
+                rightFun: () {
+                  ref.read(orderNumProvider.notifier).resetOrderNo();
+                },
+              );
             },
           ),
         ],
@@ -509,7 +524,7 @@ class _BillViewState extends ConsumerState<BillView> {
                     },
                   ),
                   AppBtn1(
-                    name: "Paid No bill",
+                    name: "Paid No print",
                     bgColor: Colors.green,
                     onPressed: () {
                       Navigator.pop(context);
