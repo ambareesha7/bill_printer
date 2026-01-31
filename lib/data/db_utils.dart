@@ -372,11 +372,14 @@ class DBUtils {
     required DateTime lastDate,
   }) async {
     try {
+      // Extend lastDate to end of day to include all transactions on that day
+      final endOfDay = lastDate
+          .add(const Duration(days: 1))
+          .copyWith(hour: 0, minute: 0, second: 0, millisecond: 0);
       return await (db.select(
             db.saleReceipts,
-          )..where((tbl) => tbl.createdAt.isBetweenValues(startDate, lastDate)))
+          )..where((tbl) => tbl.createdAt.isBetweenValues(startDate, endOfDay)))
           .get();
-      // )..where((tbl) => tbl.createdAt.equals(date))).get();
     } catch (e) {
       debugLog("Error getSaleReportFromDB: $e");
       return [];

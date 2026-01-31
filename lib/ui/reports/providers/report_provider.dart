@@ -14,11 +14,11 @@ class FiltersList extends _$FiltersList {
     return [];
   }
 
-
-  Future<void> updateFilters(List<SaleReceiptModel> transList) async{
+  Future<void> updateFilters(List<SaleReceiptModel> transList) async {
     List<String> filters = await getFilters(transList);
     state = filters;
   }
+
   Future<List<String>> getFilters(List<SaleReceiptModel> transList) async {
     List<String> filters = await _getFilterNames(transList);
     debugLog(filters.length, tag: "getFilters");
