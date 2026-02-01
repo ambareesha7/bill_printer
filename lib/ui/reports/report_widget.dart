@@ -17,14 +17,19 @@ class ReportWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     String selectedMonth = monthFormat(ref.watch(monthlyDateProvider));
-    final List<SaleReceiptModel> allTransactions = ref.watch(
-      (reportType == ReportType.monthly)
-          ? monthlyReportProvider
-          : yearlyReportProvider,
-    );
+    final dateRange = ref.watch(dateRangeProvider);
+    ref.watch(dateRangeReportProvider);
+
+    // TODO: REMOVE MONTHLY REPORT IS POSSIBLE
+    final List<SaleReceiptModel> allTransactions =
+        (dateRange.startDate != null && dateRange.endDate != null)
+        ? ref.watch(dateRangeReportProvider)
+        : (reportType == ReportType.monthly)
+        ? ref.watch(monthlyReportProvider)
+        : ref.watch(yearlyReportProvider);
+
     List<String> availableFilters = ref.watch(filtersListProvider);
     List<String> appliedFilters = ref.watch(appliedFiltersProvider);
-    Future.delayed(Duration(seconds: 1), () async {});
 
     // Filter transactions based on applied filters
     final List<SaleReceiptModel> transList = _filterTransactions(
@@ -34,6 +39,137 @@ class ReportWidget extends ConsumerWidget {
 
     return Column(
       children: [
+        // Date Range Selection (only show for custom date range reports)
+        if (reportType == ReportType.yearly)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextButton.icon(
+                    onPressed: () async {
+                      final pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: dateRange.startDate ?? DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime.now(),
+                      );
+                      if (pickedDate != null && context.mounted) {
+                        final pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.fromDateTime(
+                            dateRange.startDate ?? DateTime.now(),
+                          ),
+                        );
+                        if (pickedTime != null) {
+                          final dateWithTime = pickedDate.copyWith(
+                            hour: pickedTime.hour,
+                            minute: pickedTime.minute,
+                          );
+                          ref
+                              .read(dateRangeProvider.notifier)
+                              .setDateRange(dateWithTime, dateRange.endDate);
+                          if (dateRange.endDate != null) {
+                            await ref
+                                .read(dateRangeReportProvider.notifier)
+                                .getDateRangeTransactions(
+                                  dateWithTime,
+                                  dateRange.endDate!,
+                                );
+                            ref
+                                .read(appliedFiltersProvider.notifier)
+                                .updateAppliedFilters([]);
+                          }
+                        }
+                      }
+                    },
+                    label: Text(
+                      dateRange.startDate != null
+                          ? dateFormat(dateRange.startDate!)
+                          : "From Date & Time",
+                      style: TextStyle(
+                        color: dateRange.startDate != null
+                            ? AppColors.blue
+                            : Colors.grey,
+                      ),
+                    ),
+                    icon: Icon(Icons.calendar_today),
+                    iconAlignment: IconAlignment.end,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: Text("to"),
+                ),
+                Expanded(
+                  child: TextButton.icon(
+                    onPressed: () async {
+                      final pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: dateRange.endDate ?? DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime.now(),
+                      );
+                      if (pickedDate != null && context.mounted) {
+                        final pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.fromDateTime(
+                            dateRange.endDate ?? DateTime.now(),
+                          ),
+                        );
+                        if (pickedTime != null) {
+                          final dateWithTime = pickedDate.copyWith(
+                            hour: pickedTime.hour,
+                            minute: pickedTime.minute,
+                          );
+                          ref
+                              .read(dateRangeProvider.notifier)
+                              .setDateRange(dateRange.startDate, dateWithTime);
+                          if (dateRange.startDate != null) {
+                            await ref
+                                .read(dateRangeReportProvider.notifier)
+                                .getDateRangeTransactions(
+                                  dateRange.startDate!,
+                                  dateWithTime,
+                                );
+                            ref
+                                .read(appliedFiltersProvider.notifier)
+                                .updateAppliedFilters([]);
+                          }
+                        }
+                      }
+                    },
+                    label: Text(
+                      dateRange.endDate != null
+                          ? dateFormat(dateRange.endDate!)
+                          : "To Date & Time",
+                      style: TextStyle(
+                        color: dateRange.endDate != null
+                            ? AppColors.blue
+                            : Colors.grey,
+                      ),
+                    ),
+                    icon: Icon(Icons.calendar_today),
+                    iconAlignment: IconAlignment.end,
+                  ),
+                ),
+                if (dateRange.startDate != null && dateRange.endDate != null)
+                  IconButton(
+                    onPressed: () {
+                      ref.read(dateRangeProvider.notifier).clearDateRange();
+                      ref
+                          .read(yearlyReportProvider.notifier)
+                          .getAllTransactions();
+                      ref
+                          .read(appliedFiltersProvider.notifier)
+                          .updateAppliedFilters([]);
+                    },
+                    icon: Icon(Icons.clear),
+                    tooltip: "Clear date range",
+                  ),
+              ],
+            ),
+          ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -67,7 +203,7 @@ class ReportWidget extends ConsumerWidget {
                       ref.read(monthlyDateProvider.notifier).updateDate(date);
                       ref
                           .read(monthlyReportProvider.notifier)
-                          .getMonthlyTransactions(date);
+                          .updateTransactions(date);
                       ref
                           .read(appliedFiltersProvider.notifier)
                           .updateAppliedFilters([]);
@@ -95,18 +231,20 @@ class ReportWidget extends ConsumerWidget {
                           tag: "availableFilters",
                         );
 
-                        showDialog(
-                          context: context,
-                          builder: (context) => FiltersPanel(
-                            availableFilters: availableFilters,
-                            reportType: reportType,
-                            onApplyFilters: (selectedFilters) {
-                              ref
-                                  .read(appliedFiltersProvider.notifier)
-                                  .updateAppliedFilters(selectedFilters);
-                            },
-                          ),
-                        );
+                        if (context.mounted) {
+                          showDialog(
+                            context: context,
+                            builder: (context) => FiltersPanel(
+                              availableFilters: availableFilters,
+                              reportType: reportType,
+                              onApplyFilters: (selectedFilters) {
+                                ref
+                                    .read(appliedFiltersProvider.notifier)
+                                    .updateAppliedFilters(selectedFilters);
+                              },
+                            ),
+                          );
+                        }
                       },
                       icon: Icon(Icons.filter_alt),
                     ),

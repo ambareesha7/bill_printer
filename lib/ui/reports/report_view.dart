@@ -100,7 +100,7 @@ class _ReportViewState extends ConsumerState<ReportView>
                           selectedWeek = "W1";
                           ref
                               .read(weeklyReportProvider.notifier)
-                              .getMonthlyTransactions(date);
+                              .updateTransactions(date);
                           setState(() {});
                         }
                       });

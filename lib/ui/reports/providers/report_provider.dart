@@ -73,6 +73,39 @@ class YearlyReport extends _$YearlyReport {
 }
 
 @riverpod
+class DateRange extends _$DateRange {
+  @override
+  ({DateTime? startDate, DateTime? endDate}) build() {
+    return (startDate: null, endDate: null);
+  }
+
+  void setDateRange(DateTime? startDate, DateTime? endDate) {
+    state = (startDate: startDate, endDate: endDate);
+  }
+
+  void clearDateRange() {
+    state = (startDate: null, endDate: null);
+  }
+}
+
+@riverpod
+class DateRangeReport extends _$DateRangeReport {
+  final DBUtils dbUtils = DBUtils.instance;
+  @override
+  List<SaleReceiptModel> build() {
+    return [];
+  }
+
+  getDateRangeTransactions(DateTime startDate, DateTime endDate) async {
+    final List<SaleReceiptModel> transactions = await getReport2(
+      startDate: startDate,
+      endDate: endDate,
+    );
+    state = [...transactions];
+  }
+}
+
+@riverpod
 class MonthlyReport extends _$MonthlyReport {
   final DBUtils dbUtils = DBUtils.instance;
   @override
@@ -87,8 +120,8 @@ class MonthlyReport extends _$MonthlyReport {
     state = [...saleTrans];
   }
 
-  getMonthlyTransactions(DateTime date) async {
-    final n = await getReport(date);
+  updateTransactions(DateTime date) async {
+    final n = await getMonthlyTransactions(date);
     state = [...n];
   }
 
@@ -103,14 +136,12 @@ class WeeklyReport extends _$WeeklyReport {
   final DBUtils dbUtils = DBUtils.instance;
   @override
   List<SaleReceiptModel> build() {
-    getMonthlyTransactions(
-      DateTime(DateTime.now().year, DateTime.now().month, 1),
-    );
+    updateTransactions(DateTime(DateTime.now().year, DateTime.now().month, 1));
     return [];
   }
 
-  getMonthlyTransactions(DateTime date) async {
-    final n = await getReport(date);
+  updateTransactions(DateTime date) async {
+    final n = await getMonthlyTransactions(date);
     state = [...n];
   }
 }
@@ -185,6 +216,15 @@ Future<List<SaleReceiptModel>> getDayReport(DateTime date) async {
     lastDate: date,
   );
   return l;
+}
+
+getMonthlyTransactions(DateTime date) async {
+  ({DateTime startDate, DateTime lastDate}) dates = getDatesOfMonth(date);
+  // Extend lastDate to end of day to include all transactions on that day
+  final endOfDay = dates.lastDate
+      .add(const Duration(days: 1))
+      .copyWith(hour: 0, minute: 0, second: 0, millisecond: 0);
+  return await getReport2(startDate: dates.startDate, endDate: endOfDay);
 }
 
 int getWeekDates({required String week, required DateTime date}) {

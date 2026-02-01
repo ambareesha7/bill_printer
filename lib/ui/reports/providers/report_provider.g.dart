@@ -41,7 +41,7 @@ final class FiltersListProvider
   }
 }
 
-String _$filtersListHash() => r'ac3979a68cf2c3cca54a009928265a519ccbed4f';
+String _$filtersListHash() => r'77ea36470e4990b4fb9355cb3d79e60f78e91031';
 
 abstract class _$FiltersList extends $Notifier<List<String>> {
   List<String> build();
@@ -94,7 +94,7 @@ final class AppliedFiltersProvider
   }
 }
 
-String _$appliedFiltersHash() => r'4bab7637c0113ab14b691ebf56af6a159b95416b';
+String _$appliedFiltersHash() => r'4e286102044394578ff21cd6500f540e08a03ab3';
 
 abstract class _$AppliedFilters extends $Notifier<List<String>> {
   List<String> build();
@@ -169,6 +169,127 @@ abstract class _$YearlyReport extends $Notifier<List<SaleReceiptModel>> {
   }
 }
 
+@ProviderFor(DateRange)
+const dateRangeProvider = DateRangeProvider._();
+
+final class DateRangeProvider
+    extends
+        $NotifierProvider<
+          DateRange,
+          ({DateTime? endDate, DateTime? startDate})
+        > {
+  const DateRangeProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'dateRangeProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$dateRangeHash();
+
+  @$internal
+  @override
+  DateRange create() => DateRange();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(({DateTime? endDate, DateTime? startDate}) value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride:
+          $SyncValueProvider<({DateTime? endDate, DateTime? startDate})>(value),
+    );
+  }
+}
+
+String _$dateRangeHash() => r'64df17ae5fef57246421263b5c8f958fac640c04';
+
+abstract class _$DateRange
+    extends $Notifier<({DateTime? endDate, DateTime? startDate})> {
+  ({DateTime? endDate, DateTime? startDate}) build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref =
+        this.ref
+            as $Ref<
+              ({DateTime? endDate, DateTime? startDate}),
+              ({DateTime? endDate, DateTime? startDate})
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                ({DateTime? endDate, DateTime? startDate}),
+                ({DateTime? endDate, DateTime? startDate})
+              >,
+              ({DateTime? endDate, DateTime? startDate}),
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}
+
+@ProviderFor(DateRangeReport)
+const dateRangeReportProvider = DateRangeReportProvider._();
+
+final class DateRangeReportProvider
+    extends $NotifierProvider<DateRangeReport, List<SaleReceiptModel>> {
+  const DateRangeReportProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'dateRangeReportProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$dateRangeReportHash();
+
+  @$internal
+  @override
+  DateRangeReport create() => DateRangeReport();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<SaleReceiptModel> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<SaleReceiptModel>>(value),
+    );
+  }
+}
+
+String _$dateRangeReportHash() => r'1753d350f91e0a975ee6db7a9ae1326d74cbda74';
+
+abstract class _$DateRangeReport extends $Notifier<List<SaleReceiptModel>> {
+  List<SaleReceiptModel> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref =
+        this.ref as $Ref<List<SaleReceiptModel>, List<SaleReceiptModel>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<List<SaleReceiptModel>, List<SaleReceiptModel>>,
+              List<SaleReceiptModel>,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}
+
 @ProviderFor(MonthlyReport)
 const monthlyReportProvider = MonthlyReportProvider._();
 
@@ -201,7 +322,7 @@ final class MonthlyReportProvider
   }
 }
 
-String _$monthlyReportHash() => r'b8aedff738952ab9e26c2cee38c71b6a5368a64a';
+String _$monthlyReportHash() => r'648ee118e2b804e35e4a047ad7946db36db27422';
 
 abstract class _$MonthlyReport extends $Notifier<List<SaleReceiptModel>> {
   List<SaleReceiptModel> build();
@@ -255,7 +376,7 @@ final class WeeklyReportProvider
   }
 }
 
-String _$weeklyReportHash() => r'd5e2f84cd7dda930aa5e2254539c5fee43988027';
+String _$weeklyReportHash() => r'44365fe151a199f6469425950bfa07a2340434ae';
 
 abstract class _$WeeklyReport extends $Notifier<List<SaleReceiptModel>> {
   List<SaleReceiptModel> build();
