@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 import '../../data/models/sale_receipts/sale_receipt_model.dart';
+import 'package:bill_printer/ui/printer/providers/printer_provider.dart';
 
 class ReportWidget extends ConsumerWidget {
   const ReportWidget(this.reportType, {super.key});
@@ -19,6 +20,7 @@ class ReportWidget extends ConsumerWidget {
     String selectedMonth = monthFormat(ref.watch(monthlyDateProvider));
     final dateRange = ref.watch(dateRangeProvider);
     ref.watch(dateRangeReportProvider);
+    ref.watch(printerProvider);
 
     // TODO: REMOVE MONTHLY REPORT IS POSSIBLE
     final List<SaleReceiptModel> allTransactions =
@@ -333,12 +335,27 @@ class ReportWidget extends ConsumerWidget {
                       ...renderSubItems(subItems),
                       Wrap(
                         children: [
-                          // ElevatedButton(
-                          //   onPressed: () {
-                          //     // debugLog(transaction);
-                          //   },
-                          //   child: Text("Edit"),
-                          // ),
+                          IconButton(
+                            onPressed: () {
+                              ref
+                                  .read(printerProvider.notifier)
+                                  .printBill(
+                                    context: context,
+                                    orderNo: transaction.orederNo,
+                                    paymentMode: transaction.paymentMode,
+                                    dateTime: dateFormat(
+                                      transaction.createdAt!.toLocal(),
+                                    ),
+                                    itemsList: transaction.billItems ?? [],
+                                    totalAmount: transaction.totalAmount
+                                        .toString(),
+                                    totalItems:
+                                        (transaction.billItems?.length ?? 0)
+                                            .toString(),
+                                  );
+                            },
+                            icon: Icon(Icons.print),
+                          ),
                           IconButton(
                             onPressed: () {
                               UIUtils.confirmDialog(
@@ -390,19 +407,27 @@ class ReportWidget extends ConsumerWidget {
     if (items == null) [];
     for (BillItemModel i in items ?? []) {
       list.add(
-        Wrap(
-          children: [
-            Text("${i.name} ", style: TextStyle(color: AppColors.blueGrey)),
-            Text("Qty: "),
-            Text("${i.quantity} ", style: TextStyle(color: AppColors.blueGrey)),
-            Text("Rate: "),
-            Text("${i.rate} ", style: TextStyle(color: AppColors.blueGrey)),
-            Text("Amount: "),
-            Text(
-              "₹${i.rate * i.quantity}",
-              style: TextStyle(color: AppColors.blueGrey),
-            ),
-          ],
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.borderColor),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          padding: const EdgeInsets.all(6),
+          child: Wrap(
+            spacing: 2,
+            children: [
+              Text("${i.name} ", style: TextStyle(color: AppColors.blue)),
+              Text("Qty: "),
+              Text("${i.quantity} ", style: TextStyle(color: AppColors.blue)),
+              Text("Rate: "),
+              Text("${i.rate} ", style: TextStyle(color: AppColors.blue)),
+              Text("Amount: "),
+              Text(
+                "₹${i.rate * i.quantity}",
+                style: TextStyle(color: AppColors.blue),
+              ),
+            ],
+          ),
         ),
       );
     }

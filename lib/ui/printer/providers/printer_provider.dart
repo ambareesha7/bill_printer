@@ -90,7 +90,7 @@ class Printer extends _$Printer {
     } else {
       disconnect();
       showToast(
-        "Please the check Printer connection",
+        "Please check the PRINTER connection",
         context: context,
         backgroundColor: AppColors.red,
       );
