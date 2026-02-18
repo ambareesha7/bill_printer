@@ -43,7 +43,7 @@ class _MyHomePageState extends ConsumerState<HomeView> {
             ),
             NavBtn(path: RouterPaths.category.name),
             NavBtn(path: RouterPaths.bankAccount.name),
-            NavBtn(path: RouterPaths.reports.name),
+            NavBtn(path: RouterPaths.reportsMain.name),
             NavBtn(path: RouterPaths.signUp.name),
             NavBtn(path: RouterPaths.users.name),
             NavBtn(path: RouterPaths.printer.name),

@@ -43,7 +43,7 @@ class _BillViewState extends ConsumerState<BillView> {
       appBar: AppBar(
         title: const Text("Create Bill"),
         centerTitle: true,
-        actions: [NavBtn(path: RouterPaths.reports.name)],
+        actions: [NavBtn(path: RouterPaths.reportsMain.name)],
       ),
       resizeToAvoidBottomInset: true,
       body: Padding(
