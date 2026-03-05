@@ -1,9 +1,12 @@
 import 'dart:math';
+import 'package:bill_printer/ui/reports/widgets/export_dialog.dart';
 
 import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/ui/reports/report_widget.dart';
 import 'package:bill_printer/ui/reports/pie_chart1.dart';
 import 'package:bill_printer/ui/reports/providers/report_provider.dart';
+import 'package:bill_printer/ui/reports/providers/export_import_provider.dart';
+import 'package:bill_printer/ui/reports/widgets/import_dialog.dart';
 import 'package:bill_printer/ui/utils/app_colors.dart';
 import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -41,6 +44,9 @@ class _ReportViewState extends ConsumerState<ReportView>
     ref.watch(monthlyDateProvider);
     ref.watch(yearlyReportProvider);
 
+    // Watch sale receipts for export/import
+    final saleReceiptsAsync = ref.watch(saleReceiptsProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Reports"),
@@ -77,62 +83,90 @@ class _ReportViewState extends ConsumerState<ReportView>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-
+      body: Column(
         children: [
-          Column(
+          Row(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ...renderWeekChip(selectedMonth),
-                  TextButton.icon(
-                    onPressed: () {
-                      showMonthPicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                      ).then((date) {
-                        if (date != null) {
-                          ref
-                              .read(weeklyDateProvider.notifier)
-                              .updateDate(date);
-                          selectedWeek = "W1";
-                          ref
-                              .read(weeklyReportProvider.notifier)
-                              .updateTransactions(date);
-                          setState(() {});
-                        }
-                      });
-                    },
-                    label: Text(monthFormat(selectedMonth)),
-                    icon: Icon(Icons.unfold_more_sharp),
-                    iconAlignment: IconAlignment.end,
-                  ),
-                ],
-              ),
-              PieChart1(),
-              Flexible(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Consumer(
-                    builder: (context, ref, child) {
-                      final items = ref.watch(weeklyReportProvider);
-                      return BarChart(
-                        randomData(
-                          items: items,
-                          date: selectedMonth,
-                          week: selectedWeek,
-                        ),
-                      );
-                    },
+              saleReceiptsAsync.when(
+                data: (receipts) => ExportButton(receipts: receipts),
+                loading: () => const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    height: 40,
+                    child: Center(child: CircularProgressIndicator()),
                   ),
                 ),
+                error: (err, stack) => Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text('Error loading receipts for export'),
+                ),
+              ),
+              ImportButton(
+                onImportSuccess: (r) {
+                  debugLog(r.length, tag: "Import len");
+                },
               ),
             ],
           ),
-          ReportWidget(ReportType.monthly),
-          ReportWidget(ReportType.yearly),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ...renderWeekChip(selectedMonth),
+                        TextButton.icon(
+                          onPressed: () {
+                            showMonthPicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                            ).then((date) {
+                              if (date != null) {
+                                ref
+                                    .read(weeklyDateProvider.notifier)
+                                    .updateDate(date);
+                                selectedWeek = "W1";
+                                ref
+                                    .read(weeklyReportProvider.notifier)
+                                    .updateTransactions(date);
+                                setState(() {});
+                              }
+                            });
+                          },
+                          label: Text(monthFormat(selectedMonth)),
+                          icon: Icon(Icons.unfold_more_sharp),
+                          iconAlignment: IconAlignment.end,
+                        ),
+                      ],
+                    ),
+                    PieChart1(),
+                    Flexible(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Consumer(
+                          builder: (context, ref, child) {
+                            final items = ref.watch(weeklyReportProvider);
+                            return BarChart(
+                              randomData(
+                                items: items,
+                                date: selectedMonth,
+                                week: selectedWeek,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                ReportWidget(ReportType.monthly),
+                ReportWidget(ReportType.yearly),
+              ],
+            ),
+          ),
         ],
       ),
     );
