@@ -120,38 +120,45 @@ class FileManager {
     }
   }
 
-  Future<String?> readJsonFile1({required File file}) async {
-    String fileContent = '[]';
-    if (await file.exists()) {
-      try {
-        fileContent = await file.readAsString();
-        return fileContent;
-      } catch (e) {
-        // Utils().showToast(text: 'Failed to read the file', color: Colors.red);
-        return null;
-      }
-    }
+  Future<File> saveFileToTemp({
+    required String fileName,
+    required String content,
+  }) async {
+    try {
+      Directory directory = await getPlatformSpecificDirectory();
+      final exportsDir2 = await directory.createTemp("exports");
 
-    return null;
+      final file = File('${exportsDir2.path}/$fileName');
+      await file.writeAsString(content);
+
+      debugLog("File saved to downloads successfully: ${file.path}");
+      return file;
+    } catch (e) {
+      debugLog("Error saving file to downloads: $e");
+      throw Exception("Failed to save file to downloads: $e");
+    }
   }
 
-  // Future writeJsonFile(String storyList) async {
-  //   File file = await storyJsonFile;
-  //   var filePath = await file.writeAsString(storyList);
-  //   // print('file write ...... ${filePath.path}');
-  //   return filePath;
-  // }
-
-  Future<File?> writeJsonFile1({
-    required dynamic contents,
-    required File filePath,
-  }) async {
-    // File file = await _jsonFile;
-    // print('file write ...... ${filePath.path}');
+  /// Read data from a file
+  Future<String> readFile({required File file}) async {
     try {
-      return await filePath.writeAsString(contents);
+      if (!await file.exists()) {
+        throw Exception("File does not exist");
+      }
+      final content = await file.readAsString();
+      debugLog("File read successfully: ${file.path}");
+      return content;
     } catch (e) {
-      return null;
+      debugLog("Error reading file: $e");
+      throw Exception("Failed to read file: $e");
+    }
+  }
+
+  shareFile(File fi) async {
+    try {
+      UIUtils().shareFile(fi.path, "saveData");
+    } catch (e) {
+      debugLog(e, tag: "shareNDeleteFile2");
     }
   }
 

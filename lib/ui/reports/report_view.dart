@@ -1,12 +1,9 @@
 import 'dart:math';
-import 'package:bill_printer/ui/reports/widgets/export_dialog.dart';
 
 import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/ui/reports/report_widget.dart';
 import 'package:bill_printer/ui/reports/pie_chart1.dart';
 import 'package:bill_printer/ui/reports/providers/report_provider.dart';
-import 'package:bill_printer/ui/reports/providers/export_import_provider.dart';
-import 'package:bill_printer/ui/reports/widgets/import_dialog.dart';
 import 'package:bill_printer/ui/utils/app_colors.dart';
 import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -43,9 +40,6 @@ class _ReportViewState extends ConsumerState<ReportView>
     ref.watch(monthlyReportProvider);
     ref.watch(monthlyDateProvider);
     ref.watch(yearlyReportProvider);
-
-    // Watch sale receipts for export/import
-    final saleReceiptsAsync = ref.watch(saleReceiptsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -85,29 +79,6 @@ class _ReportViewState extends ConsumerState<ReportView>
       ),
       body: Column(
         children: [
-          Row(
-            children: [
-              saleReceiptsAsync.when(
-                data: (receipts) => ExportButton(receipts: receipts),
-                loading: () => const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    height: 40,
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                ),
-                error: (err, stack) => Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text('Error loading receipts for export'),
-                ),
-              ),
-              ImportButton(
-                onImportSuccess: (r) {
-                  debugLog(r.length, tag: "Import len");
-                },
-              ),
-            ],
-          ),
           Expanded(
             child: TabBarView(
               controller: _tabController,
