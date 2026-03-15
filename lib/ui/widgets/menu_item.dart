@@ -1,3 +1,4 @@
+import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:flutter/material.dart';
 
 class MenuItem extends StatelessWidget {
@@ -22,7 +23,7 @@ class MenuItem extends StatelessWidget {
               if (name != null)
                 Flexible(
                   child: Text(
-                    name ?? "",
+                    capitalize(name ?? ""),
                     overflow: TextOverflow.ellipsis,
                     softWrap: true,
                     maxLines: 2,
