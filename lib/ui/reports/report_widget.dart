@@ -5,6 +5,7 @@ import 'package:bill_printer/ui/reports/providers/report_provider.dart';
 import 'package:bill_printer/ui/utils/app_colors.dart';
 import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:bill_printer/ui/utils/ui_utils.dart';
+import 'package:bill_printer/ui/widgets/date_range_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
@@ -43,134 +44,87 @@ class ReportWidget extends ConsumerWidget {
       children: [
         // Date Range Selection (only show for custom date range reports)
         if (reportType == ReportType.yearly)
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextButton.icon(
-                    onPressed: () async {
-                      final pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: dateRange.startDate ?? DateTime.now(),
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime.now(),
-                      );
-                      if (pickedDate != null && context.mounted) {
-                        final pickedTime = await showTimePicker(
-                          context: context,
-                          initialTime: TimeOfDay.fromDateTime(
-                            dateRange.startDate ?? DateTime.now(),
-                          ),
+          DateRangeWidget(
+            dateRange: dateRange,
+            onFromDateSelect: () async {
+              final pickedDate = await showDatePicker(
+                context: context,
+                initialDate: dateRange.startDate ?? DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime.now(),
+              );
+              if (pickedDate != null && context.mounted) {
+                final pickedTime = await showTimePicker(
+                  context: context,
+                  initialTime: TimeOfDay.fromDateTime(
+                    dateRange.startDate ?? DateTime.now(),
+                  ),
+                );
+                if (pickedTime != null) {
+                  final dateWithTime = pickedDate.copyWith(
+                    hour: pickedTime.hour,
+                    minute: pickedTime.minute,
+                  );
+                  ref
+                      .read(dateRangeProvider.notifier)
+                      .setDateRange(dateWithTime, dateRange.endDate);
+                  if (dateRange.endDate != null) {
+                    await ref
+                        .read(dateRangeReportProvider.notifier)
+                        .getDateRangeTransactions(
+                          dateWithTime,
+                          dateRange.endDate!,
                         );
-                        if (pickedTime != null) {
-                          final dateWithTime = pickedDate.copyWith(
-                            hour: pickedTime.hour,
-                            minute: pickedTime.minute,
-                          );
-                          ref
-                              .read(dateRangeProvider.notifier)
-                              .setDateRange(dateWithTime, dateRange.endDate);
-                          if (dateRange.endDate != null) {
-                            await ref
-                                .read(dateRangeReportProvider.notifier)
-                                .getDateRangeTransactions(
-                                  dateWithTime,
-                                  dateRange.endDate!,
-                                );
-                            ref
-                                .read(appliedFiltersProvider.notifier)
-                                .updateAppliedFilters([]);
-                          }
-                        }
-                      }
-                    },
-                    label: Text(
-                      dateRange.startDate != null
-                          ? dateFormat(dateRange.startDate!)
-                          : "From Date & Time",
-                      style: TextStyle(
-                        color: dateRange.startDate != null
-                            ? AppColors.blue
-                            : Colors.grey,
-                      ),
-                    ),
-                    icon: Icon(Icons.calendar_today),
-                    iconAlignment: IconAlignment.end,
+                    ref
+                        .read(appliedFiltersProvider.notifier)
+                        .updateAppliedFilters([]);
+                  }
+                }
+              }
+            },
+            onToDateSelect: () async {
+              final pickedDate = await showDatePicker(
+                context: context,
+                initialDate: dateRange.endDate ?? DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime.now(),
+              );
+              if (pickedDate != null && context.mounted) {
+                final pickedTime = await showTimePicker(
+                  context: context,
+                  initialTime: TimeOfDay.fromDateTime(
+                    dateRange.endDate ?? DateTime.now(),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Text("to"),
-                ),
-                Expanded(
-                  child: TextButton.icon(
-                    onPressed: () async {
-                      final pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: dateRange.endDate ?? DateTime.now(),
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime.now(),
-                      );
-                      if (pickedDate != null && context.mounted) {
-                        final pickedTime = await showTimePicker(
-                          context: context,
-                          initialTime: TimeOfDay.fromDateTime(
-                            dateRange.endDate ?? DateTime.now(),
-                          ),
+                );
+                if (pickedTime != null) {
+                  final dateWithTime = pickedDate.copyWith(
+                    hour: pickedTime.hour,
+                    minute: pickedTime.minute,
+                  );
+                  ref
+                      .read(dateRangeProvider.notifier)
+                      .setDateRange(dateRange.startDate, dateWithTime);
+                  if (dateRange.startDate != null) {
+                    await ref
+                        .read(dateRangeReportProvider.notifier)
+                        .getDateRangeTransactions(
+                          dateRange.startDate!,
+                          dateWithTime,
                         );
-                        if (pickedTime != null) {
-                          final dateWithTime = pickedDate.copyWith(
-                            hour: pickedTime.hour,
-                            minute: pickedTime.minute,
-                          );
-                          ref
-                              .read(dateRangeProvider.notifier)
-                              .setDateRange(dateRange.startDate, dateWithTime);
-                          if (dateRange.startDate != null) {
-                            await ref
-                                .read(dateRangeReportProvider.notifier)
-                                .getDateRangeTransactions(
-                                  dateRange.startDate!,
-                                  dateWithTime,
-                                );
-                            ref
-                                .read(appliedFiltersProvider.notifier)
-                                .updateAppliedFilters([]);
-                          }
-                        }
-                      }
-                    },
-                    label: Text(
-                      dateRange.endDate != null
-                          ? dateFormat(dateRange.endDate!)
-                          : "To Date & Time",
-                      style: TextStyle(
-                        color: dateRange.endDate != null
-                            ? AppColors.blue
-                            : Colors.grey,
-                      ),
-                    ),
-                    icon: Icon(Icons.calendar_today),
-                    iconAlignment: IconAlignment.end,
-                  ),
-                ),
-                if (dateRange.startDate != null && dateRange.endDate != null)
-                  IconButton(
-                    onPressed: () {
-                      ref.read(dateRangeProvider.notifier).clearDateRange();
-                      ref
-                          .read(yearlyReportProvider.notifier)
-                          .getAllTransactions();
-                      ref
-                          .read(appliedFiltersProvider.notifier)
-                          .updateAppliedFilters([]);
-                    },
-                    icon: Icon(Icons.clear),
-                    tooltip: "Clear date range",
-                  ),
-              ],
-            ),
+                    ref
+                        .read(appliedFiltersProvider.notifier)
+                        .updateAppliedFilters([]);
+                  }
+                }
+              }
+            },
+            closeBtnFunc: () {
+              ref.read(dateRangeProvider.notifier).clearDateRange();
+              ref.read(yearlyReportProvider.notifier).getAllTransactions();
+              ref
+                  .read(appliedFiltersProvider.notifier)
+                  .updateAppliedFilters([]);
+            },
           ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,

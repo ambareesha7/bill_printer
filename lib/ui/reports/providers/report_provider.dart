@@ -218,7 +218,7 @@ Future<List<SaleReceiptModel>> getDayReport(DateTime date) async {
   return l;
 }
 
-getMonthlyTransactions(DateTime date) async {
+Future<List<SaleReceiptModel>> getMonthlyTransactions(DateTime date) async {
   ({DateTime startDate, DateTime lastDate}) dates = getDatesOfMonth(date);
   // Extend lastDate to end of day to include all transactions on that day
   final endOfDay = dates.lastDate

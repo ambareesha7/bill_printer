@@ -32,3 +32,6 @@ String getYearMonthDay(DateTime date) => DateFormat("yyyy-MM-dd").format(date);
 String capitalize(String text) {
   return "${text.substring(0, 1).toUpperCase()}${text.substring(1)}";
 }
+
+bool isSameDay(DateTime a, DateTime b) =>
+    a.year == b.year && a.month == b.month && a.day == b.day;

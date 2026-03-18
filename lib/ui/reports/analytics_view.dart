@@ -1,5 +1,7 @@
 import 'package:bill_printer/data/models/sale_receipts/sale_receipt_model.dart';
 import 'package:bill_printer/ui/reports/providers/report_provider.dart';
+import 'package:bill_printer/ui/utils/app_colors.dart';
+import 'package:bill_printer/ui/widgets/date_range_widget.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,12 +25,22 @@ class _AnalyticsViewState extends ConsumerState<AnalyticsView> {
     selectedDate = DateTime.now();
     fromDate = DateTime.now().subtract(const Duration(days: 30));
     toDate = DateTime.now();
+    WidgetsBinding.instance.addPostFrameCallback((t) {
+      ref.read(monthlyReportProvider.notifier).updateTransactions(selectedDate);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: get reports based selected date from DB
-    final yearlyTransactions = ref.watch(yearlyReportProvider);
+    final monthlyTransactions = ref.watch(monthlyReportProvider);
+    final dateRange = ref.watch(dateRangeProvider);
+    ref.watch(dateRangeReportProvider);
+    ref.watch(monthlyReportProvider);
+    bool dateRangeSet =
+        (dateRange.startDate != null && dateRange.endDate != null);
+    List<SaleReceiptModel> transactions = dateRangeSet
+        ? ref.watch(dateRangeReportProvider)
+        : ref.watch(monthlyReportProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Sales Analytics'), centerTitle: true),
@@ -52,49 +64,100 @@ class _AnalyticsViewState extends ConsumerState<AnalyticsView> {
                       ),
 
                       const SizedBox(height: 12),
-                      const Text(
-                        'Select Date & Time for Item View',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextButton.icon(
-                              onPressed: () async {
-                                final pickedDate = await showDatePicker(
-                                  context: context,
-                                  initialDate: selectedDate,
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime.now(),
-                                );
-                                if (pickedDate != null) {
-                                  if (!mounted) return;
-                                  setState(() {
-                                    selectedDate = DateTime(
-                                      pickedDate.year,
-                                      pickedDate.month,
-                                      pickedDate.day,
-                                      // pickedTime.hour,
-                                      // pickedTime.minute,
+                      DateRangeWidget(
+                        dateRange: dateRange,
+                        onFromDateSelect: () async {
+                          final pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: dateRange.startDate ?? DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime.now(),
+                          );
+                          if (pickedDate != null && context.mounted) {
+                            final pickedTime = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.fromDateTime(
+                                dateRange.startDate ?? DateTime.now(),
+                              ),
+                            );
+                            if (pickedTime != null) {
+                              final dateWithTime = pickedDate.copyWith(
+                                hour: pickedTime.hour,
+                                minute: pickedTime.minute,
+                              );
+                              ref
+                                  .read(dateRangeProvider.notifier)
+                                  .setDateRange(
+                                    dateWithTime,
+                                    dateRange.endDate,
+                                  );
+                              if (dateRange.endDate != null) {
+                                await ref
+                                    .read(dateRangeReportProvider.notifier)
+                                    .getDateRangeTransactions(
+                                      dateWithTime,
+                                      dateRange.endDate!,
                                     );
-                                  });
-                                }
-                              },
-                              icon: const Icon(Icons.event),
-                              label: Text(
-                                DateFormat(
-                                  'MMM dd, yyyy hh:mm a',
-                                ).format(selectedDate),
-                                style: const TextStyle(fontSize: 12),
+                              }
+                            }
+                          }
+                        },
+                        onToDateSelect: () async {
+                          final pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: dateRange.endDate ?? DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime.now(),
+                          );
+                          if (pickedDate != null && context.mounted) {
+                            final pickedTime = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.fromDateTime(
+                                dateRange.endDate ?? DateTime.now(),
+                              ),
+                            );
+                            if (pickedTime != null) {
+                              final dateWithTime = pickedDate.copyWith(
+                                hour: pickedTime.hour,
+                                minute: pickedTime.minute,
+                              );
+                              ref
+                                  .read(dateRangeProvider.notifier)
+                                  .setDateRange(
+                                    dateRange.startDate,
+                                    dateWithTime,
+                                  );
+                              if (dateRange.startDate != null) {
+                                await ref
+                                    .read(dateRangeReportProvider.notifier)
+                                    .getDateRangeTransactions(
+                                      dateRange.startDate!,
+                                      dateWithTime,
+                                    );
+                              }
+                            }
+                          }
+                        },
+                        closeBtnFunc: () {
+                          ref.read(dateRangeProvider.notifier).clearDateRange();
+                          ref
+                              .read(monthlyReportProvider.notifier)
+                              .updateTransactions(selectedDate);
+                        },
+                      ),
+                      if (!dateRangeSet)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "DateTime: ${getDateFormat(selectedDate)}",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.cyan,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
                     ],
                   ),
                 ),
@@ -103,7 +166,7 @@ class _AnalyticsViewState extends ConsumerState<AnalyticsView> {
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: _buildBillItemsCard(yearlyTransactions),
+              child: _buildBillItemsCard(transactions),
             ),
 
             const SizedBox(height: 20),
@@ -123,26 +186,9 @@ class _AnalyticsViewState extends ConsumerState<AnalyticsView> {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: SizedBox(
                 height: 300,
-                child: _buildTimeSeriesChart(yearlyTransactions),
+                child: _buildTimeSeriesChart(monthlyTransactions),
               ),
             ),
-
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Daily Statistics',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDailySalesStats(yearlyTransactions),
-                ],
-              ),
-            ),
-
             const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -154,7 +200,7 @@ class _AnalyticsViewState extends ConsumerState<AnalyticsView> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
-                  _buildItemWiseBreakdown(yearlyTransactions),
+                  _buildItemWiseBreakdown(transactions),
                 ],
               ),
             ),
@@ -167,15 +213,10 @@ class _AnalyticsViewState extends ConsumerState<AnalyticsView> {
   }
 
   Widget _buildBillItemsCard(List<SaleReceiptModel> transactions) {
-    final billsOnSelected = transactions
-        .where(
-          (t) => t.createdAt != null && isSameDay(t.createdAt!, selectedDate),
-        )
-        .toList();
-    final billCount = billsOnSelected.length;
+    final billCount = transactions.length;
     int itemCount = 0;
     int totalAmount = 0;
-    for (var b in billsOnSelected) {
+    for (var b in transactions) {
       if (b.billItems != null) {
         for (var it in b.billItems!) {
           itemCount += it.quantity;
@@ -293,36 +334,10 @@ class _AnalyticsViewState extends ConsumerState<AnalyticsView> {
     );
   }
 
-  Widget _buildDailySalesStats(List<SaleReceiptModel> transactions) {
-    final Map<String, int> map = {};
-    for (var t in transactions) {
-      if (t.createdAt == null) continue;
-      final key = DateFormat('yMd').format(t.createdAt!);
-      map[key] = (map[key] ?? 0) + (t.totalAmount ?? 0);
-    }
-    final entries = map.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-
-    return Column(
-      children: entries.take(10).map((e) {
-        return ListTile(
-          dense: true,
-          title: Text(e.key),
-          trailing: Text('${e.value}'),
-        );
-      }).toList(),
-    );
-  }
-
   Widget _buildItemWiseBreakdown(List<SaleReceiptModel> transactions) {
     final Map<String, Map<String, int>> itemMap = {};
-    final billsOnSelected = transactions
-        .where(
-          (t) => t.createdAt != null && isSameDay(t.createdAt!, selectedDate),
-        )
-        .toList();
 
-    for (var b in billsOnSelected) {
+    for (var b in transactions) {
       if (b.billItems == null) continue;
       for (var it in b.billItems!) {
         final name = it.name;
@@ -345,7 +360,10 @@ class _AnalyticsViewState extends ConsumerState<AnalyticsView> {
       );
     }
 
-    final rows = itemMap.entries.map((e) {
+    final sortedEntries = itemMap.entries.toList()
+      ..sort((a, b) => b.value['revenue']!.compareTo(a.value['revenue']!));
+
+    final rows = sortedEntries.map((e) {
       return ListTile(
         dense: true,
         title: Text(e.key),
@@ -357,6 +375,5 @@ class _AnalyticsViewState extends ConsumerState<AnalyticsView> {
     return Column(children: rows);
   }
 
-  bool isSameDay(DateTime a, DateTime b) =>
-      a.year == b.year && a.month == b.month && a.day == b.day;
+  String getDateFormat(date) => DateFormat('MMM dd, yyyy hh:mm a').format(date);
 }

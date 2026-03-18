@@ -34,7 +34,7 @@ Flutter app for creating bills, generating sales reports for hotels, restaurants
     - [x] integrate with data
     - [x] add yearly report
     - [x] integrate with data
-    - [] add option to download report
+    
     
 
  - [x] add signup view
@@ -43,9 +43,14 @@ Flutter app for creating bills, generating sales reports for hotels, restaurants
  - [x] add SignIn view (not integrated yet)
  - [x] add user DB utils for CRUD
  - [x] add userModel
- - [] add go router
+ - [x] add go router
  - [] add priority listing
- - [] 
+ - [x] add export of sales data
+ - [] add import of sales data
+ - [] fix date selection in analysis
+ - [] expose printer setting view
+ - [] complete checklist feature
+ - [] add export option to products
     
     
 
