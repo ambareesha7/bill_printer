@@ -186,18 +186,26 @@ class Printer extends _$Printer {
     // );
 
     bytes += generator.feed(3);
-    // Invoice title
+
+    // Costumer copy here
+    if (businessName != null) {
+      bytes += generator.text(businessName, styles: headerStyle1);
+    }
     if (invoiceTitle != null) {
       bytes += generator.text(
         "$invoiceTitle ${orderNo ?? ""}",
         styles: const PosStyles(
           align: PosAlign.center,
           bold: true,
-          height: PosTextSize.size2,
-          width: PosTextSize.size2,
+          height: PosTextSize.size1,
+          width: PosTextSize.size1,
         ),
       );
     }
+    bytes += generator.text(
+      "Please wait we will call your OrderNo, Once your item is ready",
+      styles: PosStyles(bold: true, align: PosAlign.center),
+    );
     bytes += generator.feed(4);
     return bytes;
   }
@@ -262,3 +270,10 @@ class Printer extends _$Printer {
     return items;
   }
 }
+
+PosStyles get headerStyle1 => PosStyles(
+  align: PosAlign.center,
+  bold: true,
+  height: PosTextSize.size2,
+  width: PosTextSize.size2,
+);

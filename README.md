@@ -51,6 +51,7 @@ Flutter app for creating bills, generating sales reports for hotels, restaurants
  - [] expose printer setting view
  - [] complete checklist feature
  - [] add export option to products
+ - [] expose paper settings to user
     
     
 
