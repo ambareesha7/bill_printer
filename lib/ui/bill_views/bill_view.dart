@@ -41,7 +41,7 @@ class _BillViewState extends ConsumerState<BillView> {
     ref.watch(printerProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Create Bill"),
+        title: const Text("MoonLight Cafe"),
         centerTitle: true,
         actions: [NavBtn(path: RouterPaths.reports.name)],
       ),
@@ -123,10 +123,7 @@ class _BillViewState extends ConsumerState<BillView> {
               builder: (context, ref, child) {
                 final billItems = ref.watch(billListProvider);
                 return TotalSection(
-                  items: ref
-                      .read(billListProvider.notifier)
-                      .getTotalQuantity(billItems)
-                      .toString(),
+                  items: getTotalQuantity(billItems).toString(),
                   total: ref
                       .read(billListProvider.notifier)
                       .getTotalAmount()
@@ -150,10 +147,7 @@ class _BillViewState extends ConsumerState<BillView> {
                           paymentMode: "Not paid",
                           dateTime: dateFormat(dateTimeNow()),
                           itemsList: billItems,
-                          totalItems: ref
-                              .read(billListProvider.notifier)
-                              .getTotalQuantity(billItems)
-                              .toString(),
+                          totalItems: getTotalQuantity(billItems).toString(),
                           totalAmount: ref
                               .read(billListProvider.notifier)
                               .getTotalAmount()
@@ -231,18 +225,10 @@ class _BillViewState extends ConsumerState<BillView> {
             onPressed: () async {
               int amount = ref.read(billListProvider.notifier).getTotalAmount();
               if (amount > 0) {
-                List<BankAccountModel> bankAccounts = await dbUtils
-                    .parseBankAccounts();
-                if (bankAccounts.isEmpty) {
-                  UIUtils.showSnackBar(
-                    context: context,
-                    text: "Please add bank account to generate QR code",
-                    bgColor: AppColors.red,
-                  );
-                } else {
-                  BankAccountModel primAccount = getPrimeryUPI(bankAccounts);
+                BankAccountModel? bankAccount = await checkBankAC(context);
+                if (bankAccount != null) {
                   _openQRcode(
-                    primAccount: primAccount,
+                    primAccount: bankAccount,
                     amount: amount,
                     preparedBy: user.fullName,
                     orderNo: orderNo,
@@ -271,26 +257,41 @@ class _BillViewState extends ConsumerState<BillView> {
             billPrint: false,
           ),
           AppBtn1(
+            name: "Bill",
+            bgColor: AppColors.blueGrey,
+            onPressed: () async {
+              int amount = ref.read(billListProvider.notifier).getTotalAmount();
+              if (amount > 0) {
+                saveNClearBill(
+                  paymentMode: PaymentMode.others,
+                  paymentStatus: PaymentStatus.receivable,
+                  preparedBy: user.fullName,
+                  orderNo: orderNo,
+                  print: true,
+                );
+              } else {
+                UIUtils.showSnackBar(
+                  context: context,
+                  text: "Please add some billable items",
+                  bgColor: AppColors.red,
+                );
+              }
+            },
+          ),
+          AppBtn1(
             name: "Received in Bank",
             bgColor: AppColors.blueGrey,
             onPressed: () async {
               int amount = ref.read(billListProvider.notifier).getTotalAmount();
               if (amount > 0) {
-                List<BankAccountModel> bankAccounts = await dbUtils
-                    .parseBankAccounts();
-                if (bankAccounts.isEmpty) {
-                  UIUtils.showSnackBar(
-                    context: context,
-                    text: "Please add bank account",
-                    bgColor: AppColors.red,
-                  );
-                } else {
-                  BankAccountModel primAccount = getPrimeryUPI(bankAccounts);
+                BankAccountModel? bankAccount = await checkBankAC(context);
+                if (bankAccount != null) {
                   saveNClearBill(
                     paymentMode: PaymentMode.upi,
+                    paymentStatus: PaymentStatus.received,
                     preparedBy: user.fullName,
                     orderNo: orderNo,
-                    paymentRef: primAccount.upiId,
+                    paymentRef: bankAccount.upiId,
                   );
                 }
               } else {
@@ -360,6 +361,7 @@ class _BillViewState extends ConsumerState<BillView> {
         if (amount > 0) {
           saveNClearBill(
             paymentMode: PaymentMode.cash,
+            paymentStatus: PaymentStatus.received,
             preparedBy: user.fullName,
             orderNo: orderNo,
             print: billPrint,
@@ -401,6 +403,7 @@ class _BillViewState extends ConsumerState<BillView> {
 
   saveNClearBill({
     required PaymentMode paymentMode,
+    required PaymentStatus paymentStatus,
     required String orderNo,
     String? paymentRef,
     String? preparedBy,
@@ -410,12 +413,18 @@ class _BillViewState extends ConsumerState<BillView> {
         .read(billListProvider.notifier)
         .saveOrder(
           paymentMode: paymentMode,
+          paymentStatus: paymentStatus,
           orderNo: orderNo,
           paymentRef: paymentRef,
           preparedBy: preparedBy,
         );
-    if (print) {
-      final billItems = ref.watch(billListProvider);
+    final billItems = ref.watch(billListProvider);
+    String totalItems = getTotalQuantity(billItems).toString();
+    String totalAmount = ref
+        .read(billListProvider.notifier)
+        .getTotalAmount()
+        .toString();
+    if (print && paymentStatus == PaymentStatus.received) {
       ref
           .read(printerProvider.notifier)
           .printBill(
@@ -424,14 +433,21 @@ class _BillViewState extends ConsumerState<BillView> {
             paymentMode: paymentMode.name,
             dateTime: dateFormat(dateTimeNow()),
             itemsList: billItems,
-            totalItems: ref
-                .read(billListProvider.notifier)
-                .getTotalQuantity(billItems)
-                .toString(),
-            totalAmount: ref
-                .read(billListProvider.notifier)
-                .getTotalAmount()
-                .toString(),
+            totalItems: totalItems,
+            totalAmount: totalAmount,
+          );
+    } else if (print && paymentStatus != PaymentStatus.received) {
+      ref
+          .read(printerProvider.notifier)
+          .printBill(
+            context: context,
+            orderNo: orderNo,
+            paymentMode: paymentMode.name,
+            paymentStatus: "Not Paid",
+            dateTime: dateFormat(dateTimeNow()),
+            itemsList: billItems,
+            totalItems: totalItems,
+            totalAmount: totalAmount,
           );
     }
     ref.read(billListProvider.notifier).clearItems();
@@ -450,13 +466,6 @@ class _BillViewState extends ConsumerState<BillView> {
           ),
         );
       },
-    );
-  }
-
-  BankAccountModel getPrimeryUPI(List<BankAccountModel> bankAccounts) {
-    return bankAccounts.firstWhere(
-      (el) => el.isPrime,
-      orElse: () => bankAccounts.first,
     );
   }
 
@@ -516,6 +525,7 @@ class _BillViewState extends ConsumerState<BillView> {
                       Navigator.pop(context);
                       saveNClearBill(
                         paymentMode: PaymentMode.upi,
+                        paymentStatus: PaymentStatus.received,
                         paymentRef: ref,
                         preparedBy: preparedBy,
                         orderNo: orderNo,
@@ -530,6 +540,7 @@ class _BillViewState extends ConsumerState<BillView> {
                       Navigator.pop(context);
                       saveNClearBill(
                         paymentMode: PaymentMode.upi,
+                        paymentStatus: PaymentStatus.received,
                         paymentRef: ref,
                         preparedBy: preparedBy,
                         orderNo: orderNo,

@@ -10,10 +10,15 @@ class UIUtils {
     required BuildContext context,
     required String text,
     Color? bgColor,
+    int? duration,
   }) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(text), backgroundColor: bgColor));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(text),
+        backgroundColor: bgColor,
+        duration: Duration(seconds: duration ?? 5),
+      ),
+    );
   }
 
   static confirmDialog({

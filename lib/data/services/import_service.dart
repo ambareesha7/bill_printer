@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:bill_printer/data/database.dart';
+import 'package:bill_printer/data/db_utils.dart';
 import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:bill_printer/ui/utils/file_manager.dart';
 
@@ -10,8 +11,9 @@ class ImportService {
   static final ImportService _instance = ImportService._internal();
 
   final FileManager _fileManager = FileManager().instance;
+  final DBUtils dbUtils = DBUtils.instance;
 
-  Future<List<SaleReceipt>> importFromJSON(File file) async {
+  Future<bool> importFromJSON(File file) async {
     try {
       final content = await _fileManager.readFile(file: file);
       final jsonData = jsonDecode(content) as Map<String, dynamic>;
@@ -25,20 +27,42 @@ class ImportService {
 
       for (var data in receiptsData) {
         try {
-          final receipt = SaleReceipt.fromJson(data as Map<String, dynamic>);
+          SaleReceipt receipt = SaleReceipt.fromJson(
+            data as Map<String, dynamic>,
+          );
+          // receipt = updatePayStatus(receipt);
           receipts.add(receipt);
-        } catch (e) {
+        } catch (e, st) {
           debugLog("Error parsing JSON receipt: $e");
+          debugLog(st, tag: "Stack Trace");
           continue;
         }
       }
 
       debugLog("JSON import successful: ${receipts.length} receipts imported");
-      debugLog("JSON import successful: ${receipts.last}");
-      return receipts;
-    } catch (e) {
-      debugLog("Error importing from JSON: $e");
-      throw Exception("Failed to import from JSON: $e");
+      debugLog("Last item: ${receipts.last}");
+      bool insert = await addImportedReceits(receipts);
+      if (insert) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e, st) {
+      debugLog("Error in importFromJSON: $e");
+      debugLog(st, tag: "Stack Trace");
+
+      return false;
+    }
+  }
+
+  Future<bool> addImportedReceits(List<SaleReceipt> receipts) async {
+    try {
+      bool insert = await dbUtils.insertAllReceipts(receipts: receipts);
+      return insert;
+    } catch (e, st) {
+      debugLog(e, tag: "error in addImportedReceits");
+      debugLog(st, tag: "Stack trace");
+      return false;
     }
   }
 

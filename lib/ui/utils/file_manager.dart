@@ -154,11 +154,13 @@ class FileManager {
     }
   }
 
-  shareFile(File fi) async {
+  Future<ShareResult?> shareFile(File fi) async {
     try {
-      UIUtils().shareFile(fi.path, "saveData");
+      ShareResult? result = await UIUtils().shareFile(fi.path, "saveData");
+      return result;
     } catch (e) {
-      debugLog(e, tag: "shareNDeleteFile2");
+      debugLog(e, tag: "shareFile");
+      return null;
     }
   }
 

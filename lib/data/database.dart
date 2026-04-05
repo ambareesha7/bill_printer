@@ -1,3 +1,4 @@
+import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/data/tables/bank_accounts.dart';
 import 'package:bill_printer/data/tables/categories_table.dart';
 import 'package:bill_printer/data/tables/products_table.dart';

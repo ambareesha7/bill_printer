@@ -1365,7 +1365,19 @@ class $SaleReceiptsTable extends SaleReceipts
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
-    defaultValue: Constant("cash"),
+    defaultValue: Constant(PaymentMode.cash.name),
+  );
+  static const VerificationMeta _paymentStatusMeta = const VerificationMeta(
+    'paymentStatus',
+  );
+  @override
+  late final GeneratedColumn<String> paymentStatus = GeneratedColumn<String>(
+    'payment_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: Constant(PaymentStatus.receivable.name),
   );
   static const VerificationMeta _paymentRefMeta = const VerificationMeta(
     'paymentRef',
@@ -1421,6 +1433,7 @@ class $SaleReceiptsTable extends SaleReceipts
     orederNo,
     billItems,
     paymentMode,
+    paymentStatus,
     paymentRef,
     totalAmount,
     createdAt,
@@ -1480,6 +1493,15 @@ class $SaleReceiptsTable extends SaleReceipts
         paymentMode.isAcceptableOrUnknown(
           data['payment_mode']!,
           _paymentModeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('payment_status')) {
+      context.handle(
+        _paymentStatusMeta,
+        paymentStatus.isAcceptableOrUnknown(
+          data['payment_status']!,
+          _paymentStatusMeta,
         ),
       );
     }
@@ -1545,6 +1567,10 @@ class $SaleReceiptsTable extends SaleReceipts
         DriftSqlType.string,
         data['${effectivePrefix}payment_mode'],
       )!,
+      paymentStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payment_status'],
+      )!,
       paymentRef: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}payment_ref'],
@@ -1577,6 +1603,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
   final String orederNo;
   final String billItems;
   final String paymentMode;
+  final String paymentStatus;
   final String? paymentRef;
   final int totalAmount;
   final DateTime createdAt;
@@ -1588,6 +1615,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
     required this.orederNo,
     required this.billItems,
     required this.paymentMode,
+    required this.paymentStatus,
     this.paymentRef,
     required this.totalAmount,
     required this.createdAt,
@@ -1606,6 +1634,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
     map['oreder_no'] = Variable<String>(orederNo);
     map['bill_items'] = Variable<String>(billItems);
     map['payment_mode'] = Variable<String>(paymentMode);
+    map['payment_status'] = Variable<String>(paymentStatus);
     if (!nullToAbsent || paymentRef != null) {
       map['payment_ref'] = Variable<String>(paymentRef);
     }
@@ -1627,6 +1656,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
       orederNo: Value(orederNo),
       billItems: Value(billItems),
       paymentMode: Value(paymentMode),
+      paymentStatus: Value(paymentStatus),
       paymentRef: paymentRef == null && nullToAbsent
           ? const Value.absent()
           : Value(paymentRef),
@@ -1648,6 +1678,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
       orederNo: serializer.fromJson<String>(json['orederNo']),
       billItems: serializer.fromJson<String>(json['billItems']),
       paymentMode: serializer.fromJson<String>(json['paymentMode']),
+      paymentStatus: serializer.fromJson<String>(json['paymentStatus']),
       paymentRef: serializer.fromJson<String?>(json['paymentRef']),
       totalAmount: serializer.fromJson<int>(json['totalAmount']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -1664,6 +1695,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
       'orederNo': serializer.toJson<String>(orederNo),
       'billItems': serializer.toJson<String>(billItems),
       'paymentMode': serializer.toJson<String>(paymentMode),
+      'paymentStatus': serializer.toJson<String>(paymentStatus),
       'paymentRef': serializer.toJson<String?>(paymentRef),
       'totalAmount': serializer.toJson<int>(totalAmount),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -1678,6 +1710,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
     String? orederNo,
     String? billItems,
     String? paymentMode,
+    String? paymentStatus,
     Value<String?> paymentRef = const Value.absent(),
     int? totalAmount,
     DateTime? createdAt,
@@ -1689,6 +1722,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
     orederNo: orederNo ?? this.orederNo,
     billItems: billItems ?? this.billItems,
     paymentMode: paymentMode ?? this.paymentMode,
+    paymentStatus: paymentStatus ?? this.paymentStatus,
     paymentRef: paymentRef.present ? paymentRef.value : this.paymentRef,
     totalAmount: totalAmount ?? this.totalAmount,
     createdAt: createdAt ?? this.createdAt,
@@ -1708,6 +1742,9 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
       paymentMode: data.paymentMode.present
           ? data.paymentMode.value
           : this.paymentMode,
+      paymentStatus: data.paymentStatus.present
+          ? data.paymentStatus.value
+          : this.paymentStatus,
       paymentRef: data.paymentRef.present
           ? data.paymentRef.value
           : this.paymentRef,
@@ -1728,6 +1765,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
           ..write('orederNo: $orederNo, ')
           ..write('billItems: $billItems, ')
           ..write('paymentMode: $paymentMode, ')
+          ..write('paymentStatus: $paymentStatus, ')
           ..write('paymentRef: $paymentRef, ')
           ..write('totalAmount: $totalAmount, ')
           ..write('createdAt: $createdAt, ')
@@ -1744,6 +1782,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
     orederNo,
     billItems,
     paymentMode,
+    paymentStatus,
     paymentRef,
     totalAmount,
     createdAt,
@@ -1759,6 +1798,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
           other.orederNo == this.orederNo &&
           other.billItems == this.billItems &&
           other.paymentMode == this.paymentMode &&
+          other.paymentStatus == this.paymentStatus &&
           other.paymentRef == this.paymentRef &&
           other.totalAmount == this.totalAmount &&
           other.createdAt == this.createdAt &&
@@ -1772,6 +1812,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
   final Value<String> orederNo;
   final Value<String> billItems;
   final Value<String> paymentMode;
+  final Value<String> paymentStatus;
   final Value<String?> paymentRef;
   final Value<int> totalAmount;
   final Value<DateTime> createdAt;
@@ -1784,6 +1825,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
     this.orederNo = const Value.absent(),
     this.billItems = const Value.absent(),
     this.paymentMode = const Value.absent(),
+    this.paymentStatus = const Value.absent(),
     this.paymentRef = const Value.absent(),
     this.totalAmount = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -1797,6 +1839,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
     required String orederNo,
     required String billItems,
     this.paymentMode = const Value.absent(),
+    this.paymentStatus = const Value.absent(),
     this.paymentRef = const Value.absent(),
     required int totalAmount,
     this.createdAt = const Value.absent(),
@@ -1813,6 +1856,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
     Expression<String>? orederNo,
     Expression<String>? billItems,
     Expression<String>? paymentMode,
+    Expression<String>? paymentStatus,
     Expression<String>? paymentRef,
     Expression<int>? totalAmount,
     Expression<DateTime>? createdAt,
@@ -1826,6 +1870,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
       if (orederNo != null) 'oreder_no': orederNo,
       if (billItems != null) 'bill_items': billItems,
       if (paymentMode != null) 'payment_mode': paymentMode,
+      if (paymentStatus != null) 'payment_status': paymentStatus,
       if (paymentRef != null) 'payment_ref': paymentRef,
       if (totalAmount != null) 'total_amount': totalAmount,
       if (createdAt != null) 'created_at': createdAt,
@@ -1841,6 +1886,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
     Value<String>? orederNo,
     Value<String>? billItems,
     Value<String>? paymentMode,
+    Value<String>? paymentStatus,
     Value<String?>? paymentRef,
     Value<int>? totalAmount,
     Value<DateTime>? createdAt,
@@ -1854,6 +1900,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
       orederNo: orederNo ?? this.orederNo,
       billItems: billItems ?? this.billItems,
       paymentMode: paymentMode ?? this.paymentMode,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
       paymentRef: paymentRef ?? this.paymentRef,
       totalAmount: totalAmount ?? this.totalAmount,
       createdAt: createdAt ?? this.createdAt,
@@ -1883,6 +1930,9 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
     if (paymentMode.present) {
       map['payment_mode'] = Variable<String>(paymentMode.value);
     }
+    if (paymentStatus.present) {
+      map['payment_status'] = Variable<String>(paymentStatus.value);
+    }
     if (paymentRef.present) {
       map['payment_ref'] = Variable<String>(paymentRef.value);
     }
@@ -1910,6 +1960,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
           ..write('orederNo: $orederNo, ')
           ..write('billItems: $billItems, ')
           ..write('paymentMode: $paymentMode, ')
+          ..write('paymentStatus: $paymentStatus, ')
           ..write('paymentRef: $paymentRef, ')
           ..write('totalAmount: $totalAmount, ')
           ..write('createdAt: $createdAt, ')
@@ -4403,6 +4454,7 @@ typedef $$SaleReceiptsTableCreateCompanionBuilder =
       required String orederNo,
       required String billItems,
       Value<String> paymentMode,
+      Value<String> paymentStatus,
       Value<String?> paymentRef,
       required int totalAmount,
       Value<DateTime> createdAt,
@@ -4417,6 +4469,7 @@ typedef $$SaleReceiptsTableUpdateCompanionBuilder =
       Value<String> orederNo,
       Value<String> billItems,
       Value<String> paymentMode,
+      Value<String> paymentStatus,
       Value<String?> paymentRef,
       Value<int> totalAmount,
       Value<DateTime> createdAt,
@@ -4460,6 +4513,11 @@ class $$SaleReceiptsTableFilterComposer
 
   ColumnFilters<String> get paymentMode => $composableBuilder(
     column: $table.paymentMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get paymentStatus => $composableBuilder(
+    column: $table.paymentStatus,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4523,6 +4581,11 @@ class $$SaleReceiptsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get paymentStatus => $composableBuilder(
+    column: $table.paymentStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get paymentRef => $composableBuilder(
     column: $table.paymentRef,
     builder: (column) => ColumnOrderings(column),
@@ -4574,6 +4637,11 @@ class $$SaleReceiptsTableAnnotationComposer
 
   GeneratedColumn<String> get paymentMode => $composableBuilder(
     column: $table.paymentMode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get paymentStatus => $composableBuilder(
+    column: $table.paymentStatus,
     builder: (column) => column,
   );
 
@@ -4631,6 +4699,7 @@ class $$SaleReceiptsTableTableManager
                 Value<String> orederNo = const Value.absent(),
                 Value<String> billItems = const Value.absent(),
                 Value<String> paymentMode = const Value.absent(),
+                Value<String> paymentStatus = const Value.absent(),
                 Value<String?> paymentRef = const Value.absent(),
                 Value<int> totalAmount = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -4643,6 +4712,7 @@ class $$SaleReceiptsTableTableManager
                 orederNo: orederNo,
                 billItems: billItems,
                 paymentMode: paymentMode,
+                paymentStatus: paymentStatus,
                 paymentRef: paymentRef,
                 totalAmount: totalAmount,
                 createdAt: createdAt,
@@ -4657,6 +4727,7 @@ class $$SaleReceiptsTableTableManager
                 required String orederNo,
                 required String billItems,
                 Value<String> paymentMode = const Value.absent(),
+                Value<String> paymentStatus = const Value.absent(),
                 Value<String?> paymentRef = const Value.absent(),
                 required int totalAmount,
                 Value<DateTime> createdAt = const Value.absent(),
@@ -4669,6 +4740,7 @@ class $$SaleReceiptsTableTableManager
                 orederNo: orederNo,
                 billItems: billItems,
                 paymentMode: paymentMode,
+                paymentStatus: paymentStatus,
                 paymentRef: paymentRef,
                 totalAmount: totalAmount,
                 createdAt: createdAt,

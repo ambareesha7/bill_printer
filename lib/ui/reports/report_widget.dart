@@ -1,4 +1,5 @@
 import 'package:bill_printer/data/app_enums.dart';
+import 'package:bill_printer/data/db_utils.dart';
 import 'package:bill_printer/data/models/bill_item_model.dart';
 import 'package:bill_printer/ui/reports/filters_panel.dart';
 import 'package:bill_printer/ui/reports/providers/report_provider.dart';
@@ -10,8 +11,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 
+import '../../data/models/bank_account/bank_account_model.dart';
 import '../../data/models/sale_receipts/sale_receipt_model.dart';
 import 'package:bill_printer/ui/printer/providers/printer_provider.dart';
+
+import '../bill_views/providers/bill_provider.dart';
 
 class ReportWidget extends ConsumerWidget {
   const ReportWidget(this.reportType, {super.key});
@@ -22,6 +26,7 @@ class ReportWidget extends ConsumerWidget {
     final dateRange = ref.watch(dateRangeProvider);
     ref.watch(dateRangeReportProvider);
     ref.watch(printerProvider);
+    DBUtils dbUtils = DBUtils.instance;
 
     // TODO: REMOVE MONTHLY REPORT IS POSSIBLE
     final List<SaleReceiptModel> allTransactions =
@@ -230,6 +235,7 @@ class ReportWidget extends ConsumerWidget {
             ),
           ],
         ),
+        // Transactions view
         Expanded(
           child: Consumer(
             builder: (context, ref, child) {
@@ -244,7 +250,16 @@ class ReportWidget extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Text(dateFormat(transaction.createdAt!.toLocal())),
-                        Text("No: ${transaction.orederNo ?? ""}"),
+                        Text(
+                          "No: ${transaction.orederNo ?? ""}",
+                          style: TextStyle(
+                            color:
+                                (transaction.paymentStatus !=
+                                    PaymentStatus.received)
+                                ? AppColors.red
+                                : null,
+                          ),
+                        ),
                         Text(
                           (transaction.paymentMode ?? "Cash").toUpperCase(),
                           style: TextStyle(color: AppColors.blue),
@@ -286,9 +301,75 @@ class ReportWidget extends ConsumerWidget {
                       if (transaction.paymentRef != null)
                         Text("Bank Ref: ${transaction.paymentRef ?? ""}"),
                       Text("ID: ${transaction.id ?? ""}"),
+                      Text(
+                        "PaymentStatus: ${capitalize(transaction.paymentStatus.name)}",
+                        style: TextStyle(
+                          color:
+                              (transaction.paymentStatus !=
+                                  PaymentStatus.received)
+                              ? AppColors.red
+                              : AppColors.green,
+                        ),
+                      ),
                       ...renderSubItems(subItems),
                       Wrap(
                         children: [
+                          if (transaction.paymentStatus !=
+                              PaymentStatus.received)
+                            TextButton(
+                              onPressed: () async {
+                                UIUtils.confirmDialog(
+                                  context: context,
+                                  title: "Are you sure",
+                                  subTitle: "You received the cash",
+                                  rightBtnColor: AppColors.green,
+                                  rightBtnName: "Yes",
+                                  rightFun: () async {
+                                    SaleReceiptModel trans = transaction
+                                        .copyWith(
+                                          paymentMode: PaymentMode.cash.name,
+                                          paymentStatus: PaymentStatus.received,
+                                        );
+                                    // debugLog(trans);
+                                    await dbUtils.updateSaleReceipt(
+                                      saleReceipt: trans,
+                                    );
+                                  },
+                                );
+                              },
+                              child: Text("Receive Cash"),
+                            ),
+                          if (transaction.paymentStatus !=
+                              PaymentStatus.received)
+                            IconButton(
+                              onPressed: () async {
+                                BankAccountModel? bankAccounts =
+                                    await checkBankAC(context);
+
+                                if (bankAccounts != null) {
+                                  String payRef =
+                                      "UPI=${bankAccounts.upiId},Name=${bankAccounts.name}";
+                                  openQRcode(
+                                    context: context,
+                                    primAccount: bankAccounts,
+                                    transaction: transaction,
+                                    paidFunc: () async {
+                                      SaleReceiptModel trans = transaction
+                                          .copyWith(
+                                            paymentMode: PaymentMode.upi.name,
+                                            paymentStatus:
+                                                PaymentStatus.received,
+                                            paymentRef: payRef,
+                                          );
+                                      await dbUtils.updateSaleReceipt(
+                                        saleReceipt: trans,
+                                      );
+                                    },
+                                  );
+                                }
+                              },
+                              icon: Icon(Icons.qr_code),
+                            ),
                           IconButton(
                             onPressed: () {
                               ref
@@ -297,6 +378,11 @@ class ReportWidget extends ConsumerWidget {
                                     context: context,
                                     orderNo: transaction.orederNo,
                                     paymentMode: transaction.paymentMode,
+                                    paymentStatus:
+                                        (transaction.paymentStatus !=
+                                            PaymentStatus.received)
+                                        ? "Not Paid"
+                                        : null,
                                     dateTime: dateFormat(
                                       transaction.createdAt!.toLocal(),
                                     ),

@@ -11,7 +11,10 @@ _SaleReceiptModel _$SaleReceiptModelFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String?,
       customerName: json['customerName'] as String?,
       preparedBy: json['preparedBy'] as String?,
-      paymentMode: json['paymentMode'] as String?,
+      paymentMode: json['paymentMode'] ?? PaymentMode.cash,
+      paymentStatus:
+          $enumDecodeNullable(_$PaymentStatusEnumMap, json['paymentStatus']) ??
+          PaymentStatus.receivable,
       paymentRef: json['paymentRef'] as String?,
       orederNo: json['orederNo'] as String?,
       billItems: (json['billItems'] as List<dynamic>?)
@@ -32,6 +35,7 @@ Map<String, dynamic> _$SaleReceiptModelToJson(_SaleReceiptModel instance) =>
       'customerName': instance.customerName,
       'preparedBy': instance.preparedBy,
       'paymentMode': instance.paymentMode,
+      'paymentStatus': _$PaymentStatusEnumMap[instance.paymentStatus]!,
       'paymentRef': instance.paymentRef,
       'orederNo': instance.orederNo,
       'billItems': instance.billItems,
@@ -39,3 +43,12 @@ Map<String, dynamic> _$SaleReceiptModelToJson(_SaleReceiptModel instance) =>
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
     };
+
+const _$PaymentStatusEnumMap = {
+  PaymentStatus.receivable: 'receivable',
+  PaymentStatus.received: 'received',
+  PaymentStatus.outstanding: 'outstanding',
+  PaymentStatus.loss: 'loss',
+  PaymentStatus.partially: 'partially',
+  PaymentStatus.none: 'none',
+};

@@ -289,17 +289,19 @@ class BankAccountView extends StatelessWidget {
                                 // Validate returns true if the form is valid, or false otherwise.
                                 if (formKey.currentState!.validate()) {
                                   acc = acc.copyWith(
-                                    name: nameEditController.text,
-                                    upiId: upiEditController.text,
+                                    name: nameEditController.text.trim(),
+                                    upiId: upiEditController.text.trim(),
                                     accountNumber:
                                         accountEditController.text.isNotEmpty
-                                        ? int.parse(accountEditController.text)
+                                        ? int.parse(
+                                            accountEditController.text.trim(),
+                                          )
                                         : null,
                                     ifsc: ifscEditController.text.isNotEmpty
-                                        ? ifscEditController.text
+                                        ? ifscEditController.text.trim()
                                         : null,
                                     note: noteEditController.text.isNotEmpty
-                                        ? noteEditController.text
+                                        ? noteEditController.text.trim()
                                         : null,
                                   );
                                   if (operationType == OperationType.add) {

@@ -58,6 +58,7 @@ class Printer extends _$Printer {
     required BuildContext context,
     String? orderNo,
     String? paymentMode,
+    String? paymentStatus,
     String? dateTime,
     required List<BillItemModel> itemsList,
     required String totalAmount,
@@ -68,7 +69,7 @@ class Printer extends _$Printer {
       bool result = false;
       List<int> ticket = await billContent(
         businessName: "MoonLight Cafe",
-        // subHeader1: "PayMode: $paymentMode",
+        subHeader1: paymentStatus,
         // shopID: "CartID: BTM-1",
         dateTime: dateTime,
         invoiceTitle: "Order no:",
@@ -133,13 +134,13 @@ class Printer extends _$Printer {
       bytes += generator.text(address);
     }
 
-    // sub header1
-    if (subHeader1 != null) {
-      bytes += generator.text("$subHeader1 ${shopID ?? ""}");
-    }
     // Date time
     if (dateTime != null) {
       bytes += generator.text(dateTime);
+    }
+    // sub header1
+    if (subHeader1 != null) {
+      bytes += generator.text(subHeader1, styles: headerStyle1);
     }
     // Invoice title
     if (invoiceTitle != null) {
@@ -197,15 +198,15 @@ class Printer extends _$Printer {
         styles: const PosStyles(
           align: PosAlign.center,
           bold: true,
-          height: PosTextSize.size1,
-          width: PosTextSize.size1,
+          height: PosTextSize.size2,
+          width: PosTextSize.size2,
         ),
       );
     }
-    bytes += generator.text(
-      "Please wait we will call your OrderNo, Once your item is ready",
-      styles: PosStyles(bold: true, align: PosAlign.center),
-    );
+    // bytes += generator.text(
+    //   "Please wait we will call your OrderNo, Once your item is ready",
+    //   styles: PosStyles(bold: true, align: PosAlign.center),
+    // );
     bytes += generator.feed(4);
     return bytes;
   }

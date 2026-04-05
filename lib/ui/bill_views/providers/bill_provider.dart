@@ -2,13 +2,30 @@ import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/data/db_utils.dart';
 import 'package:bill_printer/data/models/bill_item_model.dart';
 import 'package:bill_printer/data/models/product_model.dart';
+import 'package:bill_printer/data/models/sale_receipts/sale_receipt_model.dart';
+import 'package:bill_printer/ui/bill_views/bill_view.dart';
+import 'package:bill_printer/ui/utils/app_colors.dart';
 import 'package:bill_printer/ui/widgets/icon_btn.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../data/models/bank_account/bank_account_model.dart';
 part 'bill_provider.g.dart';
 
 DBUtils dbUtils = DBUtils.instance;
+int getTotalQuantity(List<BillItemModel>? items) {
+  int totalQty = 0;
+  if (items == null) {
+    return totalQty;
+  } else {
+    for (var i in items) {
+      totalQty += i.quantity;
+    }
+    return totalQty;
+  }
+}
 
 @riverpod
 class BillList extends _$BillList {
@@ -54,14 +71,6 @@ class BillList extends _$BillList {
 
   clearItems() => state = [];
 
-  getTotalQuantity(List<BillItemModel> items) {
-    int totalQty = 0;
-    for (var i in items) {
-      totalQty += i.quantity;
-    }
-    return totalQty;
-  }
-
   int getTotalAmount() {
     int totalAmount = 0;
     for (var i in state) {
@@ -84,6 +93,7 @@ class BillList extends _$BillList {
   saveOrder({
     required PaymentMode paymentMode,
     required String orderNo,
+    required PaymentStatus paymentStatus,
     String? paymentRef,
     String? preparedBy,
   }) async {
@@ -92,6 +102,7 @@ class BillList extends _$BillList {
       billItems: state,
       totalAmount: amount,
       paymentMode: paymentMode.name,
+      paymentStatus: paymentStatus.name,
       paymentRef: paymentRef,
       preparedBy: preparedBy,
       orderNo: orderNo,
@@ -351,4 +362,77 @@ class BillItem extends _$BillItem {
       },
     );
   }
+}
+
+// BankAccountModel getPrimeryUPI(List<BankAccountModel> bankAccounts) {
+//   return bankAccounts.firstWhere(
+//     (el) => el.isPrime,
+//     orElse: () => bankAccounts.first,
+//   );
+// }
+
+openQRcode({
+  required BuildContext context,
+  required BankAccountModel primAccount,
+  required SaleReceiptModel transaction,
+  required Function paidFunc,
+}) async {
+  String upi =
+      "upi://pay?pa=${primAccount.upiId}&pn=${primAccount.name}&cu=INR&am=${transaction.totalAmount}";
+  // String payRef = "UPI=${primAccount.upiId},Name=${primAccount.name}";
+  showModalBottomSheet(
+    isScrollControlled: true,
+    context: context,
+    builder: (BuildContext context) {
+      return SizedBox(
+        height: MediaQuery.of(context).size.height * 0.7,
+        child: Column(
+          children: [
+            PrettyQrView.data(
+              data: upi,
+              decoration: const PrettyQrDecoration(
+                shape: PrettyQrSmoothSymbol(),
+                background: Colors.white,
+                quietZone: PrettyQrQuietZone.standart,
+              ),
+            ),
+            Text("UPI ID: ${primAccount.upiId}"),
+            Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Bill amount: ", style: TextStyle(fontSize: 18)),
+                  Text(
+                    "₹${transaction.totalAmount}",
+                    style: TextStyle(fontSize: 18, color: AppColors.orange),
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                AppBtn1(
+                  name: "Cancel",
+                  bgColor: AppColors.red,
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                AppBtn1(
+                  name: "Paid",
+                  bgColor: Colors.green,
+                  onPressed: () {
+                    Navigator.pop(context);
+                    paidFunc();
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }

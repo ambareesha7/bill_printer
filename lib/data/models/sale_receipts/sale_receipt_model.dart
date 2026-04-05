@@ -1,3 +1,4 @@
+import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/data/models/bill_item_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -10,7 +11,8 @@ abstract class SaleReceiptModel with _$SaleReceiptModel {
     String? id,
     String? customerName,
     String? preparedBy,
-    String? paymentMode,
+    @Default(PaymentMode.cash) paymentMode,
+    @Default(PaymentStatus.receivable) PaymentStatus paymentStatus,
     String? paymentRef,
     String? orederNo,
     List<BillItemModel>? billItems,

@@ -46,13 +46,16 @@ Flutter app for creating bills, generating sales reports for hotels, restaurants
  - [x] add go router
  - [] add priority listing
  - [x] add export of sales data
- - [] add import of sales data
+ - [x] add import of sales data
  - [] fix date selection in analysis
  - [] expose printer setting view
  - [] complete checklist feature
  - [] add export option to products
  - [] expose paper settings to user
-    
+ - [x] add payment terms in sales transactions
+ - [] add update features in reports view
+ - [] ask bluetooth permission while printer connection
+ - [] add temorary bills generation
     
 
 
@@ -74,7 +77,8 @@ get dependencies `flutter get`
 
 [Drift doc](https://drift.simonbinder.eu/migrations/#usage)
 
-generate drift schema code  `dart run drift_dev make-migrations`
+generate drift schema code:  
+`dart run drift_dev make-migrations`
 
 
 A few resources to get you started if this is your first Flutter project:
