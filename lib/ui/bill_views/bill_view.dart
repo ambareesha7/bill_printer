@@ -39,6 +39,7 @@ class _BillViewState extends ConsumerState<BillView> {
     final user = ref.watch(authProvider);
     final orderNo = ref.watch(orderNumProvider);
     ref.watch(printerProvider);
+    var listItems = ref.watch(tempBillListProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text("MoonLight Cafe"),
@@ -132,43 +133,127 @@ class _BillViewState extends ConsumerState<BillView> {
               },
             ),
             if (user != null) _buildActionButtons(user),
-            Row(
-              children: [
-                buildCategories(),
-                ElevatedButton(
-                  onPressed: () {
-                    final billItems = ref.watch(billListProvider);
-                    if (billItems.isEmpty) return;
-                    ref
-                        .read(printerProvider.notifier)
-                        .printBill(
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  buildCategories(),
+                  AppBtn1(
+                    onPressed: () {
+                      final billItems = ref.watch(billListProvider);
+                      if (billItems.isEmpty) return;
+                      ref
+                          .read(printerProvider.notifier)
+                          .printBill(
+                            context: context,
+                            orderNo: orderNo,
+                            paymentStatus: "Not paid",
+                            dateTime: dateFormat(dateTimeNow()),
+                            itemsList: billItems,
+                            totalItems: getTotalQuantity(billItems).toString(),
+                            totalAmount: ref
+                                .read(billListProvider.notifier)
+                                .getTotalAmount()
+                                .toString(),
+                          );
+                    },
+                    name: "Print",
+                  ),
+                  SizedBox(width: btnPadding),
+                  AppBtn1(
+                    name: "Add Product",
+                    bgColor: AppColors.blue,
+                    onPressed: () {
+                      ref
+                          .read(productsListProvider.notifier)
+                          .openProductDialog(
+                            context: context,
+                            operationType: OperationType.add,
+                          );
+                    },
+                  ),
+                  AppBtn1(
+                    name: "To Temp",
+                    bgColor: AppColors.orange,
+                    onPressed: () {
+                      List<BillItemModel> item = ref.watch(billListProvider);
+                      if (item.isNotEmpty) {
+                        ref.read(tempBillListProvider.notifier).addOrder(item);
+                        ref.read(billListProvider.notifier).clearItems();
+                      }
+                    },
+                  ),
+                  AppBtn1(
+                    name: "Open Temp",
+                    onPressed: () {
+                      if (listItems.isEmpty) {
+                        UIUtils.showSnackBar(
                           context: context,
-                          orderNo: orderNo,
-                          paymentMode: "Not paid",
-                          dateTime: dateFormat(dateTimeNow()),
-                          itemsList: billItems,
-                          totalItems: getTotalQuantity(billItems).toString(),
-                          totalAmount: ref
-                              .read(billListProvider.notifier)
-                              .getTotalAmount()
-                              .toString(),
+                          text: "No items in temporary list",
                         );
-                  },
-                  child: Text("Print"),
-                ),
-                SizedBox(width: btnPadding),
-                AppBtn1(
-                  name: "Add Product",
-                  onPressed: () {
-                    ref
-                        .read(productsListProvider.notifier)
-                        .openProductDialog(
-                          context: context,
-                          operationType: OperationType.add,
-                        );
-                  },
-                ),
-              ],
+                        return;
+                      }
+                      showAdaptiveDialog(
+                        barrierLabel: "Temporary items",
+                        barrierColor: AppColors.borderColor,
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Dialog.fullscreen(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  icon: RotatedBox(
+                                    quarterTurns: 1,
+                                    child: Icon(Icons.arrow_downward),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: ListView.builder(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                    ),
+                                    itemCount: listItems.length,
+                                    itemBuilder: (context, index) {
+                                      var item = listItems[index];
+                                      return ListTile(
+                                        title: Text(
+                                          "${index + 1}, ${listItems[index].map((i) => i.name).toList().join(", ")}",
+                                        ),
+                                        tileColor: index % 2 == 0
+                                            ? AppColors.blueGrey
+                                            : AppColors.blue,
+                                        onTap: () {
+                                          ref
+                                              .read(billListProvider.notifier)
+                                              .clearItems();
+                                          ref
+                                              .read(billListProvider.notifier)
+                                              .updateFromList(item);
+                                          ref
+                                              .read(
+                                                tempBillListProvider.notifier,
+                                              )
+                                              .removeOrder(item);
+                                          Navigator.pop(context);
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
             //======== build product cards =========
             Expanded(

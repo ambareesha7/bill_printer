@@ -28,6 +28,26 @@ int getTotalQuantity(List<BillItemModel>? items) {
 }
 
 @riverpod
+class TempBillList extends _$TempBillList {
+  @override
+  List<List<BillItemModel>> build() {
+    return [];
+  }
+
+  addOrder(List<BillItemModel> item) {
+    List<List<BillItemModel>> newState = state;
+    newState.add(item);
+    state = [...newState];
+  }
+
+  removeOrder(List<BillItemModel> item) {
+    List<List<BillItemModel>> newState = state;
+    newState.remove(item);
+    state = [...newState];
+  }
+}
+
+@riverpod
 class BillList extends _$BillList {
   @override
   List<BillItemModel> build() {
@@ -70,6 +90,11 @@ class BillList extends _$BillList {
   }
 
   clearItems() => state = [];
+  
+  updateFromList(List<BillItemModel> items) {
+    clearItems();
+    state = [...items];
+  }
 
   int getTotalAmount() {
     int totalAmount = 0;
@@ -364,13 +389,6 @@ class BillItem extends _$BillItem {
   }
 }
 
-// BankAccountModel getPrimeryUPI(List<BankAccountModel> bankAccounts) {
-//   return bankAccounts.firstWhere(
-//     (el) => el.isPrime,
-//     orElse: () => bankAccounts.first,
-//   );
-// }
-
 openQRcode({
   required BuildContext context,
   required BankAccountModel primAccount,
@@ -379,7 +397,6 @@ openQRcode({
 }) async {
   String upi =
       "upi://pay?pa=${primAccount.upiId}&pn=${primAccount.name}&cu=INR&am=${transaction.totalAmount}";
-  // String payRef = "UPI=${primAccount.upiId},Name=${primAccount.name}";
   showModalBottomSheet(
     isScrollControlled: true,
     context: context,
