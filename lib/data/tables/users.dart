@@ -9,7 +9,7 @@ class Users extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
-  
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }

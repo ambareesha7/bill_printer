@@ -6,14 +6,22 @@ import 'package:bill_printer/ui/bill_views/bill_view.dart';
 import 'package:bill_printer/ui/category/category_view.dart';
 import 'package:bill_printer/ui/home/home_view.dart';
 import 'package:bill_printer/ui/printer/printer_view.dart';
+import 'package:bill_printer/ui/reports/analytics_view.dart';
 import 'package:bill_printer/ui/reports/report_view.dart';
+import 'package:bill_printer/ui/checklists/checklists.dart';
 import 'package:go_router/go_router.dart';
+
+import 'ui/reports/reports_main_view.dart';
 
 enum RouterPaths {
   createBill,
   category,
   bankAccount,
   reports,
+  reportsMain,
+  analytics,
+  checklists,
+  checklistDetails,
   signUp,
   users,
   about,
@@ -24,9 +32,7 @@ enum RouterPaths {
 final appRouter = GoRouter(
   initialLocation: "/",
   routes: [
-    GoRoute(path: "/", builder: (context, state) => HomeView(), routes: [
-      ],
-    ),
+    GoRoute(path: "/", builder: (context, state) => HomeView(), routes: []),
     GoRoute(
       path: "/${RouterPaths.createBill.name}",
       builder: (context, state) => BillView(),
@@ -42,6 +48,25 @@ final appRouter = GoRouter(
     GoRoute(
       path: "/${RouterPaths.reports.name}",
       builder: (context, state) => ReportView(),
+    ),
+    GoRoute(
+      path: "/${RouterPaths.reportsMain.name}",
+      builder: (context, state) => ReportsMainView(),
+    ),
+    GoRoute(
+      path: "/${RouterPaths.analytics.name}",
+      builder: (context, state) => AnalyticsView(),
+    ),
+    GoRoute(
+      path: "/${RouterPaths.checklists.name}",
+      builder: (context, state) => const ChecklistListView(),
+    ),
+    GoRoute(
+      path: "/${RouterPaths.checklistDetails.name}/:id",
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return ChecklistDetailView(checklistId: id ?? '');
+      },
     ),
     GoRoute(
       path: "/${RouterPaths.signUp.name}",

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:bill_printer/app_router.dart';
 import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/data/db_utils.dart';
@@ -37,9 +39,10 @@ class _BillViewState extends ConsumerState<BillView> {
     final user = ref.watch(authProvider);
     final orderNo = ref.watch(orderNumProvider);
     ref.watch(printerProvider);
+    var listItems = ref.watch(tempBillListProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Create Bill"),
+        title: const Text("MoonLight Cafe"),
         centerTitle: true,
         actions: [NavBtn(path: RouterPaths.reports.name)],
       ),
@@ -121,10 +124,7 @@ class _BillViewState extends ConsumerState<BillView> {
               builder: (context, ref, child) {
                 final billItems = ref.watch(billListProvider);
                 return TotalSection(
-                  items: ref
-                      .read(billListProvider.notifier)
-                      .getTotalQuantity(billItems)
-                      .toString(),
+                  items: getTotalQuantity(billItems).toString(),
                   total: ref
                       .read(billListProvider.notifier)
                       .getTotalAmount()
@@ -133,34 +133,127 @@ class _BillViewState extends ConsumerState<BillView> {
               },
             ),
             if (user != null) _buildActionButtons(user),
-            Row(
-              children: [
-                buildCategories(),
-                ElevatedButton(
-                  onPressed: () {
-                    final billItems = ref.watch(billListProvider);
-                    if (billItems.isEmpty) return;
-                    ref
-                        .read(printerProvider.notifier)
-                        .printBill(
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  buildCategories(),
+                  AppBtn1(
+                    onPressed: () {
+                      final billItems = ref.watch(billListProvider);
+                      if (billItems.isEmpty) return;
+                      ref
+                          .read(printerProvider.notifier)
+                          .printBill(
+                            context: context,
+                            orderNo: orderNo,
+                            paymentStatus: "Not paid",
+                            dateTime: dateFormat(dateTimeNow()),
+                            itemsList: billItems,
+                            totalItems: getTotalQuantity(billItems).toString(),
+                            totalAmount: ref
+                                .read(billListProvider.notifier)
+                                .getTotalAmount()
+                                .toString(),
+                          );
+                    },
+                    name: "Print",
+                  ),
+                  SizedBox(width: btnPadding),
+                  AppBtn1(
+                    name: "Add Product",
+                    bgColor: AppColors.blue,
+                    onPressed: () {
+                      ref
+                          .read(productsListProvider.notifier)
+                          .openProductDialog(
+                            context: context,
+                            operationType: OperationType.add,
+                          );
+                    },
+                  ),
+                  AppBtn1(
+                    name: "To Temp",
+                    bgColor: AppColors.orange,
+                    onPressed: () {
+                      List<BillItemModel> item = ref.watch(billListProvider);
+                      if (item.isNotEmpty) {
+                        ref.read(tempBillListProvider.notifier).addOrder(item);
+                        ref.read(billListProvider.notifier).clearItems();
+                      }
+                    },
+                  ),
+                  AppBtn1(
+                    name: "Open Temp",
+                    onPressed: () {
+                      if (listItems.isEmpty) {
+                        UIUtils.showSnackBar(
                           context: context,
-                          orderNo: orderNo,
-                          paymentMode: "Not paid",
-                          dateTime: dateFormat(dateTimeNow()),
-                          itemsList: billItems,
-                          totalItems: ref
-                              .read(billListProvider.notifier)
-                              .getTotalQuantity(billItems)
-                              .toString(),
-                          totalAmount: ref
-                              .read(billListProvider.notifier)
-                              .getTotalAmount()
-                              .toString(),
+                          text: "No items in temporary list",
                         );
-                  },
-                  child: Text("Print"),
-                ),
-              ],
+                        return;
+                      }
+                      showAdaptiveDialog(
+                        barrierLabel: "Temporary items",
+                        barrierColor: AppColors.borderColor,
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Dialog.fullscreen(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  icon: RotatedBox(
+                                    quarterTurns: 1,
+                                    child: Icon(Icons.arrow_downward),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: ListView.builder(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                    ),
+                                    itemCount: listItems.length,
+                                    itemBuilder: (context, index) {
+                                      var item = listItems[index];
+                                      return ListTile(
+                                        title: Text(
+                                          "${index + 1}, ${listItems[index].map((i) => i.name).toList().join(", ")}",
+                                        ),
+                                        tileColor: index % 2 == 0
+                                            ? AppColors.blueGrey
+                                            : AppColors.blue,
+                                        onTap: () {
+                                          ref
+                                              .read(billListProvider.notifier)
+                                              .clearItems();
+                                          ref
+                                              .read(billListProvider.notifier)
+                                              .updateFromList(item);
+                                          ref
+                                              .read(
+                                                tempBillListProvider.notifier,
+                                              )
+                                              .removeOrder(item);
+                                          Navigator.pop(context);
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
             //======== build product cards =========
             Expanded(
@@ -207,20 +300,9 @@ class _BillViewState extends ConsumerState<BillView> {
             onPressed: () {
               ref.read(billListProvider.notifier).clearItems();
             },
-            bgColor: Colors.red,
+            bgColor: AppColors.red,
           ),
-          SizedBox(width: btnPadding),
-          AppBtn1(
-            name: "Add Product",
-            onPressed: () {
-              ref
-                  .read(productsListProvider.notifier)
-                  .openProductDialog(
-                    context: context,
-                    operationType: OperationType.add,
-                  );
-            },
-          ),
+
           SizedBox(width: btnPadding),
           AppBtn1(
             name: "QR Code",
@@ -228,19 +310,10 @@ class _BillViewState extends ConsumerState<BillView> {
             onPressed: () async {
               int amount = ref.read(billListProvider.notifier).getTotalAmount();
               if (amount > 0) {
-                List<BankAccountModel> bankAccounts = await dbUtils
-                    .parseBankAccounts();
-                if (bankAccounts.isEmpty) {
-                  UIUtils.showSnackBar(
-                    // ignore: use_build_context_synchronously
-                    context: context,
-                    text: "Please add bank account to generate QR code",
-                    bgColor: Colors.red,
-                  );
-                } else {
-                  BankAccountModel primAccount = getPrimeryUPI(bankAccounts);
+                BankAccountModel? bankAccount = await checkBankAC(context);
+                if (bankAccount != null) {
                   _openQRcode(
-                    primAccount: primAccount,
+                    primAccount: bankAccount,
                     amount: amount,
                     preparedBy: user.fullName,
                     orderNo: orderNo,
@@ -250,18 +323,33 @@ class _BillViewState extends ConsumerState<BillView> {
                 UIUtils.showSnackBar(
                   context: context,
                   text: "Please add some billable items to generate QR code",
-                  bgColor: Colors.red,
+                  bgColor: AppColors.red,
                 );
               }
             },
           ),
+          cashBtn(
+            user: user,
+            orderNo: orderNo,
+            btnName: "Cash",
+            billPrint: true,
+            bgColor: AppColors.blue,
+          ),
+          cashBtn(
+            user: user,
+            orderNo: orderNo,
+            btnName: "Cash no print",
+            billPrint: false,
+          ),
           AppBtn1(
-            name: "Cash Pay",
-            onPressed: () {
+            name: "Bill",
+            bgColor: AppColors.blueGrey,
+            onPressed: () async {
               int amount = ref.read(billListProvider.notifier).getTotalAmount();
               if (amount > 0) {
                 saveNClearBill(
-                  paymentMode: PaymentMode.cash,
+                  paymentMode: PaymentMode.others,
+                  paymentStatus: PaymentStatus.receivable,
                   preparedBy: user.fullName,
                   orderNo: orderNo,
                   print: true,
@@ -270,7 +358,7 @@ class _BillViewState extends ConsumerState<BillView> {
                 UIUtils.showSnackBar(
                   context: context,
                   text: "Please add some billable items",
-                  bgColor: Colors.red,
+                  bgColor: AppColors.red,
                 );
               }
             },
@@ -281,29 +369,21 @@ class _BillViewState extends ConsumerState<BillView> {
             onPressed: () async {
               int amount = ref.read(billListProvider.notifier).getTotalAmount();
               if (amount > 0) {
-                List<BankAccountModel> bankAccounts = await dbUtils
-                    .parseBankAccounts();
-                if (bankAccounts.isEmpty) {
-                  UIUtils.showSnackBar(
-                    // ignore: use_build_context_synchronously
-                    context: context,
-                    text: "Please add bank account",
-                    bgColor: Colors.red,
-                  );
-                } else {
-                  BankAccountModel primAccount = getPrimeryUPI(bankAccounts);
+                BankAccountModel? bankAccount = await checkBankAC(context);
+                if (bankAccount != null) {
                   saveNClearBill(
                     paymentMode: PaymentMode.upi,
+                    paymentStatus: PaymentStatus.received,
                     preparedBy: user.fullName,
                     orderNo: orderNo,
-                    paymentRef: primAccount.upiId,
+                    paymentRef: bankAccount.upiId,
                   );
                 }
               } else {
                 UIUtils.showSnackBar(
                   context: context,
                   text: "Please add some billable items",
-                  bgColor: Colors.red,
+                  bgColor: AppColors.red,
                 );
               }
             },
@@ -331,8 +411,54 @@ class _BillViewState extends ConsumerState<BillView> {
               context.push("/${RouterPaths.bankAccount.name}");
             },
           ),
+          AppBtn1(
+            name: "Reset OrderNo",
+            bgColor: AppColors.purple,
+            onPressed: () {
+              UIUtils.confirmDialog(
+                context: context,
+                title: "Reset Oreder Number",
+                subTitle: "Are you sure",
+                rightBtnName: "Reset",
+                rightFun: () {
+                  ref.read(orderNumProvider.notifier).resetOrderNo();
+                },
+              );
+            },
+          ),
         ],
       ),
+    );
+  }
+
+  AppBtn1 cashBtn({
+    required UserModel user,
+    required String orderNo,
+    required String btnName,
+    required bool billPrint,
+    Color? bgColor,
+  }) {
+    return AppBtn1(
+      name: btnName,
+      bgColor: bgColor,
+      onPressed: () {
+        int amount = ref.read(billListProvider.notifier).getTotalAmount();
+        if (amount > 0) {
+          saveNClearBill(
+            paymentMode: PaymentMode.cash,
+            paymentStatus: PaymentStatus.received,
+            preparedBy: user.fullName,
+            orderNo: orderNo,
+            print: billPrint,
+          );
+        } else {
+          UIUtils.showSnackBar(
+            context: context,
+            text: "Please add some billable items",
+            bgColor: AppColors.red,
+          );
+        }
+      },
     );
   }
 
@@ -362,6 +488,7 @@ class _BillViewState extends ConsumerState<BillView> {
 
   saveNClearBill({
     required PaymentMode paymentMode,
+    required PaymentStatus paymentStatus,
     required String orderNo,
     String? paymentRef,
     String? preparedBy,
@@ -371,12 +498,18 @@ class _BillViewState extends ConsumerState<BillView> {
         .read(billListProvider.notifier)
         .saveOrder(
           paymentMode: paymentMode,
+          paymentStatus: paymentStatus,
           orderNo: orderNo,
           paymentRef: paymentRef,
           preparedBy: preparedBy,
         );
-    if (print) {
-      final billItems = ref.watch(billListProvider);
+    final billItems = ref.watch(billListProvider);
+    String totalItems = getTotalQuantity(billItems).toString();
+    String totalAmount = ref
+        .read(billListProvider.notifier)
+        .getTotalAmount()
+        .toString();
+    if (print && paymentStatus == PaymentStatus.received) {
       ref
           .read(printerProvider.notifier)
           .printBill(
@@ -385,14 +518,21 @@ class _BillViewState extends ConsumerState<BillView> {
             paymentMode: paymentMode.name,
             dateTime: dateFormat(dateTimeNow()),
             itemsList: billItems,
-            totalItems: ref
-                .read(billListProvider.notifier)
-                .getTotalQuantity(billItems)
-                .toString(),
-            totalAmount: ref
-                .read(billListProvider.notifier)
-                .getTotalAmount()
-                .toString(),
+            totalItems: totalItems,
+            totalAmount: totalAmount,
+          );
+    } else if (print && paymentStatus != PaymentStatus.received) {
+      ref
+          .read(printerProvider.notifier)
+          .printBill(
+            context: context,
+            orderNo: orderNo,
+            paymentMode: paymentMode.name,
+            paymentStatus: "Not Paid",
+            dateTime: dateFormat(dateTimeNow()),
+            itemsList: billItems,
+            totalItems: totalItems,
+            totalAmount: totalAmount,
           );
     }
     ref.read(billListProvider.notifier).clearItems();
@@ -411,13 +551,6 @@ class _BillViewState extends ConsumerState<BillView> {
           ),
         );
       },
-    );
-  }
-
-  BankAccountModel getPrimeryUPI(List<BankAccountModel> bankAccounts) {
-    return bankAccounts.firstWhere(
-      (el) => el.isPrime,
-      orElse: () => bankAccounts.first,
     );
   }
 
@@ -465,7 +598,7 @@ class _BillViewState extends ConsumerState<BillView> {
                 children: [
                   AppBtn1(
                     name: "Cancel",
-                    bgColor: Colors.red,
+                    bgColor: AppColors.red,
                     onPressed: () {
                       Navigator.pop(context);
                     },
@@ -477,10 +610,26 @@ class _BillViewState extends ConsumerState<BillView> {
                       Navigator.pop(context);
                       saveNClearBill(
                         paymentMode: PaymentMode.upi,
+                        paymentStatus: PaymentStatus.received,
                         paymentRef: ref,
                         preparedBy: preparedBy,
                         orderNo: orderNo,
                         print: true,
+                      );
+                    },
+                  ),
+                  AppBtn1(
+                    name: "Paid No print",
+                    bgColor: Colors.green,
+                    onPressed: () {
+                      Navigator.pop(context);
+                      saveNClearBill(
+                        paymentMode: PaymentMode.upi,
+                        paymentStatus: PaymentStatus.received,
+                        paymentRef: ref,
+                        preparedBy: preparedBy,
+                        orderNo: orderNo,
+                        print: false,
                       );
                     },
                   ),

@@ -1,3 +1,4 @@
+import 'package:bill_printer/data/app_enums.dart';
 import 'package:drift/drift.dart';
 
 class SaleReceipts extends Table {
@@ -6,7 +7,10 @@ class SaleReceipts extends Table {
   TextColumn get preparedBy => text().nullable()();
   TextColumn get orederNo => text()();
   TextColumn get billItems => text()();
-  TextColumn get paymentMode => text().withDefault(Constant("cash"))();
+  TextColumn get paymentMode =>
+      text().withDefault(Constant(PaymentMode.cash.name))();
+  TextColumn get paymentStatus =>
+      text().withDefault(Constant(PaymentStatus.receivable.name))();
   TextColumn get paymentRef => text().nullable()();
   IntColumn get totalAmount => integer()();
   DateTimeColumn get createdAt =>

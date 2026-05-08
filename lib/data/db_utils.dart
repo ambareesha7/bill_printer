@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:bill_printer/data/database.dart';
 import 'package:bill_printer/data/models/bill_item_model.dart';
@@ -253,6 +254,7 @@ class DBUtils {
     String? customerName,
     String? preparedBy,
     String? paymentMode,
+    String? paymentStatus,
     String? paymentRef,
   }) async {
     final saleReceipt = SaleReceiptsCompanion.insert(
@@ -262,7 +264,12 @@ class DBUtils {
       customerName: Value(customerName),
       preparedBy: Value(preparedBy),
       orederNo: orderNo,
-      paymentMode: paymentMode == null ? Value("cash") : Value(paymentMode),
+      paymentMode: paymentMode == null
+          ? Value(PaymentMode.cash.name)
+          : Value(paymentMode),
+      paymentStatus: paymentStatus == null
+          ? Value(PaymentStatus.receivable.name)
+          : Value(paymentStatus),
       paymentRef: Value(paymentRef),
       createdAt: Value(DateTime.now()),
       updatedAt: Value(DateTime.now()),
@@ -275,13 +282,46 @@ class DBUtils {
     }
   }
 
+  Future<bool> insertAllReceipts({required List<SaleReceipt> receipts}) async {
+    try {
+      await db.batch((batch) {
+        // functions in a batch don't have to be awaited - just
+        // await the whole batch afterwards.
+        batch.insertAll(
+          db.saleReceipts,
+          List.generate(receipts.length, (index) {
+            final i = receipts[index];
+            return SaleReceiptsCompanion.insert(
+              id: i.id,
+              billItems: i.billItems,
+              totalAmount: i.totalAmount,
+              customerName: Value(i.customerName),
+              preparedBy: Value(i.preparedBy),
+              orederNo: i.orederNo,
+              paymentMode: Value(i.paymentMode),
+              paymentStatus: Value(i.paymentStatus),
+              paymentRef: Value(i.paymentRef),
+              createdAt: Value(i.createdAt),
+              updatedAt: Value(i.updatedAt),
+            );
+          }),
+        );
+      });
+      return true;
+    } catch (e, st) {
+      debugLog(e, tag: "Error in insertAllReceipts");
+      debugLog(st, tag: "Stack");
+      return false;
+    }
+  }
+
   Future<void> updateSaleReceipt({
     required SaleReceiptModel saleReceipt,
   }) async {
     final saleRec = SaleReceiptsCompanion(
       id: Value(saleReceipt.id!),
       billItems: saleReceipt.billItems != null
-          ? Value(saleReceipt.billItems.toString())
+          ? Value(jsonEncode(saleReceipt.billItems))
           : const Value.absent(),
       totalAmount: saleReceipt.totalAmount != null
           ? Value(saleReceipt.totalAmount!)
@@ -295,6 +335,8 @@ class DBUtils {
       paymentMode: saleReceipt.paymentMode == null
           ? Value("cash")
           : Value(saleReceipt.paymentMode!),
+      paymentStatus: Value(saleReceipt.paymentStatus.name),
+      orederNo: Value(saleReceipt.orederNo ?? "0"),
       paymentRef: saleReceipt.paymentRef != null
           ? Value(saleReceipt.paymentRef)
           : const Value.absent(),
@@ -341,6 +383,9 @@ class DBUtils {
             billItems: parseBillsFromJson(b.billItems),
             totalAmount: b.totalAmount,
             paymentMode: b.paymentMode,
+            paymentStatus: PaymentStatus.values.firstWhere(
+              (e) => e.name == b.paymentStatus,
+            ),
             paymentRef: b.paymentRef,
             orederNo: b.orederNo,
             createdAt: b.createdAt,
@@ -372,11 +417,11 @@ class DBUtils {
     required DateTime lastDate,
   }) async {
     try {
+      // Use the exact times provided by the date/time picker
       return await (db.select(
             db.saleReceipts,
           )..where((tbl) => tbl.createdAt.isBetweenValues(startDate, lastDate)))
           .get();
-      // )..where((tbl) => tbl.createdAt.equals(date))).get();
     } catch (e) {
       debugLog("Error getSaleReportFromDB: $e");
       return [];

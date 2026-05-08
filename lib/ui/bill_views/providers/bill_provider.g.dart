@@ -9,6 +9,60 @@ part of 'bill_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
+@ProviderFor(TempBillList)
+const tempBillListProvider = TempBillListProvider._();
+
+final class TempBillListProvider
+    extends $NotifierProvider<TempBillList, List<List<BillItemModel>>> {
+  const TempBillListProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'tempBillListProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$tempBillListHash();
+
+  @$internal
+  @override
+  TempBillList create() => TempBillList();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<List<BillItemModel>> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<List<BillItemModel>>>(value),
+    );
+  }
+}
+
+String _$tempBillListHash() => r'8391add452a50c7f4e8ec2cbaa2c8c075d1de023';
+
+abstract class _$TempBillList extends $Notifier<List<List<BillItemModel>>> {
+  List<List<BillItemModel>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref =
+        this.ref as $Ref<List<List<BillItemModel>>, List<List<BillItemModel>>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<List<List<BillItemModel>>, List<List<BillItemModel>>>,
+              List<List<BillItemModel>>,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}
+
 @ProviderFor(BillList)
 const billListProvider = BillListProvider._();
 
@@ -41,7 +95,7 @@ final class BillListProvider
   }
 }
 
-String _$billListHash() => r'b87230a286c7363fc100d710be6009645e1c40b5';
+String _$billListHash() => r'c7cccd836425313b784eeb3543a20d8d04a93169';
 
 abstract class _$BillList extends $Notifier<List<BillItemModel>> {
   List<BillItemModel> build();

@@ -1,7 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:bill_printer/data/models/bill_item_model.dart';
 import 'package:bill_printer/ui/utils/app_colors.dart';
 import 'package:bill_printer/ui/utils/common_utils.dart';
-import 'package:bill_printer/ui/utils/ui_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
@@ -57,6 +58,7 @@ class Printer extends _$Printer {
     required BuildContext context,
     String? orderNo,
     String? paymentMode,
+    String? paymentStatus,
     String? dateTime,
     required List<BillItemModel> itemsList,
     required String totalAmount,
@@ -67,8 +69,8 @@ class Printer extends _$Printer {
       bool result = false;
       List<int> ticket = await billContent(
         businessName: "MoonLight Cafe",
-        subHeader1: "PayMode: $paymentMode",
-        shopID: "CartID: BTM-1",
+        subHeader1: paymentStatus,
+        // shopID: "CartID: BTM-1",
         dateTime: dateTime,
         invoiceTitle: "Order no:",
         orderNo: orderNo,
@@ -89,7 +91,7 @@ class Printer extends _$Printer {
     } else {
       disconnect();
       showToast(
-        "Please the check Printer connection",
+        "Please check the PRINTER connection",
         context: context,
         backgroundColor: AppColors.red,
       );
@@ -132,13 +134,13 @@ class Printer extends _$Printer {
       bytes += generator.text(address);
     }
 
-    // sub header1
-    if (subHeader1 != null) {
-      bytes += generator.text("$subHeader1 ${shopID ?? ""}");
-    }
     // Date time
     if (dateTime != null) {
       bytes += generator.text(dateTime);
+    }
+    // sub header1
+    if (subHeader1 != null) {
+      bytes += generator.text(subHeader1, styles: headerStyle1);
     }
     // Invoice title
     if (invoiceTitle != null) {
@@ -174,18 +176,38 @@ class Printer extends _$Printer {
     );
     bytes += generator.hr();
     // Footer text1
-    bytes += generator.text(
-      footerText,
-      styles: const PosStyles(
-        height: PosTextSize.size1,
-        width: PosTextSize.size1,
-        bold: true,
-        align: PosAlign.center,
-      ),
-    );
+    // bytes += generator.text(
+    //   footerText,
+    //   styles: const PosStyles(
+    //     height: PosTextSize.size1,
+    //     width: PosTextSize.size1,
+    //     bold: true,
+    //     align: PosAlign.center,
+    //   ),
+    // );
 
-    bytes += generator.feed(2);
-    //bytes += generator.cut();
+    bytes += generator.feed(3);
+
+    // Costumer copy here
+    if (businessName != null) {
+      bytes += generator.text(businessName, styles: headerStyle1);
+    }
+    if (invoiceTitle != null) {
+      bytes += generator.text(
+        "$invoiceTitle ${orderNo ?? ""}",
+        styles: const PosStyles(
+          align: PosAlign.center,
+          bold: true,
+          height: PosTextSize.size2,
+          width: PosTextSize.size2,
+        ),
+      );
+    }
+    // bytes += generator.text(
+    //   "Please wait we will call your OrderNo, Once your item is ready",
+    //   styles: PosStyles(bold: true, align: PosAlign.center),
+    // );
+    bytes += generator.feed(4);
     return bytes;
   }
 
@@ -249,3 +271,10 @@ class Printer extends _$Printer {
     return items;
   }
 }
+
+PosStyles get headerStyle1 => PosStyles(
+  align: PosAlign.center,
+  bold: true,
+  height: PosTextSize.size2,
+  width: PosTextSize.size2,
+);

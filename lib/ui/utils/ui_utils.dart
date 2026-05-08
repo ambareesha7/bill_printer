@@ -1,4 +1,6 @@
+import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 class UIUtils {
   static Size screenSize({required BuildContext context}) =>
@@ -8,10 +10,15 @@ class UIUtils {
     required BuildContext context,
     required String text,
     Color? bgColor,
+    int? duration,
   }) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(text), backgroundColor: bgColor));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(text),
+        backgroundColor: bgColor,
+        duration: Duration(seconds: duration ?? 5),
+      ),
+    );
   }
 
   static confirmDialog({
@@ -51,7 +58,11 @@ class UIUtils {
                 // Title text
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(title, style: TextStyle(fontSize: 18)),
+                  child: Text(
+                    title,
+                    style: TextStyle(fontSize: 18),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
                 // subTitle text
                 if (subTitle != null) Text(subTitle),
@@ -97,5 +108,22 @@ class UIUtils {
         );
       },
     );
+  }
+
+  Future<ShareResult?> shareFile(String filePath, String? text) async {
+    try {
+      final params = ShareParams(text: text, files: [XFile(filePath)]);
+
+      final result = await SharePlus.instance.share(params);
+
+      if (result.status == ShareResultStatus.success) {
+        debugLog('Thank you for sharing the picture!');
+      }
+      return result;
+    } catch (e, st) {
+      debugLog('something went wrong', error: e);
+      debugLog(st, tag: "StackTrace");
+      return null;
+    }
   }
 }

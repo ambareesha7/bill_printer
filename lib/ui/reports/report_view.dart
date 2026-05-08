@@ -43,7 +43,7 @@ class _ReportViewState extends ConsumerState<ReportView>
 
     return Scaffold(
       appBar: AppBar(
-        title:const Text("Reports"),
+        title: const Text("Reports"),
         centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
@@ -77,62 +77,67 @@ class _ReportViewState extends ConsumerState<ReportView>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-
+      body: Column(
         children: [
-          Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ...renderWeekChip(selectedMonth),
-                  TextButton.icon(
-                    onPressed: () {
-                      showMonthPicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                      ).then((date) {
-                        if (date != null) {
-                          ref
-                              .read(weeklyDateProvider.notifier)
-                              .updateDate(date);
-                          selectedWeek = "W1";
-                          ref
-                              .read(weeklyReportProvider.notifier)
-                              .getMonthlyTransactions(date);
-                          setState(() {});
-                        }
-                      });
-                    },
-                    label: Text(monthFormat(selectedMonth)),
-                    icon: Icon(Icons.unfold_more_sharp),
-                    iconAlignment: IconAlignment.end,
-                  ),
-                ],
-              ),
-              PieChart1(),
-              Flexible(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Consumer(
-                    builder: (context, ref, child) {
-                      final items = ref.watch(weeklyReportProvider);
-                      return BarChart(
-                        randomData(
-                          items: items,
-                          date: selectedMonth,
-                          week: selectedWeek,
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ...renderWeekChip(selectedMonth),
+                        TextButton.icon(
+                          onPressed: () {
+                            showMonthPicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                            ).then((date) {
+                              if (date != null) {
+                                ref
+                                    .read(weeklyDateProvider.notifier)
+                                    .updateDate(date);
+                                selectedWeek = "W1";
+                                ref
+                                    .read(weeklyReportProvider.notifier)
+                                    .updateTransactions(date);
+                                setState(() {});
+                              }
+                            });
+                          },
+                          label: Text(monthFormat(selectedMonth)),
+                          icon: Icon(Icons.unfold_more_sharp),
+                          iconAlignment: IconAlignment.end,
                         ),
-                      );
-                    },
-                  ),
+                      ],
+                    ),
+                    PieChart1(),
+                    Flexible(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Consumer(
+                          builder: (context, ref, child) {
+                            final items = ref.watch(weeklyReportProvider);
+                            return BarChart(
+                              randomData(
+                                items: items,
+                                date: selectedMonth,
+                                week: selectedWeek,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+                ReportWidget(ReportType.monthly),
+                ReportWidget(ReportType.yearly),
+              ],
+            ),
           ),
-          ReportWidget(ReportType.monthly),
-          ReportWidget(ReportType.yearly),
         ],
       ),
     );

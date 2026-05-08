@@ -8,6 +8,55 @@ import '../../utils/common_utils.dart';
 part 'report_provider.g.dart';
 
 @riverpod
+class FiltersList extends _$FiltersList {
+  @override
+  List<String> build() {
+    return [];
+  }
+
+  Future<void> updateFilters(List<SaleReceiptModel> transList) async {
+    List<String> filters = await getFilters(transList);
+    state = filters;
+  }
+
+  Future<List<String>> getFilters(List<SaleReceiptModel> transList) async {
+    List<String> filters = await _getFilterNames(transList);
+    debugLog(filters.length, tag: "getFilters");
+    // state = [...filters];
+    return filters;
+  }
+
+  Future<List<String>> _getFilterNames(List<SaleReceiptModel> transList) async {
+    List<String> filters = [];
+    for (var i in transList) {
+      if (i.paymentMode != null && i.paymentMode!.isNotEmpty) {
+        filters.add(i.paymentMode!);
+      }
+      if (i.paymentRef != null && i.paymentRef!.isNotEmpty) {
+        String ss = i.paymentRef!.split(",").first.split("=").last;
+        filters.add(ss);
+      }
+    }
+    filters = filters.toSet().toList();
+    filters.sort();
+    debugLog(filters.length, tag: "_getFilterNames");
+    return filters;
+  }
+}
+
+@riverpod
+class AppliedFilters extends _$AppliedFilters {
+  @override
+  List<String> build() {
+    return [];
+  }
+
+  void updateAppliedFilters(List<String> filters) {
+    state = [...filters];
+  }
+}
+
+@riverpod
 class YearlyReport extends _$YearlyReport {
   final DBUtils dbUtils = DBUtils.instance;
   @override
@@ -20,6 +69,39 @@ class YearlyReport extends _$YearlyReport {
     final List<SaleReceiptModel> saleTrans = await dbUtils
         .getNParseSaleReceipts();
     state = [...saleTrans];
+  }
+}
+
+@riverpod
+class DateRange extends _$DateRange {
+  @override
+  ({DateTime? startDate, DateTime? endDate}) build() {
+    return (startDate: null, endDate: null);
+  }
+
+  void setDateRange(DateTime? startDate, DateTime? endDate) {
+    state = (startDate: startDate, endDate: endDate);
+  }
+
+  void clearDateRange() {
+    state = (startDate: null, endDate: null);
+  }
+}
+
+@riverpod
+class DateRangeReport extends _$DateRangeReport {
+  final DBUtils dbUtils = DBUtils.instance;
+  @override
+  List<SaleReceiptModel> build() {
+    return [];
+  }
+
+  getDateRangeTransactions(DateTime startDate, DateTime endDate) async {
+    final List<SaleReceiptModel> transactions = await getReport2(
+      startDate: startDate,
+      endDate: endDate,
+    );
+    state = [...transactions];
   }
 }
 
@@ -38,9 +120,14 @@ class MonthlyReport extends _$MonthlyReport {
     state = [...saleTrans];
   }
 
-  getMonthlyTransactions(DateTime date) async {
-    final n = await getReport(date);
+  updateTransactions(DateTime date) async {
+    final n = await getMonthlyTransactions(date);
     state = [...n];
+  }
+
+  delete(String id) async {
+    await dbUtils.deleteSaleReceipt(id);
+    getAllTransactions();
   }
 }
 
@@ -49,14 +136,12 @@ class WeeklyReport extends _$WeeklyReport {
   final DBUtils dbUtils = DBUtils.instance;
   @override
   List<SaleReceiptModel> build() {
-    getMonthlyTransactions(
-      DateTime(DateTime.now().year, DateTime.now().month, 1),
-    );
+    updateTransactions(DateTime(DateTime.now().year, DateTime.now().month, 1));
     return [];
   }
 
-  getMonthlyTransactions(DateTime date) async {
-    final n = await getReport(date);
+  updateTransactions(DateTime date) async {
+    final n = await getMonthlyTransactions(date);
     state = [...n];
   }
 }
@@ -96,6 +181,7 @@ int getTotalAmount(List<SaleReceiptModel> items) {
 String getFormattedDate(DateTime date) => DateFormat("yMd").format(date);
 
 int getDayTotal(List<SaleReceiptModel> items, DateTime date) {
+  // TODO: modify dateTime to show full day transactions
   String selectedDay = getFormattedDate(date);
   items = items
       .where((i) => getFormattedDate(i.createdAt!) == selectedDay)
@@ -107,20 +193,39 @@ int getDayTotal(List<SaleReceiptModel> items, DateTime date) {
   return total;
 }
 
-Future<List<SaleReceiptModel>> getReport(DateTime date) async {
-  ({DateTime startDate, DateTime lastDate}) dates = getDatesOfMonth(date);
+// Future<List<SaleReceiptModel>> getReport(DateTime date) async {
+//   ({DateTime startDate, DateTime lastDate}) dates = getDatesOfMonth(date);
+//   return await DBUtils.instance.getNParseReport(
+//     startDate: dates.startDate,
+//     lastDate: dates.lastDate,
+//   );
+// }
+
+Future<List<SaleReceiptModel>> getReport2({
+  required DateTime startDate,
+  required DateTime endDate,
+}) async {
   return await DBUtils.instance.getNParseReport(
-    startDate: dates.startDate,
-    lastDate: dates.lastDate,
+    startDate: startDate,
+    lastDate: endDate,
   );
 }
 
-Future<List<SaleReceiptModel>> getDayReport(DateTime date) async {
-  final List<SaleReceiptModel> l = await DBUtils.instance.getNParseReport(
-    startDate: date,
-    lastDate: date,
-  );
-  return l;
+// Future<List<SaleReceiptModel>> getDayReport(DateTime date) async {
+//   final List<SaleReceiptModel> l = await DBUtils.instance.getNParseReport(
+//     startDate: date,
+//     lastDate: date,
+//   );
+//   return l;
+// }
+
+Future<List<SaleReceiptModel>> getMonthlyTransactions(DateTime date) async {
+  ({DateTime startDate, DateTime lastDate}) dates = getDatesOfMonth(date);
+  // Extend lastDate to end of day to include all transactions on that day
+  final endOfDay = dates.lastDate
+      .add(const Duration(days: 1))
+      .copyWith(hour: 0, minute: 0, second: 0, millisecond: 0);
+  return await getReport2(startDate: dates.startDate, endDate: endOfDay);
 }
 
 int getWeekDates({required String week, required DateTime date}) {
@@ -155,25 +260,25 @@ int getWeekDates({required String week, required DateTime date}) {
 int addDaysToDate({required String day}) {
   int numOfDays = 0;
   switch (day.toLowerCase()) {
-    case "mon":
+    case "sun":
       numOfDays += 7;
       break;
-    case "tue":
+    case "mon":
       numOfDays += 6;
       break;
-    case "wed":
+    case "tue":
       numOfDays += 5;
       break;
-    case "thu":
+    case "wed":
       numOfDays += 4;
       break;
-    case "fri":
+    case "thu":
       numOfDays += 3;
       break;
-    case "sat":
+    case "fri":
       numOfDays += 2;
       break;
-    case "sun":
+    case "sat":
       numOfDays += 1;
       break;
 
@@ -191,4 +296,23 @@ List<String> getWeeksInMonth(DateTime date) {
   }
   List.generate(numOfWeeks, (index) => weeks.add("W${index + 1}"));
   return weeks;
+}
+
+List<SaleReceiptModel> getFilterNameList({
+  required List<SaleReceiptModel> list,
+  required List<String> filterItems,
+}) {
+  List<SaleReceiptModel> transList = [];
+  for (var i in list) {
+    if (i.paymentMode != null &&
+        filterItems.contains(i.paymentMode?.toLowerCase())) {
+      transList.add(i);
+    } else if (i.paymentRef != null && i.paymentRef!.isNotEmpty) {
+      String ss = i.paymentRef!.split(",").first.split("=").last;
+      if (filterItems.contains(ss.toLowerCase())) {
+        transList.add(i);
+      }
+    }
+  }
+  return transList;
 }

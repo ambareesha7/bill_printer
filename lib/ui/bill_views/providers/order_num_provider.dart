@@ -1,6 +1,5 @@
 import 'package:bill_printer/data/database.dart';
 import 'package:bill_printer/data/db_utils.dart';
-import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part "order_num_provider.g.dart";
@@ -15,6 +14,10 @@ class OrderNum extends _$OrderNum {
     return "1";
   }
 
+  resetOrderNo() async {
+    state = "1";
+  }
+
   updateOrderNo() async {
     int orderNo = await getOrderNum();
     state = orderNo.toString();
@@ -25,15 +28,14 @@ class OrderNum extends _$OrderNum {
   /// we can change orderNo to something else
   Future<int> getOrderNum() async {
     SaleReceipt? lastsaleReceipt = await dbUtils.getLastBillFromDB();
-    String now = getYearMonthDay(DateTime.now());
+    // String now = getYearMonthDay(DateTime.now());
 
     if (lastsaleReceipt == null) {
       return 1;
-    } else if (getYearMonthDay(lastsaleReceipt.createdAt) == now) {
+    } else {
+      // getYearMonthDay(lastsaleReceipt.createdAt) == now
       int lastOrder = int.tryParse(lastsaleReceipt.orederNo) ?? 0;
       return lastOrder + 1;
-    } else {
-      return 1;
     }
   }
 }

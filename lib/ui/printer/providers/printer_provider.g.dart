@@ -92,7 +92,7 @@ final class PrinterProvider extends $NotifierProvider<Printer, bool> {
   }
 }
 
-String _$printerHash() => r'71190c23982d1a8d96c29ab719e2b2e2d0014704';
+String _$printerHash() => r'e9bff3759ebb9d03ed58d00fd4eb5b7ce324b236';
 
 abstract class _$Printer extends $Notifier<bool> {
   bool build();

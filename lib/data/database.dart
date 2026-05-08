@@ -1,8 +1,11 @@
+import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/data/tables/bank_accounts.dart';
 import 'package:bill_printer/data/tables/categories_table.dart';
 import 'package:bill_printer/data/tables/products_table.dart';
 import 'package:bill_printer/data/tables/sale_receipts.dart';
 import 'package:bill_printer/data/tables/users.dart';
+import 'package:bill_printer/data/tables/checklists.dart';
+import 'package:bill_printer/data/tables/checklist_tasks.dart';
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter/foundation.dart';
@@ -16,7 +19,15 @@ final databaseProvider = Provider<AppDatabase>((ref) {
 });
 
 @DriftDatabase(
-  tables: [Categories, Products, BankAccounts, SaleReceipts, Users],
+  tables: [
+    Categories,
+    Products,
+    BankAccounts,
+    SaleReceipts,
+    Users,
+    Checklists,
+    ChecklistTasks,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   // After generating code, this class needs to define a `schemaVersion` getter
