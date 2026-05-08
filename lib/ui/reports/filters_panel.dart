@@ -138,6 +138,9 @@ class _FiltersPanelState extends ConsumerState<FiltersPanel> {
                   ElevatedButton(
                     onPressed: () {
                       widget.onApplyFilters(selectedFilters);
+                      ref
+                          .read(appliedFiltersProvider.notifier)
+                          .updateAppliedFilters(selectedFilters);
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(

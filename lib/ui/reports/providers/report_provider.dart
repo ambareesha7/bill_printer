@@ -52,7 +52,7 @@ class AppliedFilters extends _$AppliedFilters {
   }
 
   void updateAppliedFilters(List<String> filters) {
-    state = filters;
+    state = [...filters];
   }
 }
 
@@ -181,7 +181,7 @@ int getTotalAmount(List<SaleReceiptModel> items) {
 String getFormattedDate(DateTime date) => DateFormat("yMd").format(date);
 
 int getDayTotal(List<SaleReceiptModel> items, DateTime date) {
-  // TODO: modify dateTime to show all day transactions
+  // TODO: modify dateTime to show full day transactions
   String selectedDay = getFormattedDate(date);
   items = items
       .where((i) => getFormattedDate(i.createdAt!) == selectedDay)

@@ -28,7 +28,7 @@ class ReportWidget extends ConsumerWidget {
     ref.watch(printerProvider);
     DBUtils dbUtils = DBUtils.instance;
 
-    // TODO: REMOVE MONTHLY REPORT IS POSSIBLE
+    // TODO: REMOVE MONTHLY REPORT IF IT IS POSSIBLE
     final List<SaleReceiptModel> allTransactions =
         (dateRange.startDate != null && dateRange.endDate != null)
         ? ref.watch(dateRangeReportProvider)
