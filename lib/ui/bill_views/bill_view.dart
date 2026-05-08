@@ -137,8 +137,8 @@ class _BillViewState extends ConsumerState<BillView> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  buildCategories(),
                   AppBtn1(
+                    name: "Print",
                     onPressed: () {
                       final billItems = ref.watch(billListProvider);
                       if (billItems.isEmpty) return;
@@ -147,7 +147,7 @@ class _BillViewState extends ConsumerState<BillView> {
                           .printBill(
                             context: context,
                             orderNo: orderNo,
-                            paymentStatus: "Not paid",
+                            paymentStatus: "Not Paid",
                             dateTime: dateFormat(dateTimeNow()),
                             itemsList: billItems,
                             totalItems: getTotalQuantity(billItems).toString(),
@@ -157,9 +157,7 @@ class _BillViewState extends ConsumerState<BillView> {
                                 .toString(),
                           );
                     },
-                    name: "Print",
                   ),
-                  SizedBox(width: btnPadding),
                   AppBtn1(
                     name: "Add Product",
                     bgColor: AppColors.blue,
@@ -252,6 +250,54 @@ class _BillViewState extends ConsumerState<BillView> {
                       );
                     },
                   ),
+                  AppBtn1(
+                    name: "Bill",
+                    bgColor: AppColors.blueGrey,
+                    onPressed: () async {
+                      int amount = ref
+                          .read(billListProvider.notifier)
+                          .getTotalAmount();
+                      if (amount > 0) {
+                        saveNClearBill(
+                          paymentMode: PaymentMode.others,
+                          paymentStatus: PaymentStatus.receivable,
+                          preparedBy: user?.fullName,
+                          orderNo: orderNo,
+                          print: true,
+                        );
+                      } else {
+                        UIUtils.showSnackBar(
+                          context: context,
+                          text: "Please add some billable items",
+                          bgColor: AppColors.red,
+                        );
+                      }
+                    },
+                  ),
+                  AppBtn1(
+                    name: "Bill No Print",
+                    bgColor: AppColors.blueGrey,
+                    onPressed: () async {
+                      int amount = ref
+                          .read(billListProvider.notifier)
+                          .getTotalAmount();
+                      if (amount > 0) {
+                        saveNClearBill(
+                          paymentMode: PaymentMode.others,
+                          paymentStatus: PaymentStatus.receivable,
+                          preparedBy: user?.fullName,
+                          orderNo: orderNo,
+                          print: false,
+                        );
+                      } else {
+                        UIUtils.showSnackBar(
+                          context: context,
+                          text: "Please add some billable items",
+                          bgColor: AppColors.red,
+                        );
+                      }
+                    },
+                  ),
                 ],
               ),
             ),
@@ -340,28 +386,6 @@ class _BillViewState extends ConsumerState<BillView> {
             orderNo: orderNo,
             btnName: "Cash no print",
             billPrint: false,
-          ),
-          AppBtn1(
-            name: "Bill",
-            bgColor: AppColors.blueGrey,
-            onPressed: () async {
-              int amount = ref.read(billListProvider.notifier).getTotalAmount();
-              if (amount > 0) {
-                saveNClearBill(
-                  paymentMode: PaymentMode.others,
-                  paymentStatus: PaymentStatus.receivable,
-                  preparedBy: user.fullName,
-                  orderNo: orderNo,
-                  print: true,
-                );
-              } else {
-                UIUtils.showSnackBar(
-                  context: context,
-                  text: "Please add some billable items",
-                  bgColor: AppColors.red,
-                );
-              }
-            },
           ),
           AppBtn1(
             name: "Received in Bank",
@@ -459,30 +483,6 @@ class _BillViewState extends ConsumerState<BillView> {
           );
         }
       },
-    );
-  }
-
-  Widget buildCategories() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: List.generate(
-          1,
-          (index) => _buildCategoryChip('ALL', isSelected: true),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoryChip(String label, {bool isSelected = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Chip(
-        visualDensity: VisualDensity(horizontal: -4, vertical: -4),
-        label: Text(label, style: TextStyle(color: Colors.white)),
-        backgroundColor: isSelected ? Colors.orange : Colors.grey[800],
-      ),
     );
   }
 
