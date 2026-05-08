@@ -181,6 +181,7 @@ int getTotalAmount(List<SaleReceiptModel> items) {
 String getFormattedDate(DateTime date) => DateFormat("yMd").format(date);
 
 int getDayTotal(List<SaleReceiptModel> items, DateTime date) {
+  // TODO: modify dateTime to show all day transactions
   String selectedDay = getFormattedDate(date);
   items = items
       .where((i) => getFormattedDate(i.createdAt!) == selectedDay)
@@ -192,13 +193,13 @@ int getDayTotal(List<SaleReceiptModel> items, DateTime date) {
   return total;
 }
 
-Future<List<SaleReceiptModel>> getReport(DateTime date) async {
-  ({DateTime startDate, DateTime lastDate}) dates = getDatesOfMonth(date);
-  return await DBUtils.instance.getNParseReport(
-    startDate: dates.startDate,
-    lastDate: dates.lastDate,
-  );
-}
+// Future<List<SaleReceiptModel>> getReport(DateTime date) async {
+//   ({DateTime startDate, DateTime lastDate}) dates = getDatesOfMonth(date);
+//   return await DBUtils.instance.getNParseReport(
+//     startDate: dates.startDate,
+//     lastDate: dates.lastDate,
+//   );
+// }
 
 Future<List<SaleReceiptModel>> getReport2({
   required DateTime startDate,
@@ -210,13 +211,13 @@ Future<List<SaleReceiptModel>> getReport2({
   );
 }
 
-Future<List<SaleReceiptModel>> getDayReport(DateTime date) async {
-  final List<SaleReceiptModel> l = await DBUtils.instance.getNParseReport(
-    startDate: date,
-    lastDate: date,
-  );
-  return l;
-}
+// Future<List<SaleReceiptModel>> getDayReport(DateTime date) async {
+//   final List<SaleReceiptModel> l = await DBUtils.instance.getNParseReport(
+//     startDate: date,
+//     lastDate: date,
+//   );
+//   return l;
+// }
 
 Future<List<SaleReceiptModel>> getMonthlyTransactions(DateTime date) async {
   ({DateTime startDate, DateTime lastDate}) dates = getDatesOfMonth(date);
@@ -259,25 +260,25 @@ int getWeekDates({required String week, required DateTime date}) {
 int addDaysToDate({required String day}) {
   int numOfDays = 0;
   switch (day.toLowerCase()) {
-    case "mon":
+    case "sun":
       numOfDays += 7;
       break;
-    case "tue":
+    case "mon":
       numOfDays += 6;
       break;
-    case "wed":
+    case "tue":
       numOfDays += 5;
       break;
-    case "thu":
+    case "wed":
       numOfDays += 4;
       break;
-    case "fri":
+    case "thu":
       numOfDays += 3;
       break;
-    case "sat":
+    case "fri":
       numOfDays += 2;
       break;
-    case "sun":
+    case "sat":
       numOfDays += 1;
       break;
 

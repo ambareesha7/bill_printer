@@ -340,7 +340,7 @@ class _AnalyticsViewState extends ConsumerState<AnalyticsView> {
     for (var b in transactions) {
       if (b.billItems == null) continue;
       for (var it in b.billItems!) {
-        final name = it.name;
+        final name = it.name.trim();
         final qty = it.quantity;
         final revenue = it.quantity * it.rate;
         if (!itemMap.containsKey(name)) {
