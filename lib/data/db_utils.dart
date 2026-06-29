@@ -251,6 +251,7 @@ class DBUtils {
     required List<BillItemModel> billItems,
     required int totalAmount,
     required String orderNo,
+    required String unitId,
     String? customerName,
     String? preparedBy,
     String? paymentMode,
@@ -263,7 +264,7 @@ class DBUtils {
       totalAmount: totalAmount,
       customerName: Value(customerName),
       preparedBy: Value(preparedBy),
-      orederNo: orderNo,
+      orderNo: orderNo,
       paymentMode: paymentMode == null
           ? Value(PaymentMode.cash.name)
           : Value(paymentMode),
@@ -273,6 +274,7 @@ class DBUtils {
       paymentRef: Value(paymentRef),
       createdAt: Value(DateTime.now()),
       updatedAt: Value(DateTime.now()),
+      unitId: unitId,
     );
     // debugLog(saleReceipt, tag: "saleReceipts");
     try {
@@ -297,7 +299,8 @@ class DBUtils {
               totalAmount: i.totalAmount,
               customerName: Value(i.customerName),
               preparedBy: Value(i.preparedBy),
-              orederNo: i.orederNo,
+              orderNo: i.orderNo,
+              unitId: i.unitId,
               paymentMode: Value(i.paymentMode),
               paymentStatus: Value(i.paymentStatus),
               paymentRef: Value(i.paymentRef),
@@ -336,7 +339,8 @@ class DBUtils {
           ? Value("cash")
           : Value(saleReceipt.paymentMode!),
       paymentStatus: Value(saleReceipt.paymentStatus.name),
-      orederNo: Value(saleReceipt.orederNo ?? "0"),
+      orderNo: Value(saleReceipt.orderNo ?? "0"),
+      unitId: Value(saleReceipt.unitId ?? "0"),
       paymentRef: saleReceipt.paymentRef != null
           ? Value(saleReceipt.paymentRef)
           : const Value.absent(),
@@ -387,7 +391,8 @@ class DBUtils {
               (e) => e.name == b.paymentStatus,
             ),
             paymentRef: b.paymentRef,
-            orederNo: b.orederNo,
+            orderNo: b.orderNo,
+            unitId: b.unitId,
             createdAt: b.createdAt,
             updatedAt: b.updatedAt,
           ),

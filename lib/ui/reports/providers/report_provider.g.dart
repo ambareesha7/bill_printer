@@ -94,7 +94,7 @@ final class AppliedFiltersProvider
   }
 }
 
-String _$appliedFiltersHash() => r'4e286102044394578ff21cd6500f540e08a03ab3';
+String _$appliedFiltersHash() => r'2058db409f41e48c373b18875807ec9ba47db79f';
 
 abstract class _$AppliedFilters extends $Notifier<List<String>> {
   List<String> build();

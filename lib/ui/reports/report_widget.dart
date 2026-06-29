@@ -251,7 +251,7 @@ class ReportWidget extends ConsumerWidget {
                       children: [
                         Text(dateFormat(transaction.createdAt!.toLocal())),
                         Text(
-                          "No: ${transaction.orederNo ?? ""}",
+                          "No: ${transaction.orderNo ?? ""}",
                           style: TextStyle(
                             color:
                                 (transaction.paymentStatus !=
@@ -301,6 +301,7 @@ class ReportWidget extends ConsumerWidget {
                       if (transaction.paymentRef != null)
                         Text("Bank Ref: ${transaction.paymentRef ?? ""}"),
                       Text("ID: ${transaction.id ?? ""}"),
+                      Text("Unit ID: ${transaction.unitId ?? ""}"),
                       Text(
                         "PaymentStatus: ${capitalize(transaction.paymentStatus.name)}",
                         style: TextStyle(
@@ -376,7 +377,7 @@ class ReportWidget extends ConsumerWidget {
                                   .read(printerProvider.notifier)
                                   .printBill(
                                     context: context,
-                                    orderNo: transaction.orederNo,
+                                    orderNo: transaction.orderNo,
                                     paymentMode: transaction.paymentMode,
                                     paymentStatus:
                                         (transaction.paymentStatus !=
@@ -402,7 +403,7 @@ class ReportWidget extends ConsumerWidget {
                                 context: context,
                                 subTitle: "Are you sure you want to delete",
                                 title:
-                                    "Order no: ${transaction.orederNo}\n${getItemNames(transaction.billItems)}",
+                                    "Order no: ${transaction.orderNo}\n${getItemNames(transaction.billItems)}",
                                 rightFun: () {
                                   ref
                                       .read(monthlyReportProvider.notifier)

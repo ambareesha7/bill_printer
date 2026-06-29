@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'order_num_provider.dart';
+part of 'unit_id.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,27 +9,27 @@ part of 'order_num_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(OrderNum)
-const orderNumProvider = OrderNumProvider._();
+@ProviderFor(UnitId)
+const unitIdProvider = UnitIdProvider._();
 
-final class OrderNumProvider extends $NotifierProvider<OrderNum, String> {
-  const OrderNumProvider._()
+final class UnitIdProvider extends $NotifierProvider<UnitId, String> {
+  const UnitIdProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'orderNumProvider',
+        name: r'unitIdProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$orderNumHash();
+  String debugGetCreateSourceHash() => _$unitIdHash();
 
   @$internal
   @override
-  OrderNum create() => OrderNum();
+  UnitId create() => UnitId();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(String value) {
@@ -40,9 +40,9 @@ final class OrderNumProvider extends $NotifierProvider<OrderNum, String> {
   }
 }
 
-String _$orderNumHash() => r'a16e1c69e495271f6938a95b975dee3b7d72b0d5';
+String _$unitIdHash() => r'4f1b6dc42d6c962ced901a23c36e616dde035f57';
 
-abstract class _$OrderNum extends $Notifier<String> {
+abstract class _$UnitId extends $Notifier<String> {
   String build();
   @$mustCallSuper
   @override

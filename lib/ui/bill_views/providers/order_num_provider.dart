@@ -34,7 +34,7 @@ class OrderNum extends _$OrderNum {
       return 1;
     } else {
       // getYearMonthDay(lastsaleReceipt.createdAt) == now
-      int lastOrder = int.tryParse(lastsaleReceipt.orederNo) ?? 0;
+      int lastOrder = int.tryParse(lastsaleReceipt.orderNo) ?? 0;
       return lastOrder + 1;
     }
   }

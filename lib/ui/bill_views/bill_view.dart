@@ -8,6 +8,7 @@ import 'package:bill_printer/data/models/users/user_model.dart';
 import 'package:bill_printer/ui/auth/providers/auth_provider.dart';
 import 'package:bill_printer/ui/bill_views/providers/bill_provider.dart';
 import 'package:bill_printer/ui/bill_views/providers/order_num_provider.dart';
+import 'package:bill_printer/ui/bill_views/providers/unit_id.dart';
 import 'package:bill_printer/ui/category/product_provider.dart';
 import 'package:bill_printer/ui/printer/providers/printer_provider.dart';
 import 'package:bill_printer/ui/utils/app_colors.dart';
@@ -38,6 +39,7 @@ class _BillViewState extends ConsumerState<BillView> {
     final itemHeadStyle = TextStyle(fontWeight: FontWeight.bold);
     final user = ref.watch(authProvider);
     final orderNo = ref.watch(orderNumProvider);
+    final unitId = ref.watch(unitIdProvider);
     ref.watch(printerProvider);
     var listItems = ref.watch(tempBillListProvider);
     return Scaffold(
@@ -57,9 +59,18 @@ class _BillViewState extends ConsumerState<BillView> {
           children: [
             Consumer(
               builder: (context, ref, child) {
-                return Text(
-                  "Order No: $orderNo",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      "Unit ID: $unitId",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      "Order No: $orderNo",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
                 );
               },
             ),
@@ -263,6 +274,7 @@ class _BillViewState extends ConsumerState<BillView> {
                           paymentStatus: PaymentStatus.receivable,
                           preparedBy: user?.fullName,
                           orderNo: orderNo,
+                          unitId: unitId,
                           print: true,
                         );
                       } else {
@@ -287,6 +299,7 @@ class _BillViewState extends ConsumerState<BillView> {
                           paymentStatus: PaymentStatus.receivable,
                           preparedBy: user?.fullName,
                           orderNo: orderNo,
+                          unitId: unitId,
                           print: false,
                         );
                       } else {
@@ -337,6 +350,8 @@ class _BillViewState extends ConsumerState<BillView> {
 
   Widget _buildActionButtons(UserModel user) {
     String orderNo = ref.watch(orderNumProvider);
+    final unitId = ref.watch(unitIdProvider);
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -363,6 +378,7 @@ class _BillViewState extends ConsumerState<BillView> {
                     amount: amount,
                     preparedBy: user.fullName,
                     orderNo: orderNo,
+                    unitId: unitId,
                   );
                 }
               } else {
@@ -377,6 +393,7 @@ class _BillViewState extends ConsumerState<BillView> {
           cashBtn(
             user: user,
             orderNo: orderNo,
+            unitId: unitId,
             btnName: "Cash",
             billPrint: true,
             bgColor: AppColors.blue,
@@ -384,6 +401,7 @@ class _BillViewState extends ConsumerState<BillView> {
           cashBtn(
             user: user,
             orderNo: orderNo,
+            unitId: unitId,
             btnName: "Cash no print",
             billPrint: false,
           ),
@@ -400,6 +418,7 @@ class _BillViewState extends ConsumerState<BillView> {
                     paymentStatus: PaymentStatus.received,
                     preparedBy: user.fullName,
                     orderNo: orderNo,
+                    unitId: unitId,
                     paymentRef: bankAccount.upiId,
                   );
                 }
@@ -458,6 +477,7 @@ class _BillViewState extends ConsumerState<BillView> {
   AppBtn1 cashBtn({
     required UserModel user,
     required String orderNo,
+    required String unitId,
     required String btnName,
     required bool billPrint,
     Color? bgColor,
@@ -473,6 +493,7 @@ class _BillViewState extends ConsumerState<BillView> {
             paymentStatus: PaymentStatus.received,
             preparedBy: user.fullName,
             orderNo: orderNo,
+            unitId: unitId,
             print: billPrint,
           );
         } else {
@@ -490,6 +511,7 @@ class _BillViewState extends ConsumerState<BillView> {
     required PaymentMode paymentMode,
     required PaymentStatus paymentStatus,
     required String orderNo,
+    required String unitId,
     String? paymentRef,
     String? preparedBy,
     bool print = false,
@@ -500,6 +522,7 @@ class _BillViewState extends ConsumerState<BillView> {
           paymentMode: paymentMode,
           paymentStatus: paymentStatus,
           orderNo: orderNo,
+          unitId: unitId,
           paymentRef: paymentRef,
           preparedBy: preparedBy,
         );
@@ -558,6 +581,7 @@ class _BillViewState extends ConsumerState<BillView> {
     required BankAccountModel primAccount,
     required int amount,
     required String orderNo,
+    required String unitId,
     String? preparedBy,
   }) async {
     String upi =
@@ -614,6 +638,7 @@ class _BillViewState extends ConsumerState<BillView> {
                         paymentRef: ref,
                         preparedBy: preparedBy,
                         orderNo: orderNo,
+                        unitId: unitId,
                         print: true,
                       );
                     },
@@ -629,6 +654,7 @@ class _BillViewState extends ConsumerState<BillView> {
                         paymentRef: ref,
                         preparedBy: preparedBy,
                         orderNo: orderNo,
+                        unitId: unitId,
                         print: false,
                       );
                     },

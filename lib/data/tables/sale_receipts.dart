@@ -5,7 +5,9 @@ class SaleReceipts extends Table {
   TextColumn get id => text()();
   TextColumn get customerName => text().nullable()();
   TextColumn get preparedBy => text().nullable()();
-  TextColumn get orederNo => text()();
+  TextColumn get orderNo => text()();
+  // add reference between unitId and shop table when suitable
+  TextColumn get unitId => text()();
   TextColumn get billItems => text()();
   TextColumn get paymentMode =>
       text().withDefault(Constant(PaymentMode.cash.name))();

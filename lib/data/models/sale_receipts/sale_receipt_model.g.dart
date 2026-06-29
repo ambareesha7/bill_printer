@@ -16,7 +16,8 @@ _SaleReceiptModel _$SaleReceiptModelFromJson(Map<String, dynamic> json) =>
           $enumDecodeNullable(_$PaymentStatusEnumMap, json['paymentStatus']) ??
           PaymentStatus.receivable,
       paymentRef: json['paymentRef'] as String?,
-      orederNo: json['orederNo'] as String?,
+      orderNo: json['orderNo'] as String?,
+      unitId: json['unitId'] as String?,
       billItems: (json['billItems'] as List<dynamic>?)
           ?.map((e) => BillItemModel.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -37,7 +38,8 @@ Map<String, dynamic> _$SaleReceiptModelToJson(_SaleReceiptModel instance) =>
       'paymentMode': instance.paymentMode,
       'paymentStatus': _$PaymentStatusEnumMap[instance.paymentStatus]!,
       'paymentRef': instance.paymentRef,
-      'orederNo': instance.orederNo,
+      'orderNo': instance.orderNo,
+      'unitId': instance.unitId,
       'billItems': instance.billItems,
       'totalAmount': instance.totalAmount,
       'createdAt': instance.createdAt?.toIso8601String(),
