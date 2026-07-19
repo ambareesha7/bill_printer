@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 
-class Shop extends Table {
+class Shops extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text().withLength(min: 2, max: 100).unique()();
   BoolColumn get isPrime => boolean().withDefault(const Constant(false))();

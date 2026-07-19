@@ -6,6 +6,7 @@ import 'package:bill_printer/data/database.dart';
 import 'package:bill_printer/data/models/bill_item_model.dart';
 import 'package:bill_printer/data/models/sale_receipts/sale_receipt_model.dart';
 import 'package:drift/drift.dart';
+import 'package:drift/isolate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/v7.dart';
 
@@ -443,6 +444,136 @@ class DBUtils {
     } catch (e) {
       debugLog("Error getLastBillFromDB: $e");
       return null;
+    }
+  }
+
+  // ======================== Shop CRUD operations =====================
+  Future<String> insertShop({
+    required String name,
+    required String shopId,
+    bool? isPrime,
+    String? address,
+    String? mapAddress,
+  }) async {
+    final shopCompanion = ShopsCompanion.insert(
+      name: name,
+      shopId: shopId,
+      isPrime: Value(isPrime ?? false),
+      address: Value(address),
+      mapAddress: Value(mapAddress),
+      createdAt: Value(DateTime.now()),
+      updatedAt: Value(DateTime.now()),
+    );
+    String errorMsg1 = "Failed to create Shop";
+    try {
+      await db.into(db.shops).insert(shopCompanion);
+      return "Success";
+    } catch (e) {
+      debugLog("Error inserting shop: $e");
+      if (e is DriftRemoteException) {
+        if (e.remoteCause.toString().contains('UNIQUE constraint failed') &&
+            e.remoteCause.toString().contains("shop_id")) {
+          debugLog("Error inserting e.remoteCause: ${e.remoteCause}");
+          return "Shop ID should be UNIQUE";
+        } else {
+          return errorMsg1;
+        }
+      } else {
+        return errorMsg1;
+      }
+    }
+  }
+
+  Future<String> updateShop({
+    required int id,
+    String? name,
+    String? shopId,
+    bool? isPrime,
+    String? address,
+    String? mapAddress,
+  }) async {
+    Shop? shop = await getShopById(id);
+    String errorMsg1 = "Failed to update Shop";
+    if (shop == null) return errorMsg1;
+
+    final shopCompanion = ShopsCompanion(
+      id: Value(id),
+      name: name != null ? Value(name) : Value(shop.name),
+      shopId: shopId != null ? Value(shopId) : Value(shop.shopId),
+      isPrime: isPrime != null ? Value(isPrime) : Value(shop.isPrime),
+      address: address != null ? Value(address) : Value(shop.address),
+      mapAddress: mapAddress != null
+          ? Value(mapAddress)
+          : Value(shop.mapAddress),
+      updatedAt: Value(DateTime.now()),
+    );
+    try {
+      await db.update(db.shops).replace(shopCompanion);
+      return "Success";
+    } catch (e) {
+      debugLog("Error Updating shop: $e");
+      if (e is DriftRemoteException) {
+        if (e.remoteCause.toString().contains('UNIQUE constraint failed') &&
+            e.remoteCause.toString().contains("shop_id")) {
+          return "Shop ID should be UNIQUE";
+        } else {
+          return errorMsg1;
+        }
+      } else {
+        return errorMsg1;
+      }
+    }
+  }
+
+  Future<void> deleteShop(int id) async {
+    try {
+      await (db.delete(db.shops)..where((tbl) => tbl.id.equals(id))).go();
+    } catch (e) {
+      debugLog("Error deleting shop: $e");
+    }
+  }
+
+  Future<List<Shop>> getShops() async {
+    try {
+      return await db.select(db.shops).get();
+    } catch (e) {
+      debugLog("Error fetching shops: $e");
+      return [];
+    }
+  }
+
+  Future<Shop?> getShopById(int id) async {
+    try {
+      return await (db.select(
+        db.shops,
+      )..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
+    } catch (e) {
+      debugLog("Error fetching shop by id: $e");
+      return null;
+    }
+  }
+
+  Future<Shop?> getByShopId(String shopId) async {
+    try {
+      return await (db.select(
+        db.shops,
+      )..where((tbl) => tbl.shopId.equals(shopId))).getSingleOrNull();
+    } catch (e) {
+      debugLog("Error fetching shop by shopId: $e");
+      return null;
+    }
+  }
+
+  Future<void> updatePrimeShop(String shopId, bool status) async {
+    Shop? shop = await getByShopId(shopId);
+    if (shop != null && status) {
+      await updateShop(id: shop.id, isPrime: status);
+      List<Shop> shops = await getShops();
+      for (var i in shops) {
+        if (i.shopId != shopId) {
+          await updateShop(id: i.id, isPrime: false);
+        }
+      }
     }
   }
 }

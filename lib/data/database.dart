@@ -28,7 +28,7 @@ final databaseProvider = Provider<AppDatabase>((ref) {
     Users,
     Checklists,
     ChecklistTasks,
-    Shop,
+    Shops,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -38,7 +38,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   /// USE FOR DEBUGGING PURPOSES ONLY, IT WORKS ONLY IN DEBUG MODE
   ///

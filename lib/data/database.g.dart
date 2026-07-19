@@ -3547,11 +3547,11 @@ class ChecklistTasksCompanion extends UpdateCompanion<ChecklistTask> {
   }
 }
 
-class $ShopTable extends Shop with TableInfo<$ShopTable, ShopData> {
+class $ShopsTable extends Shops with TableInfo<$ShopsTable, Shop> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $ShopTable(this.attachedDatabase, [this._alias]);
+  $ShopsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -3665,10 +3665,10 @@ class $ShopTable extends Shop with TableInfo<$ShopTable, ShopData> {
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'shop';
+  static const String $name = 'shops';
   @override
   VerificationContext validateIntegrity(
-    Insertable<ShopData> instance, {
+    Insertable<Shop> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -3728,9 +3728,9 @@ class $ShopTable extends Shop with TableInfo<$ShopTable, ShopData> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  ShopData map(Map<String, dynamic> data, {String? tablePrefix}) {
+  Shop map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ShopData(
+    return Shop(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}id'],
@@ -3767,12 +3767,12 @@ class $ShopTable extends Shop with TableInfo<$ShopTable, ShopData> {
   }
 
   @override
-  $ShopTable createAlias(String alias) {
-    return $ShopTable(attachedDatabase, alias);
+  $ShopsTable createAlias(String alias) {
+    return $ShopsTable(attachedDatabase, alias);
   }
 }
 
-class ShopData extends DataClass implements Insertable<ShopData> {
+class Shop extends DataClass implements Insertable<Shop> {
   final int id;
   final String name;
   final bool isPrime;
@@ -3781,7 +3781,7 @@ class ShopData extends DataClass implements Insertable<ShopData> {
   final String? mapAddress;
   final DateTime createdAt;
   final DateTime updatedAt;
-  const ShopData({
+  const Shop({
     required this.id,
     required this.name,
     required this.isPrime,
@@ -3809,8 +3809,8 @@ class ShopData extends DataClass implements Insertable<ShopData> {
     return map;
   }
 
-  ShopCompanion toCompanion(bool nullToAbsent) {
-    return ShopCompanion(
+  ShopsCompanion toCompanion(bool nullToAbsent) {
+    return ShopsCompanion(
       id: Value(id),
       name: Value(name),
       isPrime: Value(isPrime),
@@ -3826,12 +3826,12 @@ class ShopData extends DataClass implements Insertable<ShopData> {
     );
   }
 
-  factory ShopData.fromJson(
+  factory Shop.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ShopData(
+    return Shop(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       isPrime: serializer.fromJson<bool>(json['isPrime']),
@@ -3857,7 +3857,7 @@ class ShopData extends DataClass implements Insertable<ShopData> {
     };
   }
 
-  ShopData copyWith({
+  Shop copyWith({
     int? id,
     String? name,
     bool? isPrime,
@@ -3866,7 +3866,7 @@ class ShopData extends DataClass implements Insertable<ShopData> {
     Value<String?> mapAddress = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) => ShopData(
+  }) => Shop(
     id: id ?? this.id,
     name: name ?? this.name,
     isPrime: isPrime ?? this.isPrime,
@@ -3876,8 +3876,8 @@ class ShopData extends DataClass implements Insertable<ShopData> {
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
-  ShopData copyWithCompanion(ShopCompanion data) {
-    return ShopData(
+  Shop copyWithCompanion(ShopsCompanion data) {
+    return Shop(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       isPrime: data.isPrime.present ? data.isPrime.value : this.isPrime,
@@ -3893,7 +3893,7 @@ class ShopData extends DataClass implements Insertable<ShopData> {
 
   @override
   String toString() {
-    return (StringBuffer('ShopData(')
+    return (StringBuffer('Shop(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('isPrime: $isPrime, ')
@@ -3920,7 +3920,7 @@ class ShopData extends DataClass implements Insertable<ShopData> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ShopData &&
+      (other is Shop &&
           other.id == this.id &&
           other.name == this.name &&
           other.isPrime == this.isPrime &&
@@ -3931,7 +3931,7 @@ class ShopData extends DataClass implements Insertable<ShopData> {
           other.updatedAt == this.updatedAt);
 }
 
-class ShopCompanion extends UpdateCompanion<ShopData> {
+class ShopsCompanion extends UpdateCompanion<Shop> {
   final Value<int> id;
   final Value<String> name;
   final Value<bool> isPrime;
@@ -3940,7 +3940,7 @@ class ShopCompanion extends UpdateCompanion<ShopData> {
   final Value<String?> mapAddress;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
-  const ShopCompanion({
+  const ShopsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.isPrime = const Value.absent(),
@@ -3950,7 +3950,7 @@ class ShopCompanion extends UpdateCompanion<ShopData> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
-  ShopCompanion.insert({
+  ShopsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     this.isPrime = const Value.absent(),
@@ -3961,7 +3961,7 @@ class ShopCompanion extends UpdateCompanion<ShopData> {
     this.updatedAt = const Value.absent(),
   }) : name = Value(name),
        shopId = Value(shopId);
-  static Insertable<ShopData> custom({
+  static Insertable<Shop> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<bool>? isPrime,
@@ -3983,7 +3983,7 @@ class ShopCompanion extends UpdateCompanion<ShopData> {
     });
   }
 
-  ShopCompanion copyWith({
+  ShopsCompanion copyWith({
     Value<int>? id,
     Value<String>? name,
     Value<bool>? isPrime,
@@ -3993,7 +3993,7 @@ class ShopCompanion extends UpdateCompanion<ShopData> {
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
   }) {
-    return ShopCompanion(
+    return ShopsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       isPrime: isPrime ?? this.isPrime,
@@ -4037,7 +4037,7 @@ class ShopCompanion extends UpdateCompanion<ShopData> {
 
   @override
   String toString() {
-    return (StringBuffer('ShopCompanion(')
+    return (StringBuffer('ShopsCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('isPrime: $isPrime, ')
@@ -4061,7 +4061,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $UsersTable users = $UsersTable(this);
   late final $ChecklistsTable checklists = $ChecklistsTable(this);
   late final $ChecklistTasksTable checklistTasks = $ChecklistTasksTable(this);
-  late final $ShopTable shop = $ShopTable(this);
+  late final $ShopsTable shops = $ShopsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4074,7 +4074,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     users,
     checklists,
     checklistTasks,
-    shop,
+    shops,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -6112,8 +6112,8 @@ typedef $$ChecklistTasksTableProcessedTableManager =
       ChecklistTask,
       PrefetchHooks Function()
     >;
-typedef $$ShopTableCreateCompanionBuilder =
-    ShopCompanion Function({
+typedef $$ShopsTableCreateCompanionBuilder =
+    ShopsCompanion Function({
       Value<int> id,
       required String name,
       Value<bool> isPrime,
@@ -6123,8 +6123,8 @@ typedef $$ShopTableCreateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
     });
-typedef $$ShopTableUpdateCompanionBuilder =
-    ShopCompanion Function({
+typedef $$ShopsTableUpdateCompanionBuilder =
+    ShopsCompanion Function({
       Value<int> id,
       Value<String> name,
       Value<bool> isPrime,
@@ -6135,8 +6135,8 @@ typedef $$ShopTableUpdateCompanionBuilder =
       Value<DateTime> updatedAt,
     });
 
-class $$ShopTableFilterComposer extends Composer<_$AppDatabase, $ShopTable> {
-  $$ShopTableFilterComposer({
+class $$ShopsTableFilterComposer extends Composer<_$AppDatabase, $ShopsTable> {
+  $$ShopsTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -6184,8 +6184,9 @@ class $$ShopTableFilterComposer extends Composer<_$AppDatabase, $ShopTable> {
   );
 }
 
-class $$ShopTableOrderingComposer extends Composer<_$AppDatabase, $ShopTable> {
-  $$ShopTableOrderingComposer({
+class $$ShopsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ShopsTable> {
+  $$ShopsTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -6233,9 +6234,9 @@ class $$ShopTableOrderingComposer extends Composer<_$AppDatabase, $ShopTable> {
   );
 }
 
-class $$ShopTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ShopTable> {
-  $$ShopTableAnnotationComposer({
+class $$ShopsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ShopsTable> {
+  $$ShopsTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -6269,32 +6270,32 @@ class $$ShopTableAnnotationComposer
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
-class $$ShopTableTableManager
+class $$ShopsTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $ShopTable,
-          ShopData,
-          $$ShopTableFilterComposer,
-          $$ShopTableOrderingComposer,
-          $$ShopTableAnnotationComposer,
-          $$ShopTableCreateCompanionBuilder,
-          $$ShopTableUpdateCompanionBuilder,
-          (ShopData, BaseReferences<_$AppDatabase, $ShopTable, ShopData>),
-          ShopData,
+          $ShopsTable,
+          Shop,
+          $$ShopsTableFilterComposer,
+          $$ShopsTableOrderingComposer,
+          $$ShopsTableAnnotationComposer,
+          $$ShopsTableCreateCompanionBuilder,
+          $$ShopsTableUpdateCompanionBuilder,
+          (Shop, BaseReferences<_$AppDatabase, $ShopsTable, Shop>),
+          Shop,
           PrefetchHooks Function()
         > {
-  $$ShopTableTableManager(_$AppDatabase db, $ShopTable table)
+  $$ShopsTableTableManager(_$AppDatabase db, $ShopsTable table)
     : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$ShopTableFilterComposer($db: db, $table: table),
+              $$ShopsTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$ShopTableOrderingComposer($db: db, $table: table),
+              $$ShopsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$ShopTableAnnotationComposer($db: db, $table: table),
+              $$ShopsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
@@ -6305,7 +6306,7 @@ class $$ShopTableTableManager
                 Value<String?> mapAddress = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
-              }) => ShopCompanion(
+              }) => ShopsCompanion(
                 id: id,
                 name: name,
                 isPrime: isPrime,
@@ -6325,7 +6326,7 @@ class $$ShopTableTableManager
                 Value<String?> mapAddress = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
-              }) => ShopCompanion.insert(
+              }) => ShopsCompanion.insert(
                 id: id,
                 name: name,
                 isPrime: isPrime,
@@ -6343,18 +6344,18 @@ class $$ShopTableTableManager
       );
 }
 
-typedef $$ShopTableProcessedTableManager =
+typedef $$ShopsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $ShopTable,
-      ShopData,
-      $$ShopTableFilterComposer,
-      $$ShopTableOrderingComposer,
-      $$ShopTableAnnotationComposer,
-      $$ShopTableCreateCompanionBuilder,
-      $$ShopTableUpdateCompanionBuilder,
-      (ShopData, BaseReferences<_$AppDatabase, $ShopTable, ShopData>),
-      ShopData,
+      $ShopsTable,
+      Shop,
+      $$ShopsTableFilterComposer,
+      $$ShopsTableOrderingComposer,
+      $$ShopsTableAnnotationComposer,
+      $$ShopsTableCreateCompanionBuilder,
+      $$ShopsTableUpdateCompanionBuilder,
+      (Shop, BaseReferences<_$AppDatabase, $ShopsTable, Shop>),
+      Shop,
       PrefetchHooks Function()
     >;
 
@@ -6375,5 +6376,6 @@ class $AppDatabaseManager {
       $$ChecklistsTableTableManager(_db, _db.checklists);
   $$ChecklistTasksTableTableManager get checklistTasks =>
       $$ChecklistTasksTableTableManager(_db, _db.checklistTasks);
-  $$ShopTableTableManager get shop => $$ShopTableTableManager(_db, _db.shop);
+  $$ShopsTableTableManager get shops =>
+      $$ShopsTableTableManager(_db, _db.shops);
 }

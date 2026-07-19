@@ -9,6 +9,7 @@ import 'package:bill_printer/ui/printer/printer_view.dart';
 import 'package:bill_printer/ui/reports/analytics_view.dart';
 import 'package:bill_printer/ui/reports/report_view.dart';
 import 'package:bill_printer/ui/checklists/checklists.dart';
+import 'package:bill_printer/ui/shop/shop_view.dart';
 import 'package:go_router/go_router.dart';
 
 import 'ui/reports/reports_main_view.dart';
@@ -26,6 +27,7 @@ enum RouterPaths {
   users,
   about,
   printer,
+  shop,
 }
 
 // GoRouter configuration
@@ -83,6 +85,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: "/${RouterPaths.printer.name}",
       builder: (context, state) => PrinterView(),
+    ),
+    GoRoute(
+      path: "/${RouterPaths.shop.name}",
+      builder: (context, state) => ShopView(),
     ),
   ],
 );

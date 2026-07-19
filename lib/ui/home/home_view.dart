@@ -28,6 +28,7 @@ class _MyHomePageState extends ConsumerState<HomeView> {
 
     // const Icon(Icons.info_outline),
     RouterPaths.about.name,
+    RouterPaths.shop.name,
   ];
 
   @override
@@ -70,7 +71,7 @@ class _MyHomePageState extends ConsumerState<HomeView> {
                   return MenuItem(
                     name: navList[index],
                     onTap: () {
-                      debugLog(name, tag: "name");
+                      debugLog(name, tag: "Current Path");
                       context.push("/$name");
                     },
                   );
