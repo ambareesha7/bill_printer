@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:bill_printer/app_router.dart';
+import 'package:bill_printer/data/models/shop_model.dart';
+import 'package:bill_printer/ui/shop/shop_provider.dart';
 import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:bill_printer/ui/utils/ui_utils.dart';
 import 'package:bill_printer/ui/widgets/menu_item.dart';
@@ -34,6 +38,7 @@ class _MyHomePageState extends ConsumerState<HomeView> {
   @override
   Widget build(BuildContext context) {
     bool isLoggedIn = ref.watch(isUserLoggedInProvider);
+    List<ShopModel> shops = ref.watch(shopListProvider);
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -43,15 +48,27 @@ class _MyHomePageState extends ConsumerState<HomeView> {
             BillHeaderWidget(),
             SizedBox(height: 15),
             ListTile(
-              onTap: () {
-                if (isLoggedIn) {
-                  context.push("/${RouterPaths.createBill.name}");
-                } else {
+              onTap: () async {
+                if (!isLoggedIn) {
                   UIUtils.showSnackBar(
                     context: context,
-                    text: "Please setup a User to create bills",
+                    text: "Please create a User to create bills",
                   );
                   context.push("/${RouterPaths.signUp.name}");
+                } else if (shops.isEmpty) {
+                  UIUtils.showSnackBar(
+                    context: context,
+                    text: "Please create a Shop to create bills",
+                  );
+                  context.push("/${RouterPaths.shop.name}");
+                } else {
+                  final primeShop = await ref
+                      .read(shopListProvider.notifier)
+                      .getPrimeShop();
+                  // ignore: use_build_context_synchronously
+                  context.push(
+                    "/${RouterPaths.createBill.name}/${jsonEncode(primeShop.toJson())}",
+                  );
                 }
               },
               title: Center(

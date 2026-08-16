@@ -41,7 +41,7 @@ final class ShopListProvider
   }
 }
 
-String _$shopListHash() => r'8c94e440052263406e6ab8b9fd5eb25c9a4cf3ac';
+String _$shopListHash() => r'102aadf456de0bd21fa87d585e6418f056fa9f69';
 
 abstract class _$ShopList extends $Notifier<List<ShopModel>> {
   List<ShopModel> build();

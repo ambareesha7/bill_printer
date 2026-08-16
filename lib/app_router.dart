@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:bill_printer/data/models/shop_model.dart';
 import 'package:bill_printer/ui/about/about_view.dart';
 import 'package:bill_printer/ui/auth/sign_up_view.dart';
 import 'package:bill_printer/ui/auth/users_view.dart';
@@ -36,8 +39,15 @@ final appRouter = GoRouter(
   routes: [
     GoRoute(path: "/", builder: (context, state) => HomeView(), routes: []),
     GoRoute(
-      path: "/${RouterPaths.createBill.name}",
-      builder: (context, state) => BillView(),
+      path: "/${RouterPaths.createBill.name}/:shop",
+      builder: (context, state) {
+        var shop1 = jsonDecode(state.pathParameters["shop"]!);
+        ShopModel shop2 = ShopModel.fromJson(shop1);
+        return BillView(shop: shop2);
+      },
+      redirect: (context, state) {
+        return null;
+      },
     ),
     GoRoute(
       path: "/${RouterPaths.category.name}",

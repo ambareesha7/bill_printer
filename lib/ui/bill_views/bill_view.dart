@@ -4,11 +4,11 @@ import 'package:bill_printer/app_router.dart';
 import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/data/db_utils.dart';
 import 'package:bill_printer/data/models/bill_item_model.dart';
+import 'package:bill_printer/data/models/shop_model.dart';
 import 'package:bill_printer/data/models/users/user_model.dart';
 import 'package:bill_printer/ui/auth/providers/auth_provider.dart';
 import 'package:bill_printer/ui/bill_views/providers/bill_provider.dart';
 import 'package:bill_printer/ui/bill_views/providers/order_num_provider.dart';
-import 'package:bill_printer/ui/bill_views/providers/unit_id.dart';
 import 'package:bill_printer/ui/category/product_provider.dart';
 import 'package:bill_printer/ui/printer/providers/printer_provider.dart';
 import 'package:bill_printer/ui/utils/app_colors.dart';
@@ -24,7 +24,8 @@ import '../../data/models/bank_account/bank_account_model.dart';
 import '../widgets/nav_btn.dart';
 
 class BillView extends ConsumerStatefulWidget {
-  const BillView({super.key});
+  final ShopModel shop;
+  const BillView({super.key, required this.shop});
 
   @override
   ConsumerState<BillView> createState() => _BillViewState();
@@ -34,17 +35,25 @@ class _BillViewState extends ConsumerState<BillView> {
   final double btnPadding = 4;
   final double bodyPadding = 8;
   DBUtils dbUtils = DBUtils.instance;
+
+  String getShopName(ShopModel? shop) {
+    return shop == null ? "None" : shop.name;
+  }
+
+  String getShopId(ShopModel? shop) {
+    return shop == null ? "None" : shop.shopId;
+  }
+
   @override
   Widget build(BuildContext context) {
     final itemHeadStyle = TextStyle(fontWeight: FontWeight.bold);
     final user = ref.watch(authProvider);
     final orderNo = ref.watch(orderNumProvider);
-    final unitId = ref.watch(unitIdProvider);
     ref.watch(printerProvider);
     var listItems = ref.watch(tempBillListProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text("MoonLight Cafe"),
+        title: Text(getShopName(widget.shop)),
         centerTitle: true,
         actions: [NavBtn(path: RouterPaths.reports.name)],
       ),
@@ -63,7 +72,7 @@ class _BillViewState extends ConsumerState<BillView> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(
-                      "Unit ID: $unitId",
+                      "Unit ID: ${widget.shop.shopId}",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
@@ -143,7 +152,7 @@ class _BillViewState extends ConsumerState<BillView> {
                 );
               },
             ),
-            if (user != null) _buildActionButtons(user),
+            if (user != null) _buildActionButtons(user, widget.shop),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -274,7 +283,7 @@ class _BillViewState extends ConsumerState<BillView> {
                           paymentStatus: PaymentStatus.receivable,
                           preparedBy: user?.fullName,
                           orderNo: orderNo,
-                          unitId: unitId,
+                          unitId: getShopId(widget.shop),
                           print: true,
                         );
                       } else {
@@ -299,7 +308,7 @@ class _BillViewState extends ConsumerState<BillView> {
                           paymentStatus: PaymentStatus.receivable,
                           preparedBy: user?.fullName,
                           orderNo: orderNo,
-                          unitId: unitId,
+                          unitId: getShopId(widget.shop),
                           print: false,
                         );
                       } else {
@@ -348,9 +357,8 @@ class _BillViewState extends ConsumerState<BillView> {
     );
   }
 
-  Widget _buildActionButtons(UserModel user) {
+  Widget _buildActionButtons(UserModel user, ShopModel shop) {
     String orderNo = ref.watch(orderNumProvider);
-    final unitId = ref.watch(unitIdProvider);
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -378,7 +386,7 @@ class _BillViewState extends ConsumerState<BillView> {
                     amount: amount,
                     preparedBy: user.fullName,
                     orderNo: orderNo,
-                    unitId: unitId,
+                    unitId: getShopId(shop),
                   );
                 }
               } else {
@@ -393,7 +401,7 @@ class _BillViewState extends ConsumerState<BillView> {
           cashBtn(
             user: user,
             orderNo: orderNo,
-            unitId: unitId,
+            unitId: getShopId(shop),
             btnName: "Cash",
             billPrint: true,
             bgColor: AppColors.blue,
@@ -401,7 +409,7 @@ class _BillViewState extends ConsumerState<BillView> {
           cashBtn(
             user: user,
             orderNo: orderNo,
-            unitId: unitId,
+            unitId: getShopId(shop),
             btnName: "Cash no print",
             billPrint: false,
           ),
@@ -418,7 +426,7 @@ class _BillViewState extends ConsumerState<BillView> {
                     paymentStatus: PaymentStatus.received,
                     preparedBy: user.fullName,
                     orderNo: orderNo,
-                    unitId: unitId,
+                    unitId: getShopId(shop),
                     paymentRef: bankAccount.upiId,
                   );
                 }

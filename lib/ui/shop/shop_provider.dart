@@ -22,6 +22,8 @@ class ShopList extends _$ShopList {
     String? address,
     String? mapAddress,
   }) async {
+    // getting shops list to check first time creating shop
+    final shops = await getShops();
     String result = await dbUtils.insertShop(
       name: name,
       shopId: shopId,
@@ -29,10 +31,15 @@ class ShopList extends _$ShopList {
       address: address,
       mapAddress: mapAddress,
     );
+    Shop? shop = await dbUtils.getByShopId(shopId);
     if (isPrime) {
-      Shop? shop = await dbUtils.getByShopId(shopId);
       if (shop != null) {
         updateShop(id: shop.id, shopId: shopId, isPrime: isPrime);
+      }
+    } else if (shops.isEmpty) {
+      // if shops list has one item then we will make it as primery shop
+      if (shop != null) {
+        updateShop(id: shop.id, shopId: shopId, isPrime: true);
       }
     }
     await getShops();
@@ -55,6 +62,15 @@ class ShopList extends _$ShopList {
     }).toList();
     updateShops(shopModels);
     return shopModels;
+  }
+
+  Future<ShopModel> getPrimeShop() async {
+    List<ShopModel> shops = await getShops();
+    ShopModel s = shops.firstWhere(
+      (e) => e.isPrime != null && e.isPrime!,
+      orElse: () => shops.first,
+    );
+    return s;
   }
 
   void updateShops(List<ShopModel> shops) {

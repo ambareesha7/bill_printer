@@ -18,7 +18,7 @@ debugLog(dynamic value, {Object? error, String tag = ''}) {
 DateTime dateTimeNow() => DateTime.now();
 
 String dateFormat(DateTime date) =>
-    DateFormat("dd-MM-yyyy hh:mm aaa").format(date);
+    DateFormat("hh:mm aaa dd-MM-yyyy").format(date);
 
 String monthFormat(DateTime date) => DateFormat("MMM-yyyy").format(date);
 

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:bill_printer/data/app_enums.dart';
+import 'package:bill_printer/data/models/shop_model.dart';
 import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:bill_printer/data/database.dart';
 import 'package:bill_printer/data/models/bill_item_model.dart';
@@ -575,5 +576,18 @@ class DBUtils {
         }
       }
     }
+  }
+
+  ShopModel shopToShopModel(Shop shop) {
+    return ShopModel(
+      id: shop.id,
+      name: shop.name,
+      shopId: shop.shopId,
+      isPrime: shop.isPrime,
+      address: shop.address,
+      mapAddress: shop.mapAddress,
+      createdAt: shop.createdAt,
+      updatedAt: shop.updatedAt,
+    );
   }
 }

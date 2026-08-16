@@ -44,7 +44,6 @@ class _ShopViewState extends ConsumerState<ShopView> {
       _clearForm();
     }
 
-
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -262,7 +261,7 @@ class _ShopViewState extends ConsumerState<ShopView> {
     final shops = ref.watch(shopListProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text("Shop Management"), elevation: 0),
+      appBar: AppBar(title: Text("Shops"), elevation: 0, centerTitle: true),
       body: shops.isEmpty
           ? Center(
               child: Column(
@@ -290,288 +289,284 @@ class _ShopViewState extends ConsumerState<ShopView> {
                 ],
               ),
             )
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          : ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: shops.length,
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              itemBuilder: (context, index) {
+                final shop = shops[index];
+                return Card(
+                  margin: EdgeInsets.only(bottom: 12),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "Active Locations",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 15),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: shops.length,
-                      itemBuilder: (context, index) {
-                        final shop = shops[index];
-                        return Card(
-                          margin: EdgeInsets.only(bottom: 12),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  shop.name,
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                              if (shop.isPrime ?? false)
-                                                Container(
-                                                  margin: EdgeInsets.only(
-                                                    left: 8,
-                                                  ),
-                                                  padding: EdgeInsets.symmetric(
-                                                    horizontal: 8,
-                                                    vertical: 4,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: AppColors.pink1
-                                                        .withValues(alpha: 0.2),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          4,
-                                                        ),
-                                                  ),
-                                                  child: Text(
-                                                    "Prime",
-                                                    style: TextStyle(
-                                                      color: AppColors.pink1,
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                            ],
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          shop.name,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                          SizedBox(height: 4),
-                                          Text(
-                                            "ID: ${shop.shopId}",
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ],
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
-                                    ),
-
-                                    PopupMenuButton(
-                                      itemBuilder: (context) => [
-                                        if (shop.isPrime != null &&
-                                            shop.isPrime != true)
-                                          PopupMenuItem(
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  Icons
-                                                      .panorama_fish_eye_outlined,
-                                                  size: 18,
-                                                  color: AppColors.pink1,
-                                                ),
-                                                SizedBox(width: 8),
-                                                Text("Make it Prime"),
-                                              ],
+                                      if (shop.isPrime ?? false)
+                                        Container(
+                                          margin: EdgeInsets.only(left: 8),
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.pink1.withValues(
+                                              alpha: 0.2,
                                             ),
-                                            onTap: () {
-                                              ref
-                                                  .read(
-                                                    shopListProvider.notifier,
-                                                  )
-                                                  .updateShop(
-                                                    id: shop.id!,
-                                                    shopId: shop.shopId,
-                                                    isPrime: true,
-                                                  );
-                                            },
-                                          ),
-                                        PopupMenuItem(
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                Icons.edit,
-                                                size: 18,
-                                                color: Colors.blue,
-                                              ),
-                                              SizedBox(width: 8),
-                                              Text("Edit"),
-                                            ],
-                                          ),
-                                          onTap: () {
-                                            _showShopForm(
-                                              operationType: OperationType.edit,
-                                              shopId: shop.id,
-                                            );
-                                          },
-                                        ),
-                                        if (shop.isPrime != null &&
-                                            shop.isPrime != true)
-                                          PopupMenuItem(
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.delete,
-                                                  size: 18,
-                                                  color: Colors.red,
-                                                ),
-                                                SizedBox(width: 8),
-                                                Text("Delete"),
-                                              ],
+                                            borderRadius: BorderRadius.circular(
+                                              4,
                                             ),
-                                            onTap: () {
-                                              showDialog(
-                                                context: context,
-                                                builder: (context) => AlertDialog(
-                                                  title: Text("Delete Shop?"),
-                                                  content: Text(
-                                                    "Are you sure you want to delete ${shop.name}?",
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () =>
-                                                          Navigator.pop(
-                                                            context,
-                                                          ),
-                                                      child: Text("Cancel"),
-                                                    ),
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        ref
-                                                            .read(
-                                                              shopListProvider
-                                                                  .notifier,
-                                                            )
-                                                            .deleteShop(
-                                                              shop.id!,
-                                                            );
-                                                        Navigator.pop(context);
-                                                        UIUtils.showSnackBar(
-                                                          context: context,
-                                                          text:
-                                                              "Shop deleted successfully!",
-                                                        );
-                                                      },
-                                                      child: Text(
-                                                        "Delete",
-                                                        style: TextStyle(
-                                                          color: Colors.red,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
                                           ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                if (shop.address != null &&
-                                    shop.address!.isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8.0),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Icon(
-                                          Icons.location_on,
-                                          size: 16,
-                                          color: Colors.grey,
-                                        ),
-                                        SizedBox(width: 4),
-                                        Expanded(
                                           child: Text(
-                                            shop.address!,
+                                            "Prime",
                                             style: TextStyle(
+                                              color: AppColors.pink1,
                                               fontSize: 12,
-                                              color: Colors.grey,
+                                              fontWeight: FontWeight.bold,
                                             ),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
-                                      ],
+                                    ],
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "ID: ${shop.shopId}",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
                                     ),
                                   ),
-                                if (shop.createdAt != null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8.0),
+                                ],
+                              ),
+                            ),
+
+                            PopupMenuButton(
+                              itemBuilder: (context) => [
+                                if (shop.isPrime != null &&
+                                    shop.isPrime != true)
+                                  PopupMenuItem(
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
-                                          "Created: ${_formatDate(shop.createdAt!)}",
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: Colors.grey,
-                                          ),
+                                        Icon(
+                                          Icons.panorama_fish_eye_outlined,
+                                          size: 18,
+                                          color: AppColors.pink1,
                                         ),
-                                        Text(
-                                          "Updated: ${_formatDate(shop.updatedAt ?? shop.createdAt!)}",
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
+                                        SizedBox(width: 8),
+                                        Text("Make it Prime"),
                                       ],
                                     ),
+                                    onTap: () {
+                                      ref
+                                          .read(shopListProvider.notifier)
+                                          .updateShop(
+                                            id: shop.id!,
+                                            shopId: shop.shopId,
+                                            isPrime: true,
+                                          );
+                                    },
+                                  ),
+                                PopupMenuItem(
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.edit,
+                                        size: 18,
+                                        color: Colors.blue,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text("Edit"),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    _showShopForm(
+                                      operationType: OperationType.edit,
+                                      shopId: shop.id,
+                                    );
+                                  },
+                                ),
+                                if (shop.isPrime != null &&
+                                    shop.isPrime != true)
+                                  PopupMenuItem(
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.delete,
+                                          size: 18,
+                                          color: Colors.red,
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text("Delete"),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: Text("Delete Shop?"),
+                                          content: Text(
+                                            "Are you sure you want to delete ${shop.name}?",
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
+                                              child: Text("Cancel"),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                ref
+                                                    .read(
+                                                      shopListProvider.notifier,
+                                                    )
+                                                    .deleteShop(shop.id!);
+                                                Navigator.pop(context);
+                                                UIUtils.showSnackBar(
+                                                  context: context,
+                                                  text:
+                                                      "Shop deleted successfully!",
+                                                );
+                                              },
+                                              child: Text(
+                                                "Delete",
+                                                style: TextStyle(
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
                                   ),
                               ],
                             ),
+                          ],
+                        ),
+                        if (shop.address != null && shop.address!.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.location_city,
+                                  size: 16,
+                                  color: Colors.grey,
+                                ),
+                                SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    shop.address!,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        );
-                      },
+                        if (shop.mapAddress != null &&
+                            shop.mapAddress!.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.location_on,
+                                  size: 16,
+                                  color: Colors.grey,
+                                ),
+                                SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    shop.mapAddress!,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        if (shop.createdAt != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Created: ${_formatDate(shop.createdAt!)}",
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        if (shop.updatedAt != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Updated: ${_formatDate(shop.updatedAt!)}",
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            ),
-      floatingActionButton: shops.isNotEmpty
-          ? FloatingActionButton(
-              onPressed: () {
-                _showShopForm(operationType: OperationType.add);
+                  ),
+                );
               },
-              backgroundColor: Colors.teal,
-              child: Icon(Icons.add),
-            )
-          : null,
+            ),
+
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _showShopForm(operationType: OperationType.add);
+        },
+        backgroundColor: Colors.teal,
+        child: Icon(Icons.add),
+      ),
     );
   }
 
   String _formatDate(DateTime date) {
-    return "${date.day}/${date.month}/${date.year}";
+    return dateFormat(date);
   }
 }
