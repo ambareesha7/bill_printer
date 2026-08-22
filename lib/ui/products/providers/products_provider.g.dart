@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'product_provider.dart';
+part of 'products_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,28 +9,28 @@ part of 'product_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(ProductsList)
-const productsListProvider = ProductsListProvider._();
+@ProviderFor(Products)
+const productsProvider = ProductsProvider._();
 
-final class ProductsListProvider
-    extends $NotifierProvider<ProductsList, List<ProductModel>> {
-  const ProductsListProvider._()
+final class ProductsProvider
+    extends $NotifierProvider<Products, List<ProductModel>> {
+  const ProductsProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'productsListProvider',
+        name: r'productsProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$productsListHash();
+  String debugGetCreateSourceHash() => _$productsHash();
 
   @$internal
   @override
-  ProductsList create() => ProductsList();
+  Products create() => Products();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(List<ProductModel> value) {
@@ -41,9 +41,9 @@ final class ProductsListProvider
   }
 }
 
-String _$productsListHash() => r'f99b1667875437e3b50af7778b51e5563fba09f4';
+String _$productsHash() => r'a3c86134d3edc4f61316e220ad0ca1c03d6a8332';
 
-abstract class _$ProductsList extends $Notifier<List<ProductModel>> {
+abstract class _$Products extends $Notifier<List<ProductModel>> {
   List<ProductModel> build();
   @$mustCallSuper
   @override

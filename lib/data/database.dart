@@ -1,6 +1,5 @@
 import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/data/tables/bank_accounts.dart';
-import 'package:bill_printer/data/tables/categories_table.dart';
 import 'package:bill_printer/data/tables/products_table.dart';
 import 'package:bill_printer/data/tables/sale_receipts.dart';
 import 'package:bill_printer/data/tables/shop.dart';
@@ -21,7 +20,7 @@ final databaseProvider = Provider<AppDatabase>((ref) {
 
 @DriftDatabase(
   tables: [
-    Categories,
+    // Categories,
     Products,
     BankAccounts,
     SaleReceipts,
@@ -38,7 +37,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 1;
 
   /// USE FOR DEBUGGING PURPOSES ONLY, IT WORKS ONLY IN DEBUG MODE
   ///
@@ -64,7 +63,7 @@ class AppDatabase extends _$AppDatabase {
           // Create a bunch of default values so the app doesn't look too empty
           // on the first start.
           await batch((b) {
-            b.insert(categories, CategoriesCompanion.insert(name: "Category1"));
+            // b.insert(categories, CategoriesCompanion.insert(name: "Category1"));
           });
         }
       },

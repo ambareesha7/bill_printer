@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ProductModel {
 
- int? get id; String? get name; int? get categoryId; String? get price; int? get priority; DateTime? get createdAt; DateTime? get updatedAt;
+ int? get id; String? get name;// int? categoryId,
+ String? get price; int? get priority; DateTime? get createdAt; DateTime? get updatedAt;
 /// Create a copy of ProductModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +29,16 @@ $ProductModelCopyWith<ProductModel> get copyWith => _$ProductModelCopyWithImpl<P
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProductModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.price, price) || other.price == price)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProductModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,categoryId,price,priority,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,name,price,priority,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'ProductModel(id: $id, name: $name, categoryId: $categoryId, price: $price, priority: $priority, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'ProductModel(id: $id, name: $name, price: $price, priority: $priority, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -48,7 +49,7 @@ abstract mixin class $ProductModelCopyWith<$Res>  {
   factory $ProductModelCopyWith(ProductModel value, $Res Function(ProductModel) _then) = _$ProductModelCopyWithImpl;
 @useResult
 $Res call({
- int? id, String? name, int? categoryId, String? price, int? priority, DateTime? createdAt, DateTime? updatedAt
+ int? id, String? name, String? price, int? priority, DateTime? createdAt, DateTime? updatedAt
 });
 
 
@@ -65,12 +66,11 @@ class _$ProductModelCopyWithImpl<$Res>
 
 /// Create a copy of ProductModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = freezed,Object? categoryId = freezed,Object? price = freezed,Object? priority = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = freezed,Object? price = freezed,Object? priority = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String?,categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
-as int?,price: freezed == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
+as String?,price: freezed == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
 as String?,priority: freezed == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
 as int?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
@@ -159,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String? name,  int? categoryId,  String? price,  int? priority,  DateTime? createdAt,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String? name,  String? price,  int? priority,  DateTime? createdAt,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ProductModel() when $default != null:
-return $default(_that.id,_that.name,_that.categoryId,_that.price,_that.priority,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.name,_that.price,_that.priority,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -180,10 +180,10 @@ return $default(_that.id,_that.name,_that.categoryId,_that.price,_that.priority,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String? name,  int? categoryId,  String? price,  int? priority,  DateTime? createdAt,  DateTime? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String? name,  String? price,  int? priority,  DateTime? createdAt,  DateTime? updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _ProductModel():
-return $default(_that.id,_that.name,_that.categoryId,_that.price,_that.priority,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.name,_that.price,_that.priority,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,10 +200,10 @@ return $default(_that.id,_that.name,_that.categoryId,_that.price,_that.priority,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String? name,  int? categoryId,  String? price,  int? priority,  DateTime? createdAt,  DateTime? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String? name,  String? price,  int? priority,  DateTime? createdAt,  DateTime? updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _ProductModel() when $default != null:
-return $default(_that.id,_that.name,_that.categoryId,_that.price,_that.priority,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.name,_that.price,_that.priority,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -215,12 +215,12 @@ return $default(_that.id,_that.name,_that.categoryId,_that.price,_that.priority,
 @JsonSerializable()
 
 class _ProductModel implements ProductModel {
-  const _ProductModel({this.id, this.name, this.categoryId, this.price, this.priority, this.createdAt, this.updatedAt});
+  const _ProductModel({this.id, this.name, this.price, this.priority, this.createdAt, this.updatedAt});
   factory _ProductModel.fromJson(Map<String, dynamic> json) => _$ProductModelFromJson(json);
 
 @override final  int? id;
 @override final  String? name;
-@override final  int? categoryId;
+// int? categoryId,
 @override final  String? price;
 @override final  int? priority;
 @override final  DateTime? createdAt;
@@ -239,16 +239,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProductModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.price, price) || other.price == price)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProductModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,categoryId,price,priority,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,name,price,priority,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'ProductModel(id: $id, name: $name, categoryId: $categoryId, price: $price, priority: $priority, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'ProductModel(id: $id, name: $name, price: $price, priority: $priority, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -259,7 +259,7 @@ abstract mixin class _$ProductModelCopyWith<$Res> implements $ProductModelCopyWi
   factory _$ProductModelCopyWith(_ProductModel value, $Res Function(_ProductModel) _then) = __$ProductModelCopyWithImpl;
 @override @useResult
 $Res call({
- int? id, String? name, int? categoryId, String? price, int? priority, DateTime? createdAt, DateTime? updatedAt
+ int? id, String? name, String? price, int? priority, DateTime? createdAt, DateTime? updatedAt
 });
 
 
@@ -276,12 +276,11 @@ class __$ProductModelCopyWithImpl<$Res>
 
 /// Create a copy of ProductModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = freezed,Object? categoryId = freezed,Object? price = freezed,Object? priority = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = freezed,Object? price = freezed,Object? priority = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_ProductModel(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String?,categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
-as int?,price: freezed == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
+as String?,price: freezed == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
 as String?,priority: freezed == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
 as int?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable

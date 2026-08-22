@@ -8,7 +8,6 @@ final class Schema2 extends i0.VersionedSchema {
   Schema2({required super.database}) : super(version: 2);
   @override
   late final List<i1.DatabaseSchemaEntity> entities = [
-    categories,
     products,
     bankAccounts,
     saleReceipts,
@@ -17,18 +16,7 @@ final class Schema2 extends i0.VersionedSchema {
     checklistTasks,
     shops,
   ];
-  late final Shape0 categories = Shape0(
-    source: i0.VersionedTable(
-      entityName: 'categories',
-      withoutRowId: false,
-      isStrict: false,
-      tableConstraints: [],
-      columns: [_column_0, _column_1, _column_2, _column_3],
-      attachedDatabase: database,
-    ),
-    alias: null,
-  );
-  late final Shape1 products = Shape1(
+  late final Shape0 products = Shape0(
     source: i0.VersionedTable(
       entityName: 'products',
       withoutRowId: false,
@@ -37,17 +25,16 @@ final class Schema2 extends i0.VersionedSchema {
       columns: [
         _column_0,
         _column_1,
-        _column_4,
-        _column_5,
-        _column_6,
         _column_2,
         _column_3,
+        _column_4,
+        _column_5,
       ],
       attachedDatabase: database,
     ),
     alias: null,
   );
-  late final Shape2 bankAccounts = Shape2(
+  late final Shape1 bankAccounts = Shape1(
     source: i0.VersionedTable(
       entityName: 'bank_accounts',
       withoutRowId: false,
@@ -55,26 +42,27 @@ final class Schema2 extends i0.VersionedSchema {
       tableConstraints: [],
       columns: [
         _column_0,
+        _column_6,
         _column_7,
         _column_8,
         _column_9,
         _column_10,
         _column_11,
-        _column_12,
-        _column_2,
-        _column_3,
+        _column_4,
+        _column_5,
       ],
       attachedDatabase: database,
     ),
     alias: null,
   );
-  late final Shape3 saleReceipts = Shape3(
+  late final Shape2 saleReceipts = Shape2(
     source: i0.VersionedTable(
       entityName: 'sale_receipts',
       withoutRowId: false,
       isStrict: false,
       tableConstraints: ['PRIMARY KEY(id)'],
       columns: [
+        _column_12,
         _column_13,
         _column_14,
         _column_15,
@@ -84,75 +72,74 @@ final class Schema2 extends i0.VersionedSchema {
         _column_19,
         _column_20,
         _column_21,
-        _column_22,
-        _column_2,
-        _column_3,
+        _column_4,
+        _column_5,
       ],
       attachedDatabase: database,
     ),
     alias: null,
   );
-  late final Shape4 users = Shape4(
+  late final Shape3 users = Shape3(
     source: i0.VersionedTable(
       entityName: 'users',
       withoutRowId: false,
       isStrict: false,
       tableConstraints: ['PRIMARY KEY(id)'],
       columns: [
-        _column_13,
+        _column_12,
+        _column_22,
         _column_23,
         _column_24,
         _column_25,
         _column_26,
         _column_27,
         _column_28,
-        _column_29,
       ],
       attachedDatabase: database,
     ),
     alias: null,
   );
-  late final Shape5 checklists = Shape5(
+  late final Shape4 checklists = Shape4(
     source: i0.VersionedTable(
       entityName: 'checklists',
       withoutRowId: false,
       isStrict: false,
       tableConstraints: ['PRIMARY KEY(id)'],
       columns: [
-        _column_13,
+        _column_12,
+        _column_29,
         _column_30,
         _column_31,
         _column_32,
         _column_33,
-        _column_34,
-        _column_29,
-        _column_27,
         _column_28,
+        _column_26,
+        _column_27,
       ],
       attachedDatabase: database,
     ),
     alias: null,
   );
-  late final Shape6 checklistTasks = Shape6(
+  late final Shape5 checklistTasks = Shape5(
     source: i0.VersionedTable(
       entityName: 'checklist_tasks',
       withoutRowId: false,
       isStrict: false,
       tableConstraints: ['PRIMARY KEY(id)'],
       columns: [
-        _column_13,
+        _column_12,
+        _column_34,
         _column_35,
         _column_36,
         _column_37,
-        _column_38,
+        _column_26,
         _column_27,
-        _column_28,
       ],
       attachedDatabase: database,
     ),
     alias: null,
   );
-  late final Shape7 shops = Shape7(
+  late final Shape6 shops = Shape6(
     source: i0.VersionedTable(
       entityName: 'shops',
       withoutRowId: false,
@@ -161,12 +148,12 @@ final class Schema2 extends i0.VersionedSchema {
       columns: [
         _column_0,
         _column_1,
-        _column_9,
+        _column_8,
+        _column_38,
         _column_39,
         _column_40,
-        _column_41,
-        _column_2,
-        _column_3,
+        _column_4,
+        _column_5,
       ],
       attachedDatabase: database,
     ),
@@ -180,6 +167,10 @@ class Shape0 extends i0.VersionedTable {
       columnsByName['id']! as i1.GeneratedColumn<int>;
   i1.GeneratedColumn<String> get name =>
       columnsByName['name']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get price =>
+      columnsByName['price']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get priority =>
+      columnsByName['priority']! as i1.GeneratedColumn<int>;
   i1.GeneratedColumn<DateTime> get createdAt =>
       columnsByName['created_at']! as i1.GeneratedColumn<DateTime>;
   i1.GeneratedColumn<DateTime> get updatedAt =>
@@ -209,14 +200,28 @@ i1.GeneratedColumn<String> _column_1(String aliasedName) =>
       type: i1.DriftSqlType.string,
       defaultConstraints: i1.GeneratedColumn.constraintIsAlways('UNIQUE'),
     );
-i1.GeneratedColumn<DateTime> _column_2(String aliasedName) =>
+i1.GeneratedColumn<String> _column_2(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'price',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+    );
+i1.GeneratedColumn<int> _column_3(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'priority',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+    );
+i1.GeneratedColumn<DateTime> _column_4(String aliasedName) =>
     i1.GeneratedColumn<DateTime>(
       'created_at',
       aliasedName,
       false,
       type: i1.DriftSqlType.dateTime,
     );
-i1.GeneratedColumn<DateTime> _column_3(String aliasedName) =>
+i1.GeneratedColumn<DateTime> _column_5(String aliasedName) =>
     i1.GeneratedColumn<DateTime>(
       'updated_at',
       aliasedName,
@@ -226,49 +231,6 @@ i1.GeneratedColumn<DateTime> _column_3(String aliasedName) =>
 
 class Shape1 extends i0.VersionedTable {
   Shape1({required super.source, required super.alias}) : super.aliased();
-  i1.GeneratedColumn<int> get id =>
-      columnsByName['id']! as i1.GeneratedColumn<int>;
-  i1.GeneratedColumn<String> get name =>
-      columnsByName['name']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<int> get categoryId =>
-      columnsByName['category_id']! as i1.GeneratedColumn<int>;
-  i1.GeneratedColumn<String> get price =>
-      columnsByName['price']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<int> get priority =>
-      columnsByName['priority']! as i1.GeneratedColumn<int>;
-  i1.GeneratedColumn<DateTime> get createdAt =>
-      columnsByName['created_at']! as i1.GeneratedColumn<DateTime>;
-  i1.GeneratedColumn<DateTime> get updatedAt =>
-      columnsByName['updated_at']! as i1.GeneratedColumn<DateTime>;
-}
-
-i1.GeneratedColumn<int> _column_4(String aliasedName) =>
-    i1.GeneratedColumn<int>(
-      'category_id',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.int,
-      defaultConstraints: i1.GeneratedColumn.constraintIsAlways(
-        'REFERENCES categories (id) ON UPDATE CASCADE ON DELETE CASCADE',
-      ),
-    );
-i1.GeneratedColumn<String> _column_5(String aliasedName) =>
-    i1.GeneratedColumn<String>(
-      'price',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.string,
-    );
-i1.GeneratedColumn<int> _column_6(String aliasedName) =>
-    i1.GeneratedColumn<int>(
-      'priority',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.int,
-    );
-
-class Shape2 extends i0.VersionedTable {
-  Shape2({required super.source, required super.alias}) : super.aliased();
   i1.GeneratedColumn<int> get id =>
       columnsByName['id']! as i1.GeneratedColumn<int>;
   i1.GeneratedColumn<String> get name =>
@@ -289,14 +251,14 @@ class Shape2 extends i0.VersionedTable {
       columnsByName['updated_at']! as i1.GeneratedColumn<DateTime>;
 }
 
-i1.GeneratedColumn<String> _column_7(String aliasedName) =>
+i1.GeneratedColumn<String> _column_6(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'name',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_8(String aliasedName) =>
+i1.GeneratedColumn<String> _column_7(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'upi_id',
       aliasedName,
@@ -304,7 +266,7 @@ i1.GeneratedColumn<String> _column_8(String aliasedName) =>
       type: i1.DriftSqlType.string,
       defaultConstraints: i1.GeneratedColumn.constraintIsAlways('UNIQUE'),
     );
-i1.GeneratedColumn<bool> _column_9(String aliasedName) =>
+i1.GeneratedColumn<bool> _column_8(String aliasedName) =>
     i1.GeneratedColumn<bool>(
       'is_prime',
       aliasedName,
@@ -315,21 +277,21 @@ i1.GeneratedColumn<bool> _column_9(String aliasedName) =>
       ),
       defaultValue: const CustomExpression('0'),
     );
-i1.GeneratedColumn<int> _column_10(String aliasedName) =>
+i1.GeneratedColumn<int> _column_9(String aliasedName) =>
     i1.GeneratedColumn<int>(
       'account_number',
       aliasedName,
       true,
       type: i1.DriftSqlType.int,
     );
-i1.GeneratedColumn<String> _column_11(String aliasedName) =>
+i1.GeneratedColumn<String> _column_10(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'ifsc',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_12(String aliasedName) =>
+i1.GeneratedColumn<String> _column_11(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'note',
       aliasedName,
@@ -337,8 +299,8 @@ i1.GeneratedColumn<String> _column_12(String aliasedName) =>
       type: i1.DriftSqlType.string,
     );
 
-class Shape3 extends i0.VersionedTable {
-  Shape3({required super.source, required super.alias}) : super.aliased();
+class Shape2 extends i0.VersionedTable {
+  Shape2({required super.source, required super.alias}) : super.aliased();
   i1.GeneratedColumn<String> get id =>
       columnsByName['id']! as i1.GeneratedColumn<String>;
   i1.GeneratedColumn<String> get customerName =>
@@ -365,49 +327,49 @@ class Shape3 extends i0.VersionedTable {
       columnsByName['updated_at']! as i1.GeneratedColumn<DateTime>;
 }
 
-i1.GeneratedColumn<String> _column_13(String aliasedName) =>
+i1.GeneratedColumn<String> _column_12(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'id',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_14(String aliasedName) =>
+i1.GeneratedColumn<String> _column_13(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'customer_name',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_15(String aliasedName) =>
+i1.GeneratedColumn<String> _column_14(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'prepared_by',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_16(String aliasedName) =>
+i1.GeneratedColumn<String> _column_15(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'order_no',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_17(String aliasedName) =>
+i1.GeneratedColumn<String> _column_16(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'unit_id',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_18(String aliasedName) =>
+i1.GeneratedColumn<String> _column_17(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'bill_items',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_19(String aliasedName) =>
+i1.GeneratedColumn<String> _column_18(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'payment_mode',
       aliasedName,
@@ -415,7 +377,7 @@ i1.GeneratedColumn<String> _column_19(String aliasedName) =>
       type: i1.DriftSqlType.string,
       defaultValue: const CustomExpression('\'cash\''),
     );
-i1.GeneratedColumn<String> _column_20(String aliasedName) =>
+i1.GeneratedColumn<String> _column_19(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'payment_status',
       aliasedName,
@@ -423,14 +385,14 @@ i1.GeneratedColumn<String> _column_20(String aliasedName) =>
       type: i1.DriftSqlType.string,
       defaultValue: const CustomExpression('\'receivable\''),
     );
-i1.GeneratedColumn<String> _column_21(String aliasedName) =>
+i1.GeneratedColumn<String> _column_20(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'payment_ref',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<int> _column_22(String aliasedName) =>
+i1.GeneratedColumn<int> _column_21(String aliasedName) =>
     i1.GeneratedColumn<int>(
       'total_amount',
       aliasedName,
@@ -438,8 +400,8 @@ i1.GeneratedColumn<int> _column_22(String aliasedName) =>
       type: i1.DriftSqlType.int,
     );
 
-class Shape4 extends i0.VersionedTable {
-  Shape4({required super.source, required super.alias}) : super.aliased();
+class Shape3 extends i0.VersionedTable {
+  Shape3({required super.source, required super.alias}) : super.aliased();
   i1.GeneratedColumn<String> get id =>
       columnsByName['id']! as i1.GeneratedColumn<String>;
   i1.GeneratedColumn<String> get email =>
@@ -458,7 +420,7 @@ class Shape4 extends i0.VersionedTable {
       columnsByName['is_active']! as i1.GeneratedColumn<bool>;
 }
 
-i1.GeneratedColumn<String> _column_23(String aliasedName) =>
+i1.GeneratedColumn<String> _column_22(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'email',
       aliasedName,
@@ -466,28 +428,28 @@ i1.GeneratedColumn<String> _column_23(String aliasedName) =>
       type: i1.DriftSqlType.string,
       defaultConstraints: i1.GeneratedColumn.constraintIsAlways('UNIQUE'),
     );
-i1.GeneratedColumn<String> _column_24(String aliasedName) =>
+i1.GeneratedColumn<String> _column_23(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'password',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_25(String aliasedName) =>
+i1.GeneratedColumn<String> _column_24(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'full_name',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_26(String aliasedName) =>
+i1.GeneratedColumn<String> _column_25(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'phone_number',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<DateTime> _column_27(String aliasedName) =>
+i1.GeneratedColumn<DateTime> _column_26(String aliasedName) =>
     i1.GeneratedColumn<DateTime>(
       'created_at',
       aliasedName,
@@ -495,7 +457,7 @@ i1.GeneratedColumn<DateTime> _column_27(String aliasedName) =>
       type: i1.DriftSqlType.dateTime,
       defaultValue: const CustomExpression('CURRENT_TIMESTAMP'),
     );
-i1.GeneratedColumn<DateTime> _column_28(String aliasedName) =>
+i1.GeneratedColumn<DateTime> _column_27(String aliasedName) =>
     i1.GeneratedColumn<DateTime>(
       'updated_at',
       aliasedName,
@@ -503,7 +465,7 @@ i1.GeneratedColumn<DateTime> _column_28(String aliasedName) =>
       type: i1.DriftSqlType.dateTime,
       defaultValue: const CustomExpression('CURRENT_TIMESTAMP'),
     );
-i1.GeneratedColumn<bool> _column_29(String aliasedName) =>
+i1.GeneratedColumn<bool> _column_28(String aliasedName) =>
     i1.GeneratedColumn<bool>(
       'is_active',
       aliasedName,
@@ -515,8 +477,8 @@ i1.GeneratedColumn<bool> _column_29(String aliasedName) =>
       defaultValue: const CustomExpression('1'),
     );
 
-class Shape5 extends i0.VersionedTable {
-  Shape5({required super.source, required super.alias}) : super.aliased();
+class Shape4 extends i0.VersionedTable {
+  Shape4({required super.source, required super.alias}) : super.aliased();
   i1.GeneratedColumn<String> get id =>
       columnsByName['id']! as i1.GeneratedColumn<String>;
   i1.GeneratedColumn<String> get title =>
@@ -537,14 +499,14 @@ class Shape5 extends i0.VersionedTable {
       columnsByName['updated_at']! as i1.GeneratedColumn<DateTime>;
 }
 
-i1.GeneratedColumn<String> _column_30(String aliasedName) =>
+i1.GeneratedColumn<String> _column_29(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'title',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<int> _column_31(String aliasedName) =>
+i1.GeneratedColumn<int> _column_30(String aliasedName) =>
     i1.GeneratedColumn<int>(
       'completed',
       aliasedName,
@@ -552,7 +514,7 @@ i1.GeneratedColumn<int> _column_31(String aliasedName) =>
       type: i1.DriftSqlType.int,
       defaultValue: const CustomExpression('0'),
     );
-i1.GeneratedColumn<int> _column_32(String aliasedName) =>
+i1.GeneratedColumn<int> _column_31(String aliasedName) =>
     i1.GeneratedColumn<int>(
       'total',
       aliasedName,
@@ -560,7 +522,7 @@ i1.GeneratedColumn<int> _column_32(String aliasedName) =>
       type: i1.DriftSqlType.int,
       defaultValue: const CustomExpression('0'),
     );
-i1.GeneratedColumn<int> _column_33(String aliasedName) =>
+i1.GeneratedColumn<int> _column_32(String aliasedName) =>
     i1.GeneratedColumn<int>(
       'color_value',
       aliasedName,
@@ -568,7 +530,7 @@ i1.GeneratedColumn<int> _column_33(String aliasedName) =>
       type: i1.DriftSqlType.int,
       defaultValue: const CustomExpression('0'),
     );
-i1.GeneratedColumn<String> _column_34(String aliasedName) =>
+i1.GeneratedColumn<String> _column_33(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'icon_name',
       aliasedName,
@@ -580,8 +542,8 @@ i1.GeneratedColumn<String> _column_34(String aliasedName) =>
       type: i1.DriftSqlType.string,
     );
 
-class Shape6 extends i0.VersionedTable {
-  Shape6({required super.source, required super.alias}) : super.aliased();
+class Shape5 extends i0.VersionedTable {
+  Shape5({required super.source, required super.alias}) : super.aliased();
   i1.GeneratedColumn<String> get id =>
       columnsByName['id']! as i1.GeneratedColumn<String>;
   i1.GeneratedColumn<String> get checklistId =>
@@ -598,7 +560,7 @@ class Shape6 extends i0.VersionedTable {
       columnsByName['updated_at']! as i1.GeneratedColumn<DateTime>;
 }
 
-i1.GeneratedColumn<String> _column_35(String aliasedName) =>
+i1.GeneratedColumn<String> _column_34(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'checklist_id',
       aliasedName,
@@ -606,14 +568,14 @@ i1.GeneratedColumn<String> _column_35(String aliasedName) =>
       type: i1.DriftSqlType.string,
       $customConstraints: 'NOT NULL REFERENCES checklists(id)',
     );
-i1.GeneratedColumn<String> _column_36(String aliasedName) =>
+i1.GeneratedColumn<String> _column_35(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'task_text',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<bool> _column_37(String aliasedName) =>
+i1.GeneratedColumn<bool> _column_36(String aliasedName) =>
     i1.GeneratedColumn<bool>(
       'done',
       aliasedName,
@@ -624,7 +586,7 @@ i1.GeneratedColumn<bool> _column_37(String aliasedName) =>
       ),
       defaultValue: const CustomExpression('0'),
     );
-i1.GeneratedColumn<int> _column_38(String aliasedName) =>
+i1.GeneratedColumn<int> _column_37(String aliasedName) =>
     i1.GeneratedColumn<int>(
       'position',
       aliasedName,
@@ -633,8 +595,8 @@ i1.GeneratedColumn<int> _column_38(String aliasedName) =>
       defaultValue: const CustomExpression('0'),
     );
 
-class Shape7 extends i0.VersionedTable {
-  Shape7({required super.source, required super.alias}) : super.aliased();
+class Shape6 extends i0.VersionedTable {
+  Shape6({required super.source, required super.alias}) : super.aliased();
   i1.GeneratedColumn<int> get id =>
       columnsByName['id']! as i1.GeneratedColumn<int>;
   i1.GeneratedColumn<String> get name =>
@@ -653,7 +615,7 @@ class Shape7 extends i0.VersionedTable {
       columnsByName['updated_at']! as i1.GeneratedColumn<DateTime>;
 }
 
-i1.GeneratedColumn<String> _column_39(String aliasedName) =>
+i1.GeneratedColumn<String> _column_38(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'shop_id',
       aliasedName,
@@ -661,22 +623,181 @@ i1.GeneratedColumn<String> _column_39(String aliasedName) =>
       type: i1.DriftSqlType.string,
       defaultConstraints: i1.GeneratedColumn.constraintIsAlways('UNIQUE'),
     );
-i1.GeneratedColumn<String> _column_40(String aliasedName) =>
+i1.GeneratedColumn<String> _column_39(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'address',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_41(String aliasedName) =>
+i1.GeneratedColumn<String> _column_40(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'map_address',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
+
+final class Schema3 extends i0.VersionedSchema {
+  Schema3({required super.database}) : super(version: 3);
+  @override
+  late final List<i1.DatabaseSchemaEntity> entities = [
+    products,
+    bankAccounts,
+    saleReceipts,
+    users,
+    checklists,
+    checklistTasks,
+    shops,
+  ];
+  late final Shape0 products = Shape0(
+    source: i0.VersionedTable(
+      entityName: 'products',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape1 bankAccounts = Shape1(
+    source: i0.VersionedTable(
+      entityName: 'bank_accounts',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [
+        _column_0,
+        _column_6,
+        _column_7,
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_11,
+        _column_4,
+        _column_5,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape2 saleReceipts = Shape2(
+    source: i0.VersionedTable(
+      entityName: 'sale_receipts',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_12,
+        _column_13,
+        _column_14,
+        _column_15,
+        _column_16,
+        _column_17,
+        _column_18,
+        _column_19,
+        _column_20,
+        _column_21,
+        _column_4,
+        _column_5,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape3 users = Shape3(
+    source: i0.VersionedTable(
+      entityName: 'users',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_12,
+        _column_22,
+        _column_23,
+        _column_24,
+        _column_25,
+        _column_26,
+        _column_27,
+        _column_28,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape4 checklists = Shape4(
+    source: i0.VersionedTable(
+      entityName: 'checklists',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_12,
+        _column_29,
+        _column_30,
+        _column_31,
+        _column_32,
+        _column_33,
+        _column_28,
+        _column_26,
+        _column_27,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape5 checklistTasks = Shape5(
+    source: i0.VersionedTable(
+      entityName: 'checklist_tasks',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_12,
+        _column_34,
+        _column_35,
+        _column_36,
+        _column_37,
+        _column_26,
+        _column_27,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape6 shops = Shape6(
+    source: i0.VersionedTable(
+      entityName: 'shops',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_8,
+        _column_38,
+        _column_39,
+        _column_40,
+        _column_4,
+        _column_5,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+}
+
 i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
+  required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
 }) {
   return (currentVersion, database) async {
     switch (currentVersion) {
@@ -685,6 +806,11 @@ i0.MigrationStepWithVersion migrationSteps({
         final migrator = i1.Migrator(database, schema);
         await from1To2(migrator, schema);
         return 2;
+      case 2:
+        final schema = Schema3(database: database);
+        final migrator = i1.Migrator(database, schema);
+        await from2To3(migrator, schema);
+        return 3;
       default:
         throw ArgumentError.value('Unknown migration from $currentVersion');
     }
@@ -693,6 +819,7 @@ i0.MigrationStepWithVersion migrationSteps({
 
 i1.OnUpgrade stepByStep({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
+  required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
 }) => i0.VersionedSchema.stepByStepHelper(
-  step: migrationSteps(from1To2: from1To2),
+  step: migrationSteps(from1To2: from1To2, from2To3: from2To3),
 );

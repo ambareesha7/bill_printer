@@ -41,42 +41,9 @@ class DBUtils {
   /// deletes all tables and recreates them
   /// USE WITH CAUTION - this will delete all data in the database
   Future<void> reCreateDB() async => await db.reCreateDB();
-
-  // ======================== Category CRUD operations =====================
-  Future<void> insertCategory({required String name}) async {
-    final categoryCompanion = CategoriesCompanion.insert(
-      name: name,
-      createdAt: Value(DateTime.now()),
-      updatedAt: Value(DateTime.now()),
-    );
-    try {
-      await db.into(db.categories).insert(categoryCompanion);
-    } catch (e) {
-      debugLog("Error inserting category: $e");
-    }
-  }
-
-  Future<void> updateCategory(int id, String name) async {
-    final categoryCompanion = CategoriesCompanion(
-      id: Value(id),
-      name: Value(name),
-      updatedAt: Value(DateTime.now()),
-    );
-    await db.update(db.categories).replace(categoryCompanion);
-  }
-
-  Future<void> deleteCategory(int id) async {
-    await (db.delete(db.categories)..where((tbl) => tbl.id.equals(id))).go();
-  }
-
-  Future<List<Category>> getCategories() async {
-    return await db.select(db.categories).get();
-  }
-
   // ======================== Product CRUD operations =====================
   Future<void> insertProduct({
     required String name,
-    required int categoryId,
     required String price,
     int priority = 1,
   }) async {
@@ -84,7 +51,6 @@ class DBUtils {
       name: name,
       createdAt: Value(DateTime.now()),
       updatedAt: Value(DateTime.now()),
-      categoryId: categoryId,
       price: price,
       priority: priority,
     );
@@ -98,7 +64,6 @@ class DBUtils {
   Future<void> updateProduct({
     required int id,
     String? name,
-    int? categoryId,
     String? price,
     int? priority,
   }) async {
@@ -106,7 +71,6 @@ class DBUtils {
       id: Value(id),
       name: name != null ? Value(name) : const Value.absent(),
       updatedAt: Value(DateTime.now()),
-      categoryId: categoryId != null ? Value(categoryId) : const Value.absent(),
       price: price != null ? Value(price) : const Value.absent(),
       priority: priority != null ? Value(priority) : const Value.absent(),
     );
@@ -130,17 +94,6 @@ class DBUtils {
       return await db.select(db.products).get();
     } catch (e) {
       debugLog("Error fetching products: $e");
-      return [];
-    }
-  }
-
-  Future<List<Product>> getProductsByCategory(int categoryId) async {
-    try {
-      return await (db.select(
-        db.products,
-      )..where((tbl) => tbl.categoryId.equals(categoryId))).get();
-    } catch (e) {
-      debugLog("Error fetching products by category: $e");
       return [];
     }
   }

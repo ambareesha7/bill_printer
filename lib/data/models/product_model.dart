@@ -8,7 +8,7 @@ abstract class ProductModel with _$ProductModel {
   const factory ProductModel({
     int? id,
     String? name,
-    int? categoryId,
+    // int? categoryId,
     String? price,
     int? priority,
     DateTime? createdAt,

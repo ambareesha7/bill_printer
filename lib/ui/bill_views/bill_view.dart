@@ -9,8 +9,8 @@ import 'package:bill_printer/data/models/users/user_model.dart';
 import 'package:bill_printer/ui/auth/providers/auth_provider.dart';
 import 'package:bill_printer/ui/bill_views/providers/bill_provider.dart';
 import 'package:bill_printer/ui/bill_views/providers/order_num_provider.dart';
-import 'package:bill_printer/ui/category/product_provider.dart';
 import 'package:bill_printer/ui/printer/providers/printer_provider.dart';
+import 'package:bill_printer/ui/products/providers/products_provider.dart';
 import 'package:bill_printer/ui/utils/app_colors.dart';
 import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:bill_printer/ui/utils/ui_utils.dart';
@@ -183,7 +183,7 @@ class _BillViewState extends ConsumerState<BillView> {
                     bgColor: AppColors.blue,
                     onPressed: () {
                       ref
-                          .read(productsListProvider.notifier)
+                          .read(productsProvider.notifier)
                           .openProductDialog(
                             context: context,
                             operationType: OperationType.add,
@@ -328,7 +328,7 @@ class _BillViewState extends ConsumerState<BillView> {
               flex: 6,
               child: Consumer(
                 builder: (context, ref, child) {
-                  final productsList = ref.watch(productsListProvider);
+                  final productsList = ref.watch(productsProvider);
                   return GridView.builder(
                     itemCount: productsList.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

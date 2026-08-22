@@ -233,7 +233,7 @@ class _ShopViewState extends ConsumerState<ShopView> {
                           icon: Icon(Icons.save),
                           label: Text("Save"),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.teal,
+                            // backgroundColor: Colors.teal,
                           ),
                         ),
                       ],
@@ -560,7 +560,6 @@ class _ShopViewState extends ConsumerState<ShopView> {
         onPressed: () {
           _showShopForm(operationType: OperationType.add);
         },
-        backgroundColor: Colors.teal,
         child: Icon(Icons.add),
       ),
     );

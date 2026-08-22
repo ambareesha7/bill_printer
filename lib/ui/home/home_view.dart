@@ -22,15 +22,14 @@ class HomeView extends ConsumerStatefulWidget {
 
 class _MyHomePageState extends ConsumerState<HomeView> {
   List navList = [
-    RouterPaths.category.name,
+    RouterPaths.products.name,
     RouterPaths.bankAccount.name,
     RouterPaths.reportsMain.name,
     RouterPaths.signUp.name,
     RouterPaths.users.name,
     RouterPaths.printer.name,
-    RouterPaths.checklists.name,
 
-    // const Icon(Icons.info_outline),
+    // RouterPaths.checklists.name,
     RouterPaths.about.name,
     RouterPaths.shop.name,
   ];
