@@ -166,6 +166,9 @@ class _BillViewState extends ConsumerState<BillView> {
                           .read(printerProvider.notifier)
                           .printBill(
                             context: context,
+                            businessName: widget.shop.name,
+                            shopID: widget.shop.shopId,
+                            address: widget.shop.address,
                             orderNo: orderNo,
                             paymentStatus: "Not Paid",
                             dateTime: dateFormat(dateTimeNow()),
@@ -545,6 +548,9 @@ class _BillViewState extends ConsumerState<BillView> {
           .read(printerProvider.notifier)
           .printBill(
             context: context,
+            businessName: widget.shop.name,
+            shopID: widget.shop.shopId,
+            address: widget.shop.address,
             orderNo: orderNo,
             paymentMode: paymentMode.name,
             dateTime: dateFormat(dateTimeNow()),
@@ -557,6 +563,9 @@ class _BillViewState extends ConsumerState<BillView> {
           .read(printerProvider.notifier)
           .printBill(
             context: context,
+            businessName: widget.shop.name,
+            shopID: widget.shop.shopId,
+            address: widget.shop.address,
             orderNo: orderNo,
             paymentMode: paymentMode.name,
             paymentStatus: "Not Paid",

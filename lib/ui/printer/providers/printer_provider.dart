@@ -63,14 +63,18 @@ class Printer extends _$Printer {
     required List<BillItemModel> itemsList,
     required String totalAmount,
     required String totalItems,
+    String? businessName,
+    required String shopID,
+    String? address,
   }) async {
     bool printerStatus = await status();
     if (printerStatus) {
       bool result = false;
       List<int> ticket = await billContent(
-        businessName: "MoonLight Cafe",
+        businessName: businessName,
+        address: address,
         subHeader1: paymentStatus,
-        // shopID: "CartID: BTM-1",
+        shopID: shopID,
         dateTime: dateTime,
         invoiceTitle: "Order no:",
         orderNo: orderNo,
