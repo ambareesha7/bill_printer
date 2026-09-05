@@ -4,7 +4,6 @@ import 'package:bill_printer/app_router.dart';
 import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/data/db_utils.dart';
 import 'package:bill_printer/data/models/bill_item_model.dart';
-import 'package:bill_printer/data/models/shop_model.dart';
 import 'package:bill_printer/data/models/users/user_model.dart';
 import 'package:bill_printer/ui/auth/providers/auth_provider.dart';
 import 'package:bill_printer/ui/bill_views/providers/bill_provider.dart';
@@ -24,8 +23,8 @@ import '../../data/models/bank_account/bank_account_model.dart';
 import '../widgets/nav_btn.dart';
 
 class BillView extends ConsumerStatefulWidget {
-  final ShopModel shop;
-  const BillView({super.key, required this.shop});
+  final String title;
+  const BillView({super.key, required this.title});
 
   @override
   ConsumerState<BillView> createState() => _BillViewState();
@@ -36,14 +35,6 @@ class _BillViewState extends ConsumerState<BillView> {
   final double bodyPadding = 8;
   DBUtils dbUtils = DBUtils.instance;
 
-  String getShopName(ShopModel? shop) {
-    return shop == null ? "None" : shop.name;
-  }
-
-  String getShopId(ShopModel? shop) {
-    return shop == null ? "None" : shop.shopId;
-  }
-
   @override
   Widget build(BuildContext context) {
     final itemHeadStyle = TextStyle(fontWeight: FontWeight.bold);
@@ -53,7 +44,7 @@ class _BillViewState extends ConsumerState<BillView> {
     var listItems = ref.watch(tempBillListProvider);
     return Scaffold(
       appBar: AppBar(
-        title: Text(getShopName(widget.shop)),
+        title: Text(widget.title),
         centerTitle: true,
         actions: [NavBtn(path: RouterPaths.reports.name)],
       ),
@@ -71,10 +62,6 @@ class _BillViewState extends ConsumerState<BillView> {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Text(
-                      "Unit ID: ${widget.shop.shopId}",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
                     Text(
                       "Order No: $orderNo",
                       style: TextStyle(fontWeight: FontWeight.bold),
@@ -152,7 +139,7 @@ class _BillViewState extends ConsumerState<BillView> {
                 );
               },
             ),
-            if (user != null) _buildActionButtons(user, widget.shop),
+            if (user != null) _buildActionButtons(user),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -166,9 +153,6 @@ class _BillViewState extends ConsumerState<BillView> {
                           .read(printerProvider.notifier)
                           .printBill(
                             context: context,
-                            businessName: widget.shop.name,
-                            shopID: widget.shop.shopId,
-                            address: widget.shop.address,
                             orderNo: orderNo,
                             paymentStatus: "Not Paid",
                             dateTime: dateFormat(dateTimeNow()),
@@ -286,7 +270,6 @@ class _BillViewState extends ConsumerState<BillView> {
                           paymentStatus: PaymentStatus.receivable,
                           preparedBy: user?.fullName,
                           orderNo: orderNo,
-                          unitId: getShopId(widget.shop),
                           print: true,
                         );
                       } else {
@@ -311,7 +294,6 @@ class _BillViewState extends ConsumerState<BillView> {
                           paymentStatus: PaymentStatus.receivable,
                           preparedBy: user?.fullName,
                           orderNo: orderNo,
-                          unitId: getShopId(widget.shop),
                           print: false,
                         );
                       } else {
@@ -360,7 +342,7 @@ class _BillViewState extends ConsumerState<BillView> {
     );
   }
 
-  Widget _buildActionButtons(UserModel user, ShopModel shop) {
+  Widget _buildActionButtons(UserModel user) {
     String orderNo = ref.watch(orderNumProvider);
 
     return SingleChildScrollView(
@@ -389,7 +371,6 @@ class _BillViewState extends ConsumerState<BillView> {
                     amount: amount,
                     preparedBy: user.fullName,
                     orderNo: orderNo,
-                    unitId: getShopId(shop),
                   );
                 }
               } else {
@@ -404,7 +385,6 @@ class _BillViewState extends ConsumerState<BillView> {
           cashBtn(
             user: user,
             orderNo: orderNo,
-            unitId: getShopId(shop),
             btnName: "Cash",
             billPrint: true,
             bgColor: AppColors.blue,
@@ -412,7 +392,6 @@ class _BillViewState extends ConsumerState<BillView> {
           cashBtn(
             user: user,
             orderNo: orderNo,
-            unitId: getShopId(shop),
             btnName: "Cash no print",
             billPrint: false,
           ),
@@ -429,7 +408,6 @@ class _BillViewState extends ConsumerState<BillView> {
                     paymentStatus: PaymentStatus.received,
                     preparedBy: user.fullName,
                     orderNo: orderNo,
-                    unitId: getShopId(shop),
                     paymentRef: bankAccount.upiId,
                   );
                 }
@@ -488,7 +466,6 @@ class _BillViewState extends ConsumerState<BillView> {
   AppBtn1 cashBtn({
     required UserModel user,
     required String orderNo,
-    required String unitId,
     required String btnName,
     required bool billPrint,
     Color? bgColor,
@@ -504,7 +481,7 @@ class _BillViewState extends ConsumerState<BillView> {
             paymentStatus: PaymentStatus.received,
             preparedBy: user.fullName,
             orderNo: orderNo,
-            unitId: unitId,
+            // unitId: unitId,
             print: billPrint,
           );
         } else {
@@ -522,7 +499,6 @@ class _BillViewState extends ConsumerState<BillView> {
     required PaymentMode paymentMode,
     required PaymentStatus paymentStatus,
     required String orderNo,
-    required String unitId,
     String? paymentRef,
     String? preparedBy,
     bool print = false,
@@ -533,7 +509,6 @@ class _BillViewState extends ConsumerState<BillView> {
           paymentMode: paymentMode,
           paymentStatus: paymentStatus,
           orderNo: orderNo,
-          unitId: unitId,
           paymentRef: paymentRef,
           preparedBy: preparedBy,
         );
@@ -548,9 +523,6 @@ class _BillViewState extends ConsumerState<BillView> {
           .read(printerProvider.notifier)
           .printBill(
             context: context,
-            businessName: widget.shop.name,
-            shopID: widget.shop.shopId,
-            address: widget.shop.address,
             orderNo: orderNo,
             paymentMode: paymentMode.name,
             dateTime: dateFormat(dateTimeNow()),
@@ -563,9 +535,6 @@ class _BillViewState extends ConsumerState<BillView> {
           .read(printerProvider.notifier)
           .printBill(
             context: context,
-            businessName: widget.shop.name,
-            shopID: widget.shop.shopId,
-            address: widget.shop.address,
             orderNo: orderNo,
             paymentMode: paymentMode.name,
             paymentStatus: "Not Paid",
@@ -598,7 +567,6 @@ class _BillViewState extends ConsumerState<BillView> {
     required BankAccountModel primAccount,
     required int amount,
     required String orderNo,
-    required String unitId,
     String? preparedBy,
   }) async {
     String upi =
@@ -655,7 +623,6 @@ class _BillViewState extends ConsumerState<BillView> {
                         paymentRef: ref,
                         preparedBy: preparedBy,
                         orderNo: orderNo,
-                        unitId: unitId,
                         print: true,
                       );
                     },
@@ -671,7 +638,6 @@ class _BillViewState extends ConsumerState<BillView> {
                         paymentRef: ref,
                         preparedBy: preparedBy,
                         orderNo: orderNo,
-                        unitId: unitId,
                         print: false,
                       );
                     },

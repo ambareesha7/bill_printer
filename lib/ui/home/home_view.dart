@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:bill_printer/app_router.dart';
-import 'package:bill_printer/data/models/shop_model.dart';
-import 'package:bill_printer/ui/shop/shop_provider.dart';
+import 'package:bill_printer/ui/print_settings/providers/print_settings_provider.dart';
 import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:bill_printer/ui/utils/ui_utils.dart';
 import 'package:bill_printer/ui/widgets/menu_item.dart';
@@ -28,16 +25,15 @@ class _MyHomePageState extends ConsumerState<HomeView> {
     RouterPaths.signUp.name,
     RouterPaths.users.name,
     RouterPaths.printer.name,
-
-    // RouterPaths.checklists.name,
     RouterPaths.about.name,
-    RouterPaths.shop.name,
+    RouterPaths.printSettings.name,
   ];
 
   @override
   Widget build(BuildContext context) {
     bool isLoggedIn = ref.watch(isUserLoggedInProvider);
-    List<ShopModel> shops = ref.watch(shopListProvider);
+    final printSettings = ref.watch(printSettingsProvider);
+    String name = "Unknown";
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -54,20 +50,13 @@ class _MyHomePageState extends ConsumerState<HomeView> {
                     text: "Please create a User to create bills",
                   );
                   context.push("/${RouterPaths.signUp.name}");
-                } else if (shops.isEmpty) {
-                  UIUtils.showSnackBar(
-                    context: context,
-                    text: "Please create a Shop to create bills",
-                  );
-                  context.push("/${RouterPaths.shop.name}");
                 } else {
-                  final primeShop = await ref
-                      .read(shopListProvider.notifier)
-                      .getPrimeShop();
-                  // ignore: use_build_context_synchronously
-                  context.push(
-                    "/${RouterPaths.createBill.name}/${jsonEncode(primeShop.toJson())}",
-                  );
+                  if (printSettings != null &&
+                      printSettings.businessName != null) {
+                    name = printSettings.businessName!;
+                  }
+
+                  context.push("/${RouterPaths.createBill.name}/$name");
                 }
               },
               title: Center(

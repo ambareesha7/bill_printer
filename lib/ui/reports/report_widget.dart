@@ -377,7 +377,6 @@ class ReportWidget extends ConsumerWidget {
                                   .read(printerProvider.notifier)
                                   .printBill(
                                     context: context,
-                                    shopID: transaction.unitId ?? "non",
                                     orderNo: transaction.orderNo,
                                     paymentMode: transaction.paymentMode,
                                     paymentStatus:

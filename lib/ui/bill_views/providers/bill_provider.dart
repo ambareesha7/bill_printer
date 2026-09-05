@@ -118,7 +118,6 @@ class BillList extends _$BillList {
   saveOrder({
     required PaymentMode paymentMode,
     required String orderNo,
-    required String unitId,
     required PaymentStatus paymentStatus,
     String? paymentRef,
     String? preparedBy,
@@ -132,7 +131,6 @@ class BillList extends _$BillList {
       paymentRef: paymentRef,
       preparedBy: preparedBy,
       orderNo: orderNo,
-      unitId: unitId,
     );
   }
 }

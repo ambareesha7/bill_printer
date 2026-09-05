@@ -1,13 +1,12 @@
 import 'dart:convert';
 
 import 'package:bill_printer/data/app_enums.dart';
-import 'package:bill_printer/data/models/shop_model.dart';
+import 'package:bill_printer/data/models/print_settings_model.dart';
 import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:bill_printer/data/database.dart';
 import 'package:bill_printer/data/models/bill_item_model.dart';
 import 'package:bill_printer/data/models/sale_receipts/sale_receipt_model.dart';
 import 'package:drift/drift.dart';
-import 'package:drift/isolate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/v7.dart';
 
@@ -206,7 +205,6 @@ class DBUtils {
     required List<BillItemModel> billItems,
     required int totalAmount,
     required String orderNo,
-    required String unitId,
     String? customerName,
     String? preparedBy,
     String? paymentMode,
@@ -229,7 +227,6 @@ class DBUtils {
       paymentRef: Value(paymentRef),
       createdAt: Value(DateTime.now()),
       updatedAt: Value(DateTime.now()),
-      unitId: unitId,
     );
     // debugLog(saleReceipt, tag: "saleReceipts");
     try {
@@ -255,7 +252,6 @@ class DBUtils {
               customerName: Value(i.customerName),
               preparedBy: Value(i.preparedBy),
               orderNo: i.orderNo,
-              unitId: i.unitId,
               paymentMode: Value(i.paymentMode),
               paymentStatus: Value(i.paymentStatus),
               paymentRef: Value(i.paymentRef),
@@ -295,7 +291,6 @@ class DBUtils {
           : Value(saleReceipt.paymentMode!),
       paymentStatus: Value(saleReceipt.paymentStatus.name),
       orderNo: Value(saleReceipt.orderNo ?? "0"),
-      unitId: Value(saleReceipt.unitId ?? "0"),
       paymentRef: saleReceipt.paymentRef != null
           ? Value(saleReceipt.paymentRef)
           : const Value.absent(),
@@ -347,7 +342,6 @@ class DBUtils {
             ),
             paymentRef: b.paymentRef,
             orderNo: b.orderNo,
-            unitId: b.unitId,
             createdAt: b.createdAt,
             updatedAt: b.updatedAt,
           ),
@@ -401,146 +395,93 @@ class DBUtils {
     }
   }
 
-  // ======================== Shop CRUD operations =====================
-  Future<String> insertShop({
-    required String name,
-    required String shopId,
-    bool? isPrime,
-    String? address,
-    String? mapAddress,
-  }) async {
-    final shopCompanion = ShopsCompanion.insert(
-      name: name,
-      shopId: shopId,
-      isPrime: Value(isPrime ?? false),
-      address: Value(address),
-      mapAddress: Value(mapAddress),
-      createdAt: Value(DateTime.now()),
-      updatedAt: Value(DateTime.now()),
-    );
-    String errorMsg1 = "Failed to create Shop";
-    try {
-      await db.into(db.shops).insert(shopCompanion);
-      return "Success";
-    } catch (e) {
-      debugLog("Error inserting shop: $e");
-      if (e is DriftRemoteException) {
-        if (e.remoteCause.toString().contains('UNIQUE constraint failed') &&
-            e.remoteCause.toString().contains("shop_id")) {
-          debugLog("Error inserting e.remoteCause: ${e.remoteCause}");
-          return "Shop ID should be UNIQUE";
-        } else {
-          return errorMsg1;
-        }
-      } else {
-        return errorMsg1;
-      }
-    }
-  }
 
-  Future<String> updateShop({
-    required int id,
-    String? name,
-    String? shopId,
-    bool? isPrime,
-    String? address,
-    String? mapAddress,
-  }) async {
-    Shop? shop = await getShopById(id);
-    String errorMsg1 = "Failed to update Shop";
-    if (shop == null) return errorMsg1;
-
-    final shopCompanion = ShopsCompanion(
-      id: Value(id),
-      name: name != null ? Value(name) : Value(shop.name),
-      shopId: shopId != null ? Value(shopId) : Value(shop.shopId),
-      isPrime: isPrime != null ? Value(isPrime) : Value(shop.isPrime),
-      address: address != null ? Value(address) : Value(shop.address),
-      mapAddress: mapAddress != null
-          ? Value(mapAddress)
-          : Value(shop.mapAddress),
-      updatedAt: Value(DateTime.now()),
-    );
+  // ======================== Print settings CRUD operations =====================
+  Future<PrintSetting?> getPrintSettings() async {
     try {
-      await db.update(db.shops).replace(shopCompanion);
-      return "Success";
+      return await (db.select(db.printSettings)
+            ..orderBy([(table) => OrderingTerm.asc(table.id)])
+            ..limit(1))
+          .getSingleOrNull();
     } catch (e) {
-      debugLog("Error Updating shop: $e");
-      if (e is DriftRemoteException) {
-        if (e.remoteCause.toString().contains('UNIQUE constraint failed') &&
-            e.remoteCause.toString().contains("shop_id")) {
-          return "Shop ID should be UNIQUE";
-        } else {
-          return errorMsg1;
-        }
-      } else {
-        return errorMsg1;
-      }
-    }
-  }
-
-  Future<void> deleteShop(int id) async {
-    try {
-      await (db.delete(db.shops)..where((tbl) => tbl.id.equals(id))).go();
-    } catch (e) {
-      debugLog("Error deleting shop: $e");
-    }
-  }
-
-  Future<List<Shop>> getShops() async {
-    try {
-      return await db.select(db.shops).get();
-    } catch (e) {
-      debugLog("Error fetching shops: $e");
-      return [];
-    }
-  }
-
-  Future<Shop?> getShopById(int id) async {
-    try {
-      return await (db.select(
-        db.shops,
-      )..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
-    } catch (e) {
-      debugLog("Error fetching shop by id: $e");
+      debugLog("Error in getPrintSettings: $e");
       return null;
     }
   }
 
-  Future<Shop?> getByShopId(String shopId) async {
+  Future<void> insertPrintSettings({
+    required PrintSettingsModel settings,
+  }) async {
     try {
-      return await (db.select(
-        db.shops,
-      )..where((tbl) => tbl.shopId.equals(shopId))).getSingleOrNull();
+      await db
+          .into(db.printSettings)
+          .insert(
+            PrintSettingsCompanion.insert(
+              businessName: Value(settings.businessName),
+              placeAddress: Value(settings.placeAddress),
+              headerText1: Value(settings.headerText1),
+              headerText2: Value(settings.headerText2),
+              gstNo: Value(settings.gstNo),
+              invoiceTitle: Value(settings.invoiceTitle),
+              footerText1: Value(settings.footerText1),
+              footerText2: Value(settings.footerText2),
+              createdAt: settings.createdAt ?? DateTime.now(),
+              updatedAt: settings.updatedAt ?? DateTime.now(),
+            ),
+          );
     } catch (e) {
-      debugLog("Error fetching shop by shopId: $e");
-      return null;
+      debugLog("Error insertPrintSettings: $e");
     }
   }
 
-  Future<void> updatePrimeShop(String shopId, bool status) async {
-    Shop? shop = await getByShopId(shopId);
-    if (shop != null && status) {
-      await updateShop(id: shop.id, isPrime: status);
-      List<Shop> shops = await getShops();
-      for (var i in shops) {
-        if (i.shopId != shopId) {
-          await updateShop(id: i.id, isPrime: false);
-        }
-      }
+  Future<void> updatePrintSettings({
+    required PrintSettingsModel settings,
+  }) async {
+    if (settings.id == null) return;
+    try {
+      await db
+          .update(db.printSettings)
+          .replace(
+            PrintSettingsCompanion(
+              id: Value(settings.id!),
+              businessName: Value(settings.businessName),
+              placeAddress: Value(settings.placeAddress),
+              headerText1: Value(settings.headerText1),
+              headerText2: Value(settings.headerText2),
+              gstNo: Value(settings.gstNo),
+              invoiceTitle: Value(settings.invoiceTitle),
+              footerText1: Value(settings.footerText1),
+              footerText2: Value(settings.footerText2),
+              createdAt: Value(settings.createdAt ?? DateTime.now()),
+              updatedAt: Value(settings.updatedAt ?? DateTime.now()),
+            ),
+          );
+    } catch (e) {
+      debugLog("Error in updatePrintSettings: $e");
     }
   }
 
-  ShopModel shopToShopModel(Shop shop) {
-    return ShopModel(
-      id: shop.id,
-      name: shop.name,
-      shopId: shop.shopId,
-      isPrime: shop.isPrime,
-      address: shop.address,
-      mapAddress: shop.mapAddress,
-      createdAt: shop.createdAt,
-      updatedAt: shop.updatedAt,
+  Future<void> deletePrintSettings() async {
+    try {
+      await db.delete(db.printSettings).go();
+    } catch (e) {
+      debugLog("Error in deletePrintSettings: $e");
+    }
+  }
+
+  PrintSettingsModel printSettingsToModel(PrintSetting settings) {
+    return PrintSettingsModel(
+      id: settings.id,
+      businessName: settings.businessName,
+      placeAddress: settings.placeAddress,
+      headerText1: settings.headerText1,
+      headerText2: settings.headerText2,
+      gstNo: settings.gstNo,
+      invoiceTitle: settings.invoiceTitle,
+      footerText1: settings.footerText1,
+      footerText2: settings.footerText2,
+      createdAt: settings.createdAt,
+      updatedAt: settings.updatedAt,
     );
   }
 }

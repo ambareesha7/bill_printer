@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:bill_printer/data/models/shop_model.dart';
 import 'package:bill_printer/ui/about/about_view.dart';
 import 'package:bill_printer/ui/auth/sign_up_view.dart';
 import 'package:bill_printer/ui/auth/users_view.dart';
@@ -8,18 +5,16 @@ import 'package:bill_printer/ui/bank_account/bank_account_view.dart';
 import 'package:bill_printer/ui/bill_views/bill_view.dart';
 import 'package:bill_printer/ui/home/home_view.dart';
 import 'package:bill_printer/ui/printer/printer_view.dart';
+import 'package:bill_printer/ui/print_settings/print_settings_view.dart';
 import 'package:bill_printer/ui/products/product_view.dart';
 import 'package:bill_printer/ui/reports/analytics_view.dart';
 import 'package:bill_printer/ui/reports/report_view.dart';
-import 'package:bill_printer/ui/checklists/checklists.dart';
-import 'package:bill_printer/ui/shop/shop_view.dart';
 import 'package:go_router/go_router.dart';
 
 import 'ui/reports/reports_main_view.dart';
 
 enum RouterPaths {
   createBill,
-  // category,
   bankAccount,
   reports,
   reportsMain,
@@ -30,8 +25,8 @@ enum RouterPaths {
   users,
   about,
   printer,
-  shop,
   products,
+  printSettings,
 }
 
 // GoRouter configuration
@@ -40,11 +35,10 @@ final appRouter = GoRouter(
   routes: [
     GoRoute(path: "/", builder: (context, state) => HomeView(), routes: []),
     GoRoute(
-      path: "/${RouterPaths.createBill.name}/:shop",
+      path: "/${RouterPaths.createBill.name}/:name",
       builder: (context, state) {
-        var shop1 = jsonDecode(state.pathParameters["shop"]!);
-        ShopModel shop2 = ShopModel.fromJson(shop1);
-        return BillView(shop: shop2);
+        String? name = state.pathParameters["name"];
+        return BillView(title: name ?? "No name");
       },
       redirect: (context, state) {
         return null;
@@ -71,17 +65,6 @@ final appRouter = GoRouter(
       builder: (context, state) => AnalyticsView(),
     ),
     GoRoute(
-      path: "/${RouterPaths.checklists.name}",
-      builder: (context, state) => const ChecklistListView(),
-    ),
-    GoRoute(
-      path: "/${RouterPaths.checklistDetails.name}/:id",
-      builder: (context, state) {
-        final id = state.pathParameters['id'];
-        return ChecklistDetailView(checklistId: id ?? '');
-      },
-    ),
-    GoRoute(
       path: "/${RouterPaths.signUp.name}",
       builder: (context, state) => SignUpView(),
     ),
@@ -98,8 +81,8 @@ final appRouter = GoRouter(
       builder: (context, state) => PrinterView(),
     ),
     GoRoute(
-      path: "/${RouterPaths.shop.name}",
-      builder: (context, state) => ShopView(),
+      path: "/${RouterPaths.printSettings.name}",
+      builder: (context, state) => const PrintSettingsView(),
     ),
   ],
 );
