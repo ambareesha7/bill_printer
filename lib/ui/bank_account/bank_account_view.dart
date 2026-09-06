@@ -14,15 +14,21 @@ class BankAccountView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Bank Accounts"), centerTitle: true),
-      floatingActionButton: FloatingActionButton.extended(
-        label: Text("Add new account"),
-        onPressed: () {
-          openFormDialog(
-            context: context,
-            acc: BankAccountModel(name: ""),
-            operationType: OperationType.add,
-          );
-        },
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          IconButton(onPressed: () {}, icon: Icon(Icons.qr_code_scanner)),
+          FloatingActionButton.extended(
+            label: Text("Add new account"),
+            onPressed: () {
+              openFormDialog(
+                context: context,
+                acc: BankAccountModel(name: ""),
+                operationType: OperationType.add,
+              );
+            },
+          ),
+        ],
       ),
       body: Consumer(
         builder: (context, ref, child) {

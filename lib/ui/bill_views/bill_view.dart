@@ -20,7 +20,6 @@ import 'package:go_router/go_router.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 
 import '../../data/models/bank_account/bank_account_model.dart';
-import '../widgets/nav_btn.dart';
 
 class BillView extends ConsumerStatefulWidget {
   final String title;
@@ -34,6 +33,14 @@ class _BillViewState extends ConsumerState<BillView> {
   final double btnPadding = 4;
   final double bodyPadding = 8;
   DBUtils dbUtils = DBUtils.instance;
+  final TextEditingController _searchController = TextEditingController();
+  bool _isSearching = false;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +51,37 @@ class _BillViewState extends ConsumerState<BillView> {
     var listItems = ref.watch(tempBillListProvider);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                onChanged: (_) => setState(() {}),
+                decoration: const InputDecoration(
+                  hintText: 'Search products',
+                  border: InputBorder.none,
+                ),
+              )
+            : Text(widget.title),
         centerTitle: true,
-        actions: [NavBtn(path: RouterPaths.reports.name)],
+        actions: [
+          IconButton(
+            tooltip: _isSearching ? 'Close search' : 'Search products',
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+                if (!_isSearching) _searchController.clear();
+              });
+            },
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+          ),
+          // NavBtn(path: RouterPaths.reports.name),
+          TextButton(
+            onPressed: () {
+              context.push("/${RouterPaths.reports.name}");
+            },
+            child: Text("Reports"),
+          ),
+        ],
       ),
       resizeToAvoidBottomInset: true,
       body: Padding(
@@ -314,21 +349,33 @@ class _BillViewState extends ConsumerState<BillView> {
               child: Consumer(
                 builder: (context, ref, child) {
                   final productsList = ref.watch(productsProvider);
+                  final searchQuery = _searchController.text
+                      .trim()
+                      .toLowerCase();
+                  final filteredProducts = searchQuery.isEmpty
+                      ? productsList
+                      : productsList
+                            .where(
+                              (product) => (product.name ?? '')
+                                  .toLowerCase()
+                                  .contains(searchQuery),
+                            )
+                            .toList();
                   return GridView.builder(
-                    itemCount: productsList.length,
+                    itemCount: filteredProducts.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       childAspectRatio: 1.2,
                     ),
                     itemBuilder: (context, index) {
                       return ProductCard(
-                        name: productsList[index].name ?? "",
-                        price: productsList[index].price ?? "0",
+                        name: filteredProducts[index].name ?? "",
+                        price: filteredProducts[index].price ?? "0",
 
                         onTap: () {
                           ref
                               .read(billListProvider.notifier)
-                              .addItem(productsList[index]);
+                              .addItem(filteredProducts[index]);
                         },
                       );
                     },
