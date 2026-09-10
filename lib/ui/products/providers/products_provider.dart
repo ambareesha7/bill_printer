@@ -37,6 +37,8 @@ class Products extends _$Products {
         .toList();
   }
 
+  Future<void> refreshProducts() => getProducts();
+
   // Create
   Future<void> addProduct({
     required String name,
