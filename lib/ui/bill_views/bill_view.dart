@@ -74,7 +74,6 @@ class _BillViewState extends ConsumerState<BillView> {
             },
             icon: Icon(_isSearching ? Icons.close : Icons.search),
           ),
-          // NavBtn(path: RouterPaths.reports.name),
           TextButton(
             onPressed: () {
               context.push("/${RouterPaths.reports.name}");
@@ -224,7 +223,7 @@ class _BillViewState extends ConsumerState<BillView> {
                     },
                   ),
                   AppBtn1(
-                    name: "Open Temp",
+                    name: "OpenTemp",
                     onPressed: () {
                       if (listItems.isEmpty) {
                         UIUtils.showSnackBar(
@@ -317,7 +316,7 @@ class _BillViewState extends ConsumerState<BillView> {
                     },
                   ),
                   AppBtn1(
-                    name: "Bill No Print",
+                    name: "Bill NoPrint",
                     bgColor: AppColors.blueGrey,
                     onPressed: () async {
                       int amount = ref
@@ -439,11 +438,11 @@ class _BillViewState extends ConsumerState<BillView> {
           cashBtn(
             user: user,
             orderNo: orderNo,
-            btnName: "Cash no print",
+            btnName: "Cash NoPrint",
             billPrint: false,
           ),
           AppBtn1(
-            name: "Received in Bank",
+            name: "Received",
             bgColor: AppColors.blueGrey,
             onPressed: () async {
               int amount = ref.read(billListProvider.notifier).getTotalAmount();
