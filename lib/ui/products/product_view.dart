@@ -20,12 +20,55 @@ class ProductView extends ConsumerStatefulWidget {
 }
 
 class _ProductViewState extends ConsumerState<ProductView> {
+  final TextEditingController _searchController = TextEditingController();
+  bool _isSearching = false;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final products = ref.watch(productsProvider);
+    final searchQuery = _searchController.text.trim().toLowerCase();
+    final filteredProducts = searchQuery.isEmpty
+        ? products
+        : products
+              .where(
+                (product) =>
+                    (product.name ?? '').toLowerCase().contains(searchQuery),
+              )
+              .toList();
     return Scaffold(
-      appBar: AppBar(title: Text("Products"), centerTitle: true),
-
+      appBar: AppBar(
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                onChanged: (_) => setState(() {}),
+                decoration: const InputDecoration(
+                  hintText: 'Search products',
+                  border: InputBorder.none,
+                ),
+              )
+            : Text("Products"),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            tooltip: _isSearching ? 'Close search' : 'Search products',
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+                if (!_isSearching) _searchController.clear();
+              });
+            },
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+          ),
+        ],
+      ),
+      resizeToAvoidBottomInset: false,
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -59,7 +102,7 @@ class _ProductViewState extends ConsumerState<ProductView> {
           ),
           Expanded(
             child: GridView.builder(
-              itemCount: products.length,
+              itemCount: filteredProducts.length,
               padding: EdgeInsets.all(8),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
@@ -67,16 +110,16 @@ class _ProductViewState extends ConsumerState<ProductView> {
               ),
               itemBuilder: (context, index) {
                 return GridCard(
-                  text: products[index].name ?? "",
-                  price: products[index].price ?? "0",
+                  text: filteredProducts[index].name ?? "",
+                  price: filteredProducts[index].price ?? "0",
                   editFunc: () {
-                    if (products[index].id != null) {
+                    if (filteredProducts[index].id != null) {
                       ref
                           .read(productsProvider.notifier)
                           .openProductDialog(
                             context: context,
                             operationType: OperationType.edit,
-                            product: products[index],
+                            product: filteredProducts[index],
                           );
                     }
                   },
@@ -84,11 +127,11 @@ class _ProductViewState extends ConsumerState<ProductView> {
                     UIUtils.confirmDialog(
                       context: context,
                       title: "Are you sure",
-                      subTitle: "${products[index].name}",
+                      subTitle: "${filteredProducts[index].name}",
                       rightFun: () {
                         ref
                             .read(productsProvider.notifier)
-                            .deleteProduct(products[index].id!);
+                            .deleteProduct(filteredProducts[index].id!);
                       },
                     );
                   },
