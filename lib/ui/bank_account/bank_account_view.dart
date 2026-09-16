@@ -1,6 +1,7 @@
 import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/data/models/bank_account/bank_account_model.dart';
 import 'package:bill_printer/ui/bank_account/providers/bank_provider.dart';
+import 'package:bill_printer/ui/bank_account/qr_scanner_view.dart';
 import 'package:bill_printer/ui/utils/ui_utils.dart';
 import 'package:bill_printer/ui/widgets/delete_btn.dart';
 import 'package:bill_printer/ui/widgets/edit_btn.dart';
@@ -14,15 +15,37 @@ class BankAccountView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Bank Accounts"), centerTitle: true),
-      floatingActionButton: FloatingActionButton.extended(
-        label: Text("Add new account"),
-        onPressed: () {
-          openFormDialog(
-            context: context,
-            acc: BankAccountModel(name: ""),
-            operationType: OperationType.add,
-          );
-        },
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          IconButton(
+            tooltip: "Scan UPI QR code",
+            onPressed: () async {
+              final ScannedQrResult? result = await showQrScanner(context);
+              if (!context.mounted || result == null) return;
+
+              openFormDialog(
+                context: context,
+                acc: BankAccountModel(
+                  name: result.name ?? "",
+                  upiId: result.upiId,
+                ),
+                operationType: OperationType.add,
+              );
+            },
+            icon: Icon(Icons.qr_code_scanner),
+          ),
+          FloatingActionButton.extended(
+            label: Text("Add new account"),
+            onPressed: () {
+              openFormDialog(
+                context: context,
+                acc: BankAccountModel(name: ""),
+                operationType: OperationType.add,
+              );
+            },
+          ),
+        ],
       ),
       body: Consumer(
         builder: (context, ref, child) {
@@ -155,7 +178,7 @@ class BankAccountView extends StatelessWidget {
     final TextEditingController noteEditController = TextEditingController();
     final formKey = GlobalKey<FormState>();
 
-    if (operationType == OperationType.edit) {
+    if (operationType == OperationType.edit || acc.upiId != null) {
       if (acc.accountNumber != null) {
         accountEditController.text = acc.accountNumber.toString();
       }

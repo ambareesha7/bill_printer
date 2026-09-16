@@ -90,7 +90,7 @@ class BillList extends _$BillList {
   }
 
   clearItems() => state = [];
-  
+
   updateFromList(List<BillItemModel> items) {
     clearItems();
     state = [...items];

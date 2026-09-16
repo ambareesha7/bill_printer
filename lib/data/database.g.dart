@@ -3,305 +3,6 @@
 part of 'database.dart';
 
 // ignore_for_file: type=lint
-class $CategoriesTable extends Categories
-    with TableInfo<$CategoriesTable, Category> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $CategoriesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-    'id',
-    aliasedName,
-    false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
-  );
-  static const VerificationMeta _nameMeta = const VerificationMeta('name');
-  @override
-  late final GeneratedColumn<String> name = GeneratedColumn<String>(
-    'name',
-    aliasedName,
-    false,
-    additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 2,
-      maxTextLength: 100,
-    ),
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
-  );
-  static const VerificationMeta _createdAtMeta = const VerificationMeta(
-    'createdAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-    'created_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    clientDefault: () => DateTime.now(),
-  );
-  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
-    'updatedAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-    'updated_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    clientDefault: () => DateTime.now(),
-  );
-  @override
-  List<GeneratedColumn> get $columns => [id, name, createdAt, updatedAt];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'categories';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<Category> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('name')) {
-      context.handle(
-        _nameMeta,
-        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_nameMeta);
-    }
-    if (data.containsKey('created_at')) {
-      context.handle(
-        _createdAtMeta,
-        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
-      );
-    }
-    if (data.containsKey('updated_at')) {
-      context.handle(
-        _updatedAtMeta,
-        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
-      );
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  Category map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Category(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}id'],
-      )!,
-      name: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}name'],
-      )!,
-      createdAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}created_at'],
-      )!,
-      updatedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}updated_at'],
-      )!,
-    );
-  }
-
-  @override
-  $CategoriesTable createAlias(String alias) {
-    return $CategoriesTable(attachedDatabase, alias);
-  }
-}
-
-class Category extends DataClass implements Insertable<Category> {
-  final int id;
-  final String name;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  const Category({
-    required this.id,
-    required this.name,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['name'] = Variable<String>(name);
-    map['created_at'] = Variable<DateTime>(createdAt);
-    map['updated_at'] = Variable<DateTime>(updatedAt);
-    return map;
-  }
-
-  CategoriesCompanion toCompanion(bool nullToAbsent) {
-    return CategoriesCompanion(
-      id: Value(id),
-      name: Value(name),
-      createdAt: Value(createdAt),
-      updatedAt: Value(updatedAt),
-    );
-  }
-
-  factory Category.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Category(
-      id: serializer.fromJson<int>(json['id']),
-      name: serializer.fromJson<String>(json['name']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
-      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'name': serializer.toJson<String>(name),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
-      'updatedAt': serializer.toJson<DateTime>(updatedAt),
-    };
-  }
-
-  Category copyWith({
-    int? id,
-    String? name,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-  }) => Category(
-    id: id ?? this.id,
-    name: name ?? this.name,
-    createdAt: createdAt ?? this.createdAt,
-    updatedAt: updatedAt ?? this.updatedAt,
-  );
-  Category copyWithCompanion(CategoriesCompanion data) {
-    return Category(
-      id: data.id.present ? data.id.value : this.id,
-      name: data.name.present ? data.name.value : this.name,
-      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('Category(')
-          ..write('id: $id, ')
-          ..write('name: $name, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(id, name, createdAt, updatedAt);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Category &&
-          other.id == this.id &&
-          other.name == this.name &&
-          other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
-}
-
-class CategoriesCompanion extends UpdateCompanion<Category> {
-  final Value<int> id;
-  final Value<String> name;
-  final Value<DateTime> createdAt;
-  final Value<DateTime> updatedAt;
-  const CategoriesCompanion({
-    this.id = const Value.absent(),
-    this.name = const Value.absent(),
-    this.createdAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
-  });
-  CategoriesCompanion.insert({
-    this.id = const Value.absent(),
-    required String name,
-    this.createdAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
-  }) : name = Value(name);
-  static Insertable<Category> custom({
-    Expression<int>? id,
-    Expression<String>? name,
-    Expression<DateTime>? createdAt,
-    Expression<DateTime>? updatedAt,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (name != null) 'name': name,
-      if (createdAt != null) 'created_at': createdAt,
-      if (updatedAt != null) 'updated_at': updatedAt,
-    });
-  }
-
-  CategoriesCompanion copyWith({
-    Value<int>? id,
-    Value<String>? name,
-    Value<DateTime>? createdAt,
-    Value<DateTime>? updatedAt,
-  }) {
-    return CategoriesCompanion(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (name.present) {
-      map['name'] = Variable<String>(name.value);
-    }
-    if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
-    }
-    if (updatedAt.present) {
-      map['updated_at'] = Variable<DateTime>(updatedAt.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('CategoriesCompanion(')
-          ..write('id: $id, ')
-          ..write('name: $name, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
-          ..write(')'))
-        .toString();
-  }
-}
-
 class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -333,20 +34,6 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
-  );
-  static const VerificationMeta _categoryIdMeta = const VerificationMeta(
-    'categoryId',
-  );
-  @override
-  late final GeneratedColumn<int> categoryId = GeneratedColumn<int>(
-    'category_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES categories (id) ON UPDATE CASCADE ON DELETE CASCADE',
-    ),
   );
   static const VerificationMeta _priceMeta = const VerificationMeta('price');
   @override
@@ -396,7 +83,6 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
   List<GeneratedColumn> get $columns => [
     id,
     name,
-    categoryId,
     price,
     priority,
     createdAt,
@@ -424,14 +110,6 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
       );
     } else if (isInserting) {
       context.missing(_nameMeta);
-    }
-    if (data.containsKey('category_id')) {
-      context.handle(
-        _categoryIdMeta,
-        categoryId.isAcceptableOrUnknown(data['category_id']!, _categoryIdMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_categoryIdMeta);
     }
     if (data.containsKey('price')) {
       context.handle(
@@ -478,10 +156,6 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         DriftSqlType.string,
         data['${effectivePrefix}name'],
       )!,
-      categoryId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}category_id'],
-      )!,
       price: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}price'],
@@ -510,7 +184,6 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
 class Product extends DataClass implements Insertable<Product> {
   final int id;
   final String name;
-  final int categoryId;
   final String price;
   final int priority;
   final DateTime createdAt;
@@ -518,7 +191,6 @@ class Product extends DataClass implements Insertable<Product> {
   const Product({
     required this.id,
     required this.name,
-    required this.categoryId,
     required this.price,
     required this.priority,
     required this.createdAt,
@@ -529,7 +201,6 @@ class Product extends DataClass implements Insertable<Product> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
-    map['category_id'] = Variable<int>(categoryId);
     map['price'] = Variable<String>(price);
     map['priority'] = Variable<int>(priority);
     map['created_at'] = Variable<DateTime>(createdAt);
@@ -541,7 +212,6 @@ class Product extends DataClass implements Insertable<Product> {
     return ProductsCompanion(
       id: Value(id),
       name: Value(name),
-      categoryId: Value(categoryId),
       price: Value(price),
       priority: Value(priority),
       createdAt: Value(createdAt),
@@ -557,7 +227,6 @@ class Product extends DataClass implements Insertable<Product> {
     return Product(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
-      categoryId: serializer.fromJson<int>(json['categoryId']),
       price: serializer.fromJson<String>(json['price']),
       priority: serializer.fromJson<int>(json['priority']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -570,7 +239,6 @@ class Product extends DataClass implements Insertable<Product> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
-      'categoryId': serializer.toJson<int>(categoryId),
       'price': serializer.toJson<String>(price),
       'priority': serializer.toJson<int>(priority),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -581,7 +249,6 @@ class Product extends DataClass implements Insertable<Product> {
   Product copyWith({
     int? id,
     String? name,
-    int? categoryId,
     String? price,
     int? priority,
     DateTime? createdAt,
@@ -589,7 +256,6 @@ class Product extends DataClass implements Insertable<Product> {
   }) => Product(
     id: id ?? this.id,
     name: name ?? this.name,
-    categoryId: categoryId ?? this.categoryId,
     price: price ?? this.price,
     priority: priority ?? this.priority,
     createdAt: createdAt ?? this.createdAt,
@@ -599,9 +265,6 @@ class Product extends DataClass implements Insertable<Product> {
     return Product(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
-      categoryId: data.categoryId.present
-          ? data.categoryId.value
-          : this.categoryId,
       price: data.price.present ? data.price.value : this.price,
       priority: data.priority.present ? data.priority.value : this.priority,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -614,7 +277,6 @@ class Product extends DataClass implements Insertable<Product> {
     return (StringBuffer('Product(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('categoryId: $categoryId, ')
           ..write('price: $price, ')
           ..write('priority: $priority, ')
           ..write('createdAt: $createdAt, ')
@@ -625,14 +287,13 @@ class Product extends DataClass implements Insertable<Product> {
 
   @override
   int get hashCode =>
-      Object.hash(id, name, categoryId, price, priority, createdAt, updatedAt);
+      Object.hash(id, name, price, priority, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Product &&
           other.id == this.id &&
           other.name == this.name &&
-          other.categoryId == this.categoryId &&
           other.price == this.price &&
           other.priority == this.priority &&
           other.createdAt == this.createdAt &&
@@ -642,7 +303,6 @@ class Product extends DataClass implements Insertable<Product> {
 class ProductsCompanion extends UpdateCompanion<Product> {
   final Value<int> id;
   final Value<String> name;
-  final Value<int> categoryId;
   final Value<String> price;
   final Value<int> priority;
   final Value<DateTime> createdAt;
@@ -650,7 +310,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   const ProductsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
-    this.categoryId = const Value.absent(),
     this.price = const Value.absent(),
     this.priority = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -659,19 +318,16 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   ProductsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
-    required int categoryId,
     required String price,
     required int priority,
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : name = Value(name),
-       categoryId = Value(categoryId),
        price = Value(price),
        priority = Value(priority);
   static Insertable<Product> custom({
     Expression<int>? id,
     Expression<String>? name,
-    Expression<int>? categoryId,
     Expression<String>? price,
     Expression<int>? priority,
     Expression<DateTime>? createdAt,
@@ -680,7 +336,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
-      if (categoryId != null) 'category_id': categoryId,
       if (price != null) 'price': price,
       if (priority != null) 'priority': priority,
       if (createdAt != null) 'created_at': createdAt,
@@ -691,7 +346,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   ProductsCompanion copyWith({
     Value<int>? id,
     Value<String>? name,
-    Value<int>? categoryId,
     Value<String>? price,
     Value<int>? priority,
     Value<DateTime>? createdAt,
@@ -700,7 +354,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     return ProductsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
-      categoryId: categoryId ?? this.categoryId,
       price: price ?? this.price,
       priority: priority ?? this.priority,
       createdAt: createdAt ?? this.createdAt,
@@ -716,9 +369,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
-    }
-    if (categoryId.present) {
-      map['category_id'] = Variable<int>(categoryId.value);
     }
     if (price.present) {
       map['price'] = Variable<String>(price.value);
@@ -740,7 +390,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     return (StringBuffer('ProductsCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('categoryId: $categoryId, ')
           ..write('price: $price, ')
           ..write('priority: $priority, ')
           ..write('createdAt: $createdAt, ')
@@ -1333,12 +982,12 @@ class $SaleReceiptsTable extends SaleReceipts
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _orederNoMeta = const VerificationMeta(
-    'orederNo',
+  static const VerificationMeta _orderNoMeta = const VerificationMeta(
+    'orderNo',
   );
   @override
-  late final GeneratedColumn<String> orederNo = GeneratedColumn<String>(
-    'oreder_no',
+  late final GeneratedColumn<String> orderNo = GeneratedColumn<String>(
+    'order_no',
     aliasedName,
     false,
     type: DriftSqlType.string,
@@ -1430,7 +1079,7 @@ class $SaleReceiptsTable extends SaleReceipts
     id,
     customerName,
     preparedBy,
-    orederNo,
+    orderNo,
     billItems,
     paymentMode,
     paymentStatus,
@@ -1471,13 +1120,13 @@ class $SaleReceiptsTable extends SaleReceipts
         preparedBy.isAcceptableOrUnknown(data['prepared_by']!, _preparedByMeta),
       );
     }
-    if (data.containsKey('oreder_no')) {
+    if (data.containsKey('order_no')) {
       context.handle(
-        _orederNoMeta,
-        orederNo.isAcceptableOrUnknown(data['oreder_no']!, _orederNoMeta),
+        _orderNoMeta,
+        orderNo.isAcceptableOrUnknown(data['order_no']!, _orderNoMeta),
       );
     } else if (isInserting) {
-      context.missing(_orederNoMeta);
+      context.missing(_orderNoMeta);
     }
     if (data.containsKey('bill_items')) {
       context.handle(
@@ -1555,9 +1204,9 @@ class $SaleReceiptsTable extends SaleReceipts
         DriftSqlType.string,
         data['${effectivePrefix}prepared_by'],
       ),
-      orederNo: attachedDatabase.typeMapping.read(
+      orderNo: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}oreder_no'],
+        data['${effectivePrefix}order_no'],
       )!,
       billItems: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -1600,7 +1249,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
   final String id;
   final String? customerName;
   final String? preparedBy;
-  final String orederNo;
+  final String orderNo;
   final String billItems;
   final String paymentMode;
   final String paymentStatus;
@@ -1612,7 +1261,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
     required this.id,
     this.customerName,
     this.preparedBy,
-    required this.orederNo,
+    required this.orderNo,
     required this.billItems,
     required this.paymentMode,
     required this.paymentStatus,
@@ -1631,7 +1280,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
     if (!nullToAbsent || preparedBy != null) {
       map['prepared_by'] = Variable<String>(preparedBy);
     }
-    map['oreder_no'] = Variable<String>(orederNo);
+    map['order_no'] = Variable<String>(orderNo);
     map['bill_items'] = Variable<String>(billItems);
     map['payment_mode'] = Variable<String>(paymentMode);
     map['payment_status'] = Variable<String>(paymentStatus);
@@ -1653,7 +1302,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
       preparedBy: preparedBy == null && nullToAbsent
           ? const Value.absent()
           : Value(preparedBy),
-      orederNo: Value(orederNo),
+      orderNo: Value(orderNo),
       billItems: Value(billItems),
       paymentMode: Value(paymentMode),
       paymentStatus: Value(paymentStatus),
@@ -1675,7 +1324,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
       id: serializer.fromJson<String>(json['id']),
       customerName: serializer.fromJson<String?>(json['customerName']),
       preparedBy: serializer.fromJson<String?>(json['preparedBy']),
-      orederNo: serializer.fromJson<String>(json['orederNo']),
+      orderNo: serializer.fromJson<String>(json['orderNo']),
       billItems: serializer.fromJson<String>(json['billItems']),
       paymentMode: serializer.fromJson<String>(json['paymentMode']),
       paymentStatus: serializer.fromJson<String>(json['paymentStatus']),
@@ -1692,7 +1341,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
       'id': serializer.toJson<String>(id),
       'customerName': serializer.toJson<String?>(customerName),
       'preparedBy': serializer.toJson<String?>(preparedBy),
-      'orederNo': serializer.toJson<String>(orederNo),
+      'orderNo': serializer.toJson<String>(orderNo),
       'billItems': serializer.toJson<String>(billItems),
       'paymentMode': serializer.toJson<String>(paymentMode),
       'paymentStatus': serializer.toJson<String>(paymentStatus),
@@ -1707,7 +1356,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
     String? id,
     Value<String?> customerName = const Value.absent(),
     Value<String?> preparedBy = const Value.absent(),
-    String? orederNo,
+    String? orderNo,
     String? billItems,
     String? paymentMode,
     String? paymentStatus,
@@ -1719,7 +1368,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
     id: id ?? this.id,
     customerName: customerName.present ? customerName.value : this.customerName,
     preparedBy: preparedBy.present ? preparedBy.value : this.preparedBy,
-    orederNo: orederNo ?? this.orederNo,
+    orderNo: orderNo ?? this.orderNo,
     billItems: billItems ?? this.billItems,
     paymentMode: paymentMode ?? this.paymentMode,
     paymentStatus: paymentStatus ?? this.paymentStatus,
@@ -1737,7 +1386,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
       preparedBy: data.preparedBy.present
           ? data.preparedBy.value
           : this.preparedBy,
-      orederNo: data.orederNo.present ? data.orederNo.value : this.orederNo,
+      orderNo: data.orderNo.present ? data.orderNo.value : this.orderNo,
       billItems: data.billItems.present ? data.billItems.value : this.billItems,
       paymentMode: data.paymentMode.present
           ? data.paymentMode.value
@@ -1762,7 +1411,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
           ..write('id: $id, ')
           ..write('customerName: $customerName, ')
           ..write('preparedBy: $preparedBy, ')
-          ..write('orederNo: $orederNo, ')
+          ..write('orderNo: $orderNo, ')
           ..write('billItems: $billItems, ')
           ..write('paymentMode: $paymentMode, ')
           ..write('paymentStatus: $paymentStatus, ')
@@ -1779,7 +1428,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
     id,
     customerName,
     preparedBy,
-    orederNo,
+    orderNo,
     billItems,
     paymentMode,
     paymentStatus,
@@ -1795,7 +1444,7 @@ class SaleReceipt extends DataClass implements Insertable<SaleReceipt> {
           other.id == this.id &&
           other.customerName == this.customerName &&
           other.preparedBy == this.preparedBy &&
-          other.orederNo == this.orederNo &&
+          other.orderNo == this.orderNo &&
           other.billItems == this.billItems &&
           other.paymentMode == this.paymentMode &&
           other.paymentStatus == this.paymentStatus &&
@@ -1809,7 +1458,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
   final Value<String> id;
   final Value<String?> customerName;
   final Value<String?> preparedBy;
-  final Value<String> orederNo;
+  final Value<String> orderNo;
   final Value<String> billItems;
   final Value<String> paymentMode;
   final Value<String> paymentStatus;
@@ -1822,7 +1471,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
     this.id = const Value.absent(),
     this.customerName = const Value.absent(),
     this.preparedBy = const Value.absent(),
-    this.orederNo = const Value.absent(),
+    this.orderNo = const Value.absent(),
     this.billItems = const Value.absent(),
     this.paymentMode = const Value.absent(),
     this.paymentStatus = const Value.absent(),
@@ -1836,7 +1485,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
     required String id,
     this.customerName = const Value.absent(),
     this.preparedBy = const Value.absent(),
-    required String orederNo,
+    required String orderNo,
     required String billItems,
     this.paymentMode = const Value.absent(),
     this.paymentStatus = const Value.absent(),
@@ -1846,14 +1495,14 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
-       orederNo = Value(orederNo),
+       orderNo = Value(orderNo),
        billItems = Value(billItems),
        totalAmount = Value(totalAmount);
   static Insertable<SaleReceipt> custom({
     Expression<String>? id,
     Expression<String>? customerName,
     Expression<String>? preparedBy,
-    Expression<String>? orederNo,
+    Expression<String>? orderNo,
     Expression<String>? billItems,
     Expression<String>? paymentMode,
     Expression<String>? paymentStatus,
@@ -1867,7 +1516,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
       if (id != null) 'id': id,
       if (customerName != null) 'customer_name': customerName,
       if (preparedBy != null) 'prepared_by': preparedBy,
-      if (orederNo != null) 'oreder_no': orederNo,
+      if (orderNo != null) 'order_no': orderNo,
       if (billItems != null) 'bill_items': billItems,
       if (paymentMode != null) 'payment_mode': paymentMode,
       if (paymentStatus != null) 'payment_status': paymentStatus,
@@ -1883,7 +1532,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
     Value<String>? id,
     Value<String?>? customerName,
     Value<String?>? preparedBy,
-    Value<String>? orederNo,
+    Value<String>? orderNo,
     Value<String>? billItems,
     Value<String>? paymentMode,
     Value<String>? paymentStatus,
@@ -1897,7 +1546,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
       id: id ?? this.id,
       customerName: customerName ?? this.customerName,
       preparedBy: preparedBy ?? this.preparedBy,
-      orederNo: orederNo ?? this.orederNo,
+      orderNo: orderNo ?? this.orderNo,
       billItems: billItems ?? this.billItems,
       paymentMode: paymentMode ?? this.paymentMode,
       paymentStatus: paymentStatus ?? this.paymentStatus,
@@ -1921,8 +1570,8 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
     if (preparedBy.present) {
       map['prepared_by'] = Variable<String>(preparedBy.value);
     }
-    if (orederNo.present) {
-      map['oreder_no'] = Variable<String>(orederNo.value);
+    if (orderNo.present) {
+      map['order_no'] = Variable<String>(orderNo.value);
     }
     if (billItems.present) {
       map['bill_items'] = Variable<String>(billItems.value);
@@ -1957,7 +1606,7 @@ class SaleReceiptsCompanion extends UpdateCompanion<SaleReceipt> {
           ..write('id: $id, ')
           ..write('customerName: $customerName, ')
           ..write('preparedBy: $preparedBy, ')
-          ..write('orederNo: $orederNo, ')
+          ..write('orderNo: $orderNo, ')
           ..write('billItems: $billItems, ')
           ..write('paymentMode: $paymentMode, ')
           ..write('paymentStatus: $paymentStatus, ')
@@ -2484,93 +2133,110 @@ class UsersCompanion extends UpdateCompanion<User> {
   }
 }
 
-class $ChecklistsTable extends Checklists
-    with TableInfo<$ChecklistsTable, Checklist> {
+class $PrintSettingsTable extends PrintSettings
+    with TableInfo<$PrintSettingsTable, PrintSetting> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $ChecklistsTable(this.attachedDatabase, [this._alias]);
+  $PrintSettingsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
     'id',
     aliasedName,
     false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _titleMeta = const VerificationMeta('title');
-  @override
-  late final GeneratedColumn<String> title = GeneratedColumn<String>(
-    'title',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _completedMeta = const VerificationMeta(
-    'completed',
-  );
-  @override
-  late final GeneratedColumn<int> completed = GeneratedColumn<int>(
-    'completed',
-    aliasedName,
-    false,
+    hasAutoIncrement: true,
     type: DriftSqlType.int,
     requiredDuringInsert: false,
-    defaultValue: const Constant(0),
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
   );
-  static const VerificationMeta _totalMeta = const VerificationMeta('total');
-  @override
-  late final GeneratedColumn<int> total = GeneratedColumn<int>(
-    'total',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0),
-  );
-  static const VerificationMeta _colorValueMeta = const VerificationMeta(
-    'colorValue',
+  static const VerificationMeta _businessNameMeta = const VerificationMeta(
+    'businessName',
   );
   @override
-  late final GeneratedColumn<int> colorValue = GeneratedColumn<int>(
-    'color_value',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0),
-  );
-  static const VerificationMeta _iconNameMeta = const VerificationMeta(
-    'iconName',
-  );
-  @override
-  late final GeneratedColumn<String> iconName = GeneratedColumn<String>(
-    'icon_name',
+  late final GeneratedColumn<String> businessName = GeneratedColumn<String>(
+    'business_name',
     aliasedName,
     true,
-    additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 0,
-      maxTextLength: 64,
-    ),
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _isActiveMeta = const VerificationMeta(
-    'isActive',
+  static const VerificationMeta _placeAddressMeta = const VerificationMeta(
+    'placeAddress',
   );
   @override
-  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
-    'is_active',
+  late final GeneratedColumn<String> placeAddress = GeneratedColumn<String>(
+    'place_address',
     aliasedName,
-    false,
-    type: DriftSqlType.bool,
+    true,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("is_active" IN (0, 1))',
-    ),
-    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _headerText1Meta = const VerificationMeta(
+    'headerText1',
+  );
+  @override
+  late final GeneratedColumn<String> headerText1 = GeneratedColumn<String>(
+    'header_text1',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _headerText2Meta = const VerificationMeta(
+    'headerText2',
+  );
+  @override
+  late final GeneratedColumn<String> headerText2 = GeneratedColumn<String>(
+    'header_text2',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _gstNoMeta = const VerificationMeta('gstNo');
+  @override
+  late final GeneratedColumn<String> gstNo = GeneratedColumn<String>(
+    'gst_no',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _invoiceTitleMeta = const VerificationMeta(
+    'invoiceTitle',
+  );
+  @override
+  late final GeneratedColumn<String> invoiceTitle = GeneratedColumn<String>(
+    'invoice_title',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _footerText1Meta = const VerificationMeta(
+    'footerText1',
+  );
+  @override
+  late final GeneratedColumn<String> footerText1 = GeneratedColumn<String>(
+    'footer_text1',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _footerText2Meta = const VerificationMeta(
+    'footerText2',
+  );
+  @override
+  late final GeneratedColumn<String> footerText2 = GeneratedColumn<String>(
+    'footer_text2',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
@@ -2581,8 +2247,7 @@ class $ChecklistsTable extends Checklists
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    defaultValue: currentDateAndTime,
+    requiredDuringInsert: true,
   );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
@@ -2593,18 +2258,19 @@ class $ChecklistsTable extends Checklists
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    defaultValue: currentDateAndTime,
+    requiredDuringInsert: true,
   );
   @override
   List<GeneratedColumn> get $columns => [
     id,
-    title,
-    completed,
-    total,
-    colorValue,
-    iconName,
-    isActive,
+    businessName,
+    placeAddress,
+    headerText1,
+    headerText2,
+    gstNo,
+    invoiceTitle,
+    footerText1,
+    footerText2,
     createdAt,
     updatedAt,
   ];
@@ -2612,575 +2278,84 @@ class $ChecklistsTable extends Checklists
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'checklists';
+  static const String $name = 'print_settings';
   @override
   VerificationContext validateIntegrity(
-    Insertable<Checklist> instance, {
+    Insertable<PrintSetting> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
     }
-    if (data.containsKey('title')) {
+    if (data.containsKey('business_name')) {
       context.handle(
-        _titleMeta,
-        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_titleMeta);
-    }
-    if (data.containsKey('completed')) {
-      context.handle(
-        _completedMeta,
-        completed.isAcceptableOrUnknown(data['completed']!, _completedMeta),
-      );
-    }
-    if (data.containsKey('total')) {
-      context.handle(
-        _totalMeta,
-        total.isAcceptableOrUnknown(data['total']!, _totalMeta),
-      );
-    }
-    if (data.containsKey('color_value')) {
-      context.handle(
-        _colorValueMeta,
-        colorValue.isAcceptableOrUnknown(data['color_value']!, _colorValueMeta),
-      );
-    }
-    if (data.containsKey('icon_name')) {
-      context.handle(
-        _iconNameMeta,
-        iconName.isAcceptableOrUnknown(data['icon_name']!, _iconNameMeta),
-      );
-    }
-    if (data.containsKey('is_active')) {
-      context.handle(
-        _isActiveMeta,
-        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
-      );
-    }
-    if (data.containsKey('created_at')) {
-      context.handle(
-        _createdAtMeta,
-        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
-      );
-    }
-    if (data.containsKey('updated_at')) {
-      context.handle(
-        _updatedAtMeta,
-        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
-      );
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  Checklist map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Checklist(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}id'],
-      )!,
-      title: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}title'],
-      )!,
-      completed: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}completed'],
-      )!,
-      total: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}total'],
-      )!,
-      colorValue: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}color_value'],
-      )!,
-      iconName: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}icon_name'],
-      ),
-      isActive: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}is_active'],
-      )!,
-      createdAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}created_at'],
-      )!,
-      updatedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}updated_at'],
-      )!,
-    );
-  }
-
-  @override
-  $ChecklistsTable createAlias(String alias) {
-    return $ChecklistsTable(attachedDatabase, alias);
-  }
-}
-
-class Checklist extends DataClass implements Insertable<Checklist> {
-  final String id;
-  final String title;
-  final int completed;
-  final int total;
-  final int colorValue;
-  final String? iconName;
-  final bool isActive;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  const Checklist({
-    required this.id,
-    required this.title,
-    required this.completed,
-    required this.total,
-    required this.colorValue,
-    this.iconName,
-    required this.isActive,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<String>(id);
-    map['title'] = Variable<String>(title);
-    map['completed'] = Variable<int>(completed);
-    map['total'] = Variable<int>(total);
-    map['color_value'] = Variable<int>(colorValue);
-    if (!nullToAbsent || iconName != null) {
-      map['icon_name'] = Variable<String>(iconName);
-    }
-    map['is_active'] = Variable<bool>(isActive);
-    map['created_at'] = Variable<DateTime>(createdAt);
-    map['updated_at'] = Variable<DateTime>(updatedAt);
-    return map;
-  }
-
-  ChecklistsCompanion toCompanion(bool nullToAbsent) {
-    return ChecklistsCompanion(
-      id: Value(id),
-      title: Value(title),
-      completed: Value(completed),
-      total: Value(total),
-      colorValue: Value(colorValue),
-      iconName: iconName == null && nullToAbsent
-          ? const Value.absent()
-          : Value(iconName),
-      isActive: Value(isActive),
-      createdAt: Value(createdAt),
-      updatedAt: Value(updatedAt),
-    );
-  }
-
-  factory Checklist.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Checklist(
-      id: serializer.fromJson<String>(json['id']),
-      title: serializer.fromJson<String>(json['title']),
-      completed: serializer.fromJson<int>(json['completed']),
-      total: serializer.fromJson<int>(json['total']),
-      colorValue: serializer.fromJson<int>(json['colorValue']),
-      iconName: serializer.fromJson<String?>(json['iconName']),
-      isActive: serializer.fromJson<bool>(json['isActive']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
-      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
-      'title': serializer.toJson<String>(title),
-      'completed': serializer.toJson<int>(completed),
-      'total': serializer.toJson<int>(total),
-      'colorValue': serializer.toJson<int>(colorValue),
-      'iconName': serializer.toJson<String?>(iconName),
-      'isActive': serializer.toJson<bool>(isActive),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
-      'updatedAt': serializer.toJson<DateTime>(updatedAt),
-    };
-  }
-
-  Checklist copyWith({
-    String? id,
-    String? title,
-    int? completed,
-    int? total,
-    int? colorValue,
-    Value<String?> iconName = const Value.absent(),
-    bool? isActive,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-  }) => Checklist(
-    id: id ?? this.id,
-    title: title ?? this.title,
-    completed: completed ?? this.completed,
-    total: total ?? this.total,
-    colorValue: colorValue ?? this.colorValue,
-    iconName: iconName.present ? iconName.value : this.iconName,
-    isActive: isActive ?? this.isActive,
-    createdAt: createdAt ?? this.createdAt,
-    updatedAt: updatedAt ?? this.updatedAt,
-  );
-  Checklist copyWithCompanion(ChecklistsCompanion data) {
-    return Checklist(
-      id: data.id.present ? data.id.value : this.id,
-      title: data.title.present ? data.title.value : this.title,
-      completed: data.completed.present ? data.completed.value : this.completed,
-      total: data.total.present ? data.total.value : this.total,
-      colorValue: data.colorValue.present
-          ? data.colorValue.value
-          : this.colorValue,
-      iconName: data.iconName.present ? data.iconName.value : this.iconName,
-      isActive: data.isActive.present ? data.isActive.value : this.isActive,
-      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('Checklist(')
-          ..write('id: $id, ')
-          ..write('title: $title, ')
-          ..write('completed: $completed, ')
-          ..write('total: $total, ')
-          ..write('colorValue: $colorValue, ')
-          ..write('iconName: $iconName, ')
-          ..write('isActive: $isActive, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    id,
-    title,
-    completed,
-    total,
-    colorValue,
-    iconName,
-    isActive,
-    createdAt,
-    updatedAt,
-  );
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Checklist &&
-          other.id == this.id &&
-          other.title == this.title &&
-          other.completed == this.completed &&
-          other.total == this.total &&
-          other.colorValue == this.colorValue &&
-          other.iconName == this.iconName &&
-          other.isActive == this.isActive &&
-          other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
-}
-
-class ChecklistsCompanion extends UpdateCompanion<Checklist> {
-  final Value<String> id;
-  final Value<String> title;
-  final Value<int> completed;
-  final Value<int> total;
-  final Value<int> colorValue;
-  final Value<String?> iconName;
-  final Value<bool> isActive;
-  final Value<DateTime> createdAt;
-  final Value<DateTime> updatedAt;
-  final Value<int> rowid;
-  const ChecklistsCompanion({
-    this.id = const Value.absent(),
-    this.title = const Value.absent(),
-    this.completed = const Value.absent(),
-    this.total = const Value.absent(),
-    this.colorValue = const Value.absent(),
-    this.iconName = const Value.absent(),
-    this.isActive = const Value.absent(),
-    this.createdAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  ChecklistsCompanion.insert({
-    required String id,
-    required String title,
-    this.completed = const Value.absent(),
-    this.total = const Value.absent(),
-    this.colorValue = const Value.absent(),
-    this.iconName = const Value.absent(),
-    this.isActive = const Value.absent(),
-    this.createdAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
-    this.rowid = const Value.absent(),
-  }) : id = Value(id),
-       title = Value(title);
-  static Insertable<Checklist> custom({
-    Expression<String>? id,
-    Expression<String>? title,
-    Expression<int>? completed,
-    Expression<int>? total,
-    Expression<int>? colorValue,
-    Expression<String>? iconName,
-    Expression<bool>? isActive,
-    Expression<DateTime>? createdAt,
-    Expression<DateTime>? updatedAt,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (title != null) 'title': title,
-      if (completed != null) 'completed': completed,
-      if (total != null) 'total': total,
-      if (colorValue != null) 'color_value': colorValue,
-      if (iconName != null) 'icon_name': iconName,
-      if (isActive != null) 'is_active': isActive,
-      if (createdAt != null) 'created_at': createdAt,
-      if (updatedAt != null) 'updated_at': updatedAt,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  ChecklistsCompanion copyWith({
-    Value<String>? id,
-    Value<String>? title,
-    Value<int>? completed,
-    Value<int>? total,
-    Value<int>? colorValue,
-    Value<String?>? iconName,
-    Value<bool>? isActive,
-    Value<DateTime>? createdAt,
-    Value<DateTime>? updatedAt,
-    Value<int>? rowid,
-  }) {
-    return ChecklistsCompanion(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      completed: completed ?? this.completed,
-      total: total ?? this.total,
-      colorValue: colorValue ?? this.colorValue,
-      iconName: iconName ?? this.iconName,
-      isActive: isActive ?? this.isActive,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<String>(id.value);
-    }
-    if (title.present) {
-      map['title'] = Variable<String>(title.value);
-    }
-    if (completed.present) {
-      map['completed'] = Variable<int>(completed.value);
-    }
-    if (total.present) {
-      map['total'] = Variable<int>(total.value);
-    }
-    if (colorValue.present) {
-      map['color_value'] = Variable<int>(colorValue.value);
-    }
-    if (iconName.present) {
-      map['icon_name'] = Variable<String>(iconName.value);
-    }
-    if (isActive.present) {
-      map['is_active'] = Variable<bool>(isActive.value);
-    }
-    if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
-    }
-    if (updatedAt.present) {
-      map['updated_at'] = Variable<DateTime>(updatedAt.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('ChecklistsCompanion(')
-          ..write('id: $id, ')
-          ..write('title: $title, ')
-          ..write('completed: $completed, ')
-          ..write('total: $total, ')
-          ..write('colorValue: $colorValue, ')
-          ..write('iconName: $iconName, ')
-          ..write('isActive: $isActive, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $ChecklistTasksTable extends ChecklistTasks
-    with TableInfo<$ChecklistTasksTable, ChecklistTask> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $ChecklistTasksTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-    'id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _checklistIdMeta = const VerificationMeta(
-    'checklistId',
-  );
-  @override
-  late final GeneratedColumn<String> checklistId = GeneratedColumn<String>(
-    'checklist_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL REFERENCES checklists(id)',
-  );
-  static const VerificationMeta _taskTextMeta = const VerificationMeta(
-    'taskText',
-  );
-  @override
-  late final GeneratedColumn<String> taskText = GeneratedColumn<String>(
-    'task_text',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _doneMeta = const VerificationMeta('done');
-  @override
-  late final GeneratedColumn<bool> done = GeneratedColumn<bool>(
-    'done',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("done" IN (0, 1))',
-    ),
-    defaultValue: const Constant(false),
-  );
-  static const VerificationMeta _positionMeta = const VerificationMeta(
-    'position',
-  );
-  @override
-  late final GeneratedColumn<int> position = GeneratedColumn<int>(
-    'position',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0),
-  );
-  static const VerificationMeta _createdAtMeta = const VerificationMeta(
-    'createdAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-    'created_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    defaultValue: currentDateAndTime,
-  );
-  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
-    'updatedAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-    'updated_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    defaultValue: currentDateAndTime,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [
-    id,
-    checklistId,
-    taskText,
-    done,
-    position,
-    createdAt,
-    updatedAt,
-  ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'checklist_tasks';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<ChecklistTask> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
-    }
-    if (data.containsKey('checklist_id')) {
-      context.handle(
-        _checklistIdMeta,
-        checklistId.isAcceptableOrUnknown(
-          data['checklist_id']!,
-          _checklistIdMeta,
+        _businessNameMeta,
+        businessName.isAcceptableOrUnknown(
+          data['business_name']!,
+          _businessNameMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_checklistIdMeta);
     }
-    if (data.containsKey('task_text')) {
+    if (data.containsKey('place_address')) {
       context.handle(
-        _taskTextMeta,
-        taskText.isAcceptableOrUnknown(data['task_text']!, _taskTextMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_taskTextMeta);
-    }
-    if (data.containsKey('done')) {
-      context.handle(
-        _doneMeta,
-        done.isAcceptableOrUnknown(data['done']!, _doneMeta),
+        _placeAddressMeta,
+        placeAddress.isAcceptableOrUnknown(
+          data['place_address']!,
+          _placeAddressMeta,
+        ),
       );
     }
-    if (data.containsKey('position')) {
+    if (data.containsKey('header_text1')) {
       context.handle(
-        _positionMeta,
-        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+        _headerText1Meta,
+        headerText1.isAcceptableOrUnknown(
+          data['header_text1']!,
+          _headerText1Meta,
+        ),
+      );
+    }
+    if (data.containsKey('header_text2')) {
+      context.handle(
+        _headerText2Meta,
+        headerText2.isAcceptableOrUnknown(
+          data['header_text2']!,
+          _headerText2Meta,
+        ),
+      );
+    }
+    if (data.containsKey('gst_no')) {
+      context.handle(
+        _gstNoMeta,
+        gstNo.isAcceptableOrUnknown(data['gst_no']!, _gstNoMeta),
+      );
+    }
+    if (data.containsKey('invoice_title')) {
+      context.handle(
+        _invoiceTitleMeta,
+        invoiceTitle.isAcceptableOrUnknown(
+          data['invoice_title']!,
+          _invoiceTitleMeta,
+        ),
+      );
+    }
+    if (data.containsKey('footer_text1')) {
+      context.handle(
+        _footerText1Meta,
+        footerText1.isAcceptableOrUnknown(
+          data['footer_text1']!,
+          _footerText1Meta,
+        ),
+      );
+    }
+    if (data.containsKey('footer_text2')) {
+      context.handle(
+        _footerText2Meta,
+        footerText2.isAcceptableOrUnknown(
+          data['footer_text2']!,
+          _footerText2Meta,
+        ),
       );
     }
     if (data.containsKey('created_at')) {
@@ -3188,12 +2363,16 @@ class $ChecklistTasksTable extends ChecklistTasks
         _createdAtMeta,
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
     }
     if (data.containsKey('updated_at')) {
       context.handle(
         _updatedAtMeta,
         updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
     }
     return context;
   }
@@ -3201,29 +2380,45 @@ class $ChecklistTasksTable extends ChecklistTasks
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  ChecklistTask map(Map<String, dynamic> data, {String? tablePrefix}) {
+  PrintSetting map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ChecklistTask(
+    return PrintSetting(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
+        DriftSqlType.int,
         data['${effectivePrefix}id'],
       )!,
-      checklistId: attachedDatabase.typeMapping.read(
+      businessName: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}checklist_id'],
-      )!,
-      taskText: attachedDatabase.typeMapping.read(
+        data['${effectivePrefix}business_name'],
+      ),
+      placeAddress: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}task_text'],
-      )!,
-      done: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}done'],
-      )!,
-      position: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}position'],
-      )!,
+        data['${effectivePrefix}place_address'],
+      ),
+      headerText1: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}header_text1'],
+      ),
+      headerText2: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}header_text2'],
+      ),
+      gstNo: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gst_no'],
+      ),
+      invoiceTitle: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}invoice_title'],
+      ),
+      footerText1: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}footer_text1'],
+      ),
+      footerText2: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}footer_text2'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -3236,64 +2431,116 @@ class $ChecklistTasksTable extends ChecklistTasks
   }
 
   @override
-  $ChecklistTasksTable createAlias(String alias) {
-    return $ChecklistTasksTable(attachedDatabase, alias);
+  $PrintSettingsTable createAlias(String alias) {
+    return $PrintSettingsTable(attachedDatabase, alias);
   }
 }
 
-class ChecklistTask extends DataClass implements Insertable<ChecklistTask> {
-  final String id;
-  final String checklistId;
-  final String taskText;
-  final bool done;
-  final int position;
+class PrintSetting extends DataClass implements Insertable<PrintSetting> {
+  final int id;
+  final String? businessName;
+  final String? placeAddress;
+  final String? headerText1;
+  final String? headerText2;
+  final String? gstNo;
+  final String? invoiceTitle;
+  final String? footerText1;
+  final String? footerText2;
   final DateTime createdAt;
   final DateTime updatedAt;
-  const ChecklistTask({
+  const PrintSetting({
     required this.id,
-    required this.checklistId,
-    required this.taskText,
-    required this.done,
-    required this.position,
+    this.businessName,
+    this.placeAddress,
+    this.headerText1,
+    this.headerText2,
+    this.gstNo,
+    this.invoiceTitle,
+    this.footerText1,
+    this.footerText2,
     required this.createdAt,
     required this.updatedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<String>(id);
-    map['checklist_id'] = Variable<String>(checklistId);
-    map['task_text'] = Variable<String>(taskText);
-    map['done'] = Variable<bool>(done);
-    map['position'] = Variable<int>(position);
+    map['id'] = Variable<int>(id);
+    if (!nullToAbsent || businessName != null) {
+      map['business_name'] = Variable<String>(businessName);
+    }
+    if (!nullToAbsent || placeAddress != null) {
+      map['place_address'] = Variable<String>(placeAddress);
+    }
+    if (!nullToAbsent || headerText1 != null) {
+      map['header_text1'] = Variable<String>(headerText1);
+    }
+    if (!nullToAbsent || headerText2 != null) {
+      map['header_text2'] = Variable<String>(headerText2);
+    }
+    if (!nullToAbsent || gstNo != null) {
+      map['gst_no'] = Variable<String>(gstNo);
+    }
+    if (!nullToAbsent || invoiceTitle != null) {
+      map['invoice_title'] = Variable<String>(invoiceTitle);
+    }
+    if (!nullToAbsent || footerText1 != null) {
+      map['footer_text1'] = Variable<String>(footerText1);
+    }
+    if (!nullToAbsent || footerText2 != null) {
+      map['footer_text2'] = Variable<String>(footerText2);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
 
-  ChecklistTasksCompanion toCompanion(bool nullToAbsent) {
-    return ChecklistTasksCompanion(
+  PrintSettingsCompanion toCompanion(bool nullToAbsent) {
+    return PrintSettingsCompanion(
       id: Value(id),
-      checklistId: Value(checklistId),
-      taskText: Value(taskText),
-      done: Value(done),
-      position: Value(position),
+      businessName: businessName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(businessName),
+      placeAddress: placeAddress == null && nullToAbsent
+          ? const Value.absent()
+          : Value(placeAddress),
+      headerText1: headerText1 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(headerText1),
+      headerText2: headerText2 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(headerText2),
+      gstNo: gstNo == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gstNo),
+      invoiceTitle: invoiceTitle == null && nullToAbsent
+          ? const Value.absent()
+          : Value(invoiceTitle),
+      footerText1: footerText1 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(footerText1),
+      footerText2: footerText2 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(footerText2),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
   }
 
-  factory ChecklistTask.fromJson(
+  factory PrintSetting.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ChecklistTask(
-      id: serializer.fromJson<String>(json['id']),
-      checklistId: serializer.fromJson<String>(json['checklistId']),
-      taskText: serializer.fromJson<String>(json['taskText']),
-      done: serializer.fromJson<bool>(json['done']),
-      position: serializer.fromJson<int>(json['position']),
+    return PrintSetting(
+      id: serializer.fromJson<int>(json['id']),
+      businessName: serializer.fromJson<String?>(json['businessName']),
+      placeAddress: serializer.fromJson<String?>(json['placeAddress']),
+      headerText1: serializer.fromJson<String?>(json['headerText1']),
+      headerText2: serializer.fromJson<String?>(json['headerText2']),
+      gstNo: serializer.fromJson<String?>(json['gstNo']),
+      invoiceTitle: serializer.fromJson<String?>(json['invoiceTitle']),
+      footerText1: serializer.fromJson<String?>(json['footerText1']),
+      footerText2: serializer.fromJson<String?>(json['footerText2']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -3302,42 +2549,70 @@ class ChecklistTask extends DataClass implements Insertable<ChecklistTask> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
-      'checklistId': serializer.toJson<String>(checklistId),
-      'taskText': serializer.toJson<String>(taskText),
-      'done': serializer.toJson<bool>(done),
-      'position': serializer.toJson<int>(position),
+      'id': serializer.toJson<int>(id),
+      'businessName': serializer.toJson<String?>(businessName),
+      'placeAddress': serializer.toJson<String?>(placeAddress),
+      'headerText1': serializer.toJson<String?>(headerText1),
+      'headerText2': serializer.toJson<String?>(headerText2),
+      'gstNo': serializer.toJson<String?>(gstNo),
+      'invoiceTitle': serializer.toJson<String?>(invoiceTitle),
+      'footerText1': serializer.toJson<String?>(footerText1),
+      'footerText2': serializer.toJson<String?>(footerText2),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
 
-  ChecklistTask copyWith({
-    String? id,
-    String? checklistId,
-    String? taskText,
-    bool? done,
-    int? position,
+  PrintSetting copyWith({
+    int? id,
+    Value<String?> businessName = const Value.absent(),
+    Value<String?> placeAddress = const Value.absent(),
+    Value<String?> headerText1 = const Value.absent(),
+    Value<String?> headerText2 = const Value.absent(),
+    Value<String?> gstNo = const Value.absent(),
+    Value<String?> invoiceTitle = const Value.absent(),
+    Value<String?> footerText1 = const Value.absent(),
+    Value<String?> footerText2 = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) => ChecklistTask(
+  }) => PrintSetting(
     id: id ?? this.id,
-    checklistId: checklistId ?? this.checklistId,
-    taskText: taskText ?? this.taskText,
-    done: done ?? this.done,
-    position: position ?? this.position,
+    businessName: businessName.present ? businessName.value : this.businessName,
+    placeAddress: placeAddress.present ? placeAddress.value : this.placeAddress,
+    headerText1: headerText1.present ? headerText1.value : this.headerText1,
+    headerText2: headerText2.present ? headerText2.value : this.headerText2,
+    gstNo: gstNo.present ? gstNo.value : this.gstNo,
+    invoiceTitle: invoiceTitle.present ? invoiceTitle.value : this.invoiceTitle,
+    footerText1: footerText1.present ? footerText1.value : this.footerText1,
+    footerText2: footerText2.present ? footerText2.value : this.footerText2,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
-  ChecklistTask copyWithCompanion(ChecklistTasksCompanion data) {
-    return ChecklistTask(
+  PrintSetting copyWithCompanion(PrintSettingsCompanion data) {
+    return PrintSetting(
       id: data.id.present ? data.id.value : this.id,
-      checklistId: data.checklistId.present
-          ? data.checklistId.value
-          : this.checklistId,
-      taskText: data.taskText.present ? data.taskText.value : this.taskText,
-      done: data.done.present ? data.done.value : this.done,
-      position: data.position.present ? data.position.value : this.position,
+      businessName: data.businessName.present
+          ? data.businessName.value
+          : this.businessName,
+      placeAddress: data.placeAddress.present
+          ? data.placeAddress.value
+          : this.placeAddress,
+      headerText1: data.headerText1.present
+          ? data.headerText1.value
+          : this.headerText1,
+      headerText2: data.headerText2.present
+          ? data.headerText2.value
+          : this.headerText2,
+      gstNo: data.gstNo.present ? data.gstNo.value : this.gstNo,
+      invoiceTitle: data.invoiceTitle.present
+          ? data.invoiceTitle.value
+          : this.invoiceTitle,
+      footerText1: data.footerText1.present
+          ? data.footerText1.value
+          : this.footerText1,
+      footerText2: data.footerText2.present
+          ? data.footerText2.value
+          : this.footerText2,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -3345,12 +2620,16 @@ class ChecklistTask extends DataClass implements Insertable<ChecklistTask> {
 
   @override
   String toString() {
-    return (StringBuffer('ChecklistTask(')
+    return (StringBuffer('PrintSetting(')
           ..write('id: $id, ')
-          ..write('checklistId: $checklistId, ')
-          ..write('taskText: $taskText, ')
-          ..write('done: $done, ')
-          ..write('position: $position, ')
+          ..write('businessName: $businessName, ')
+          ..write('placeAddress: $placeAddress, ')
+          ..write('headerText1: $headerText1, ')
+          ..write('headerText2: $headerText2, ')
+          ..write('gstNo: $gstNo, ')
+          ..write('invoiceTitle: $invoiceTitle, ')
+          ..write('footerText1: $footerText1, ')
+          ..write('footerText2: $footerText2, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -3360,98 +2639,126 @@ class ChecklistTask extends DataClass implements Insertable<ChecklistTask> {
   @override
   int get hashCode => Object.hash(
     id,
-    checklistId,
-    taskText,
-    done,
-    position,
+    businessName,
+    placeAddress,
+    headerText1,
+    headerText2,
+    gstNo,
+    invoiceTitle,
+    footerText1,
+    footerText2,
     createdAt,
     updatedAt,
   );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ChecklistTask &&
+      (other is PrintSetting &&
           other.id == this.id &&
-          other.checklistId == this.checklistId &&
-          other.taskText == this.taskText &&
-          other.done == this.done &&
-          other.position == this.position &&
+          other.businessName == this.businessName &&
+          other.placeAddress == this.placeAddress &&
+          other.headerText1 == this.headerText1 &&
+          other.headerText2 == this.headerText2 &&
+          other.gstNo == this.gstNo &&
+          other.invoiceTitle == this.invoiceTitle &&
+          other.footerText1 == this.footerText1 &&
+          other.footerText2 == this.footerText2 &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
 
-class ChecklistTasksCompanion extends UpdateCompanion<ChecklistTask> {
-  final Value<String> id;
-  final Value<String> checklistId;
-  final Value<String> taskText;
-  final Value<bool> done;
-  final Value<int> position;
+class PrintSettingsCompanion extends UpdateCompanion<PrintSetting> {
+  final Value<int> id;
+  final Value<String?> businessName;
+  final Value<String?> placeAddress;
+  final Value<String?> headerText1;
+  final Value<String?> headerText2;
+  final Value<String?> gstNo;
+  final Value<String?> invoiceTitle;
+  final Value<String?> footerText1;
+  final Value<String?> footerText2;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
-  final Value<int> rowid;
-  const ChecklistTasksCompanion({
+  const PrintSettingsCompanion({
     this.id = const Value.absent(),
-    this.checklistId = const Value.absent(),
-    this.taskText = const Value.absent(),
-    this.done = const Value.absent(),
-    this.position = const Value.absent(),
+    this.businessName = const Value.absent(),
+    this.placeAddress = const Value.absent(),
+    this.headerText1 = const Value.absent(),
+    this.headerText2 = const Value.absent(),
+    this.gstNo = const Value.absent(),
+    this.invoiceTitle = const Value.absent(),
+    this.footerText1 = const Value.absent(),
+    this.footerText2 = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
-  ChecklistTasksCompanion.insert({
-    required String id,
-    required String checklistId,
-    required String taskText,
-    this.done = const Value.absent(),
-    this.position = const Value.absent(),
-    this.createdAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
-    this.rowid = const Value.absent(),
-  }) : id = Value(id),
-       checklistId = Value(checklistId),
-       taskText = Value(taskText);
-  static Insertable<ChecklistTask> custom({
-    Expression<String>? id,
-    Expression<String>? checklistId,
-    Expression<String>? taskText,
-    Expression<bool>? done,
-    Expression<int>? position,
+  PrintSettingsCompanion.insert({
+    this.id = const Value.absent(),
+    this.businessName = const Value.absent(),
+    this.placeAddress = const Value.absent(),
+    this.headerText1 = const Value.absent(),
+    this.headerText2 = const Value.absent(),
+    this.gstNo = const Value.absent(),
+    this.invoiceTitle = const Value.absent(),
+    this.footerText1 = const Value.absent(),
+    this.footerText2 = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+  }) : createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<PrintSetting> custom({
+    Expression<int>? id,
+    Expression<String>? businessName,
+    Expression<String>? placeAddress,
+    Expression<String>? headerText1,
+    Expression<String>? headerText2,
+    Expression<String>? gstNo,
+    Expression<String>? invoiceTitle,
+    Expression<String>? footerText1,
+    Expression<String>? footerText2,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (checklistId != null) 'checklist_id': checklistId,
-      if (taskText != null) 'task_text': taskText,
-      if (done != null) 'done': done,
-      if (position != null) 'position': position,
+      if (businessName != null) 'business_name': businessName,
+      if (placeAddress != null) 'place_address': placeAddress,
+      if (headerText1 != null) 'header_text1': headerText1,
+      if (headerText2 != null) 'header_text2': headerText2,
+      if (gstNo != null) 'gst_no': gstNo,
+      if (invoiceTitle != null) 'invoice_title': invoiceTitle,
+      if (footerText1 != null) 'footer_text1': footerText1,
+      if (footerText2 != null) 'footer_text2': footerText2,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
-  ChecklistTasksCompanion copyWith({
-    Value<String>? id,
-    Value<String>? checklistId,
-    Value<String>? taskText,
-    Value<bool>? done,
-    Value<int>? position,
+  PrintSettingsCompanion copyWith({
+    Value<int>? id,
+    Value<String?>? businessName,
+    Value<String?>? placeAddress,
+    Value<String?>? headerText1,
+    Value<String?>? headerText2,
+    Value<String?>? gstNo,
+    Value<String?>? invoiceTitle,
+    Value<String?>? footerText1,
+    Value<String?>? footerText2,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
-    Value<int>? rowid,
   }) {
-    return ChecklistTasksCompanion(
+    return PrintSettingsCompanion(
       id: id ?? this.id,
-      checklistId: checklistId ?? this.checklistId,
-      taskText: taskText ?? this.taskText,
-      done: done ?? this.done,
-      position: position ?? this.position,
+      businessName: businessName ?? this.businessName,
+      placeAddress: placeAddress ?? this.placeAddress,
+      headerText1: headerText1 ?? this.headerText1,
+      headerText2: headerText2 ?? this.headerText2,
+      gstNo: gstNo ?? this.gstNo,
+      invoiceTitle: invoiceTitle ?? this.invoiceTitle,
+      footerText1: footerText1 ?? this.footerText1,
+      footerText2: footerText2 ?? this.footerText2,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -3459,19 +2766,31 @@ class ChecklistTasksCompanion extends UpdateCompanion<ChecklistTask> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<String>(id.value);
+      map['id'] = Variable<int>(id.value);
     }
-    if (checklistId.present) {
-      map['checklist_id'] = Variable<String>(checklistId.value);
+    if (businessName.present) {
+      map['business_name'] = Variable<String>(businessName.value);
     }
-    if (taskText.present) {
-      map['task_text'] = Variable<String>(taskText.value);
+    if (placeAddress.present) {
+      map['place_address'] = Variable<String>(placeAddress.value);
     }
-    if (done.present) {
-      map['done'] = Variable<bool>(done.value);
+    if (headerText1.present) {
+      map['header_text1'] = Variable<String>(headerText1.value);
     }
-    if (position.present) {
-      map['position'] = Variable<int>(position.value);
+    if (headerText2.present) {
+      map['header_text2'] = Variable<String>(headerText2.value);
+    }
+    if (gstNo.present) {
+      map['gst_no'] = Variable<String>(gstNo.value);
+    }
+    if (invoiceTitle.present) {
+      map['invoice_title'] = Variable<String>(invoiceTitle.value);
+    }
+    if (footerText1.present) {
+      map['footer_text1'] = Variable<String>(footerText1.value);
+    }
+    if (footerText2.present) {
+      map['footer_text2'] = Variable<String>(footerText2.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -3479,23 +2798,23 @@ class ChecklistTasksCompanion extends UpdateCompanion<ChecklistTask> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
     return map;
   }
 
   @override
   String toString() {
-    return (StringBuffer('ChecklistTasksCompanion(')
+    return (StringBuffer('PrintSettingsCompanion(')
           ..write('id: $id, ')
-          ..write('checklistId: $checklistId, ')
-          ..write('taskText: $taskText, ')
-          ..write('done: $done, ')
-          ..write('position: $position, ')
+          ..write('businessName: $businessName, ')
+          ..write('placeAddress: $placeAddress, ')
+          ..write('headerText1: $headerText1, ')
+          ..write('headerText2: $headerText2, ')
+          ..write('gstNo: $gstNo, ')
+          ..write('invoiceTitle: $invoiceTitle, ')
+          ..write('footerText1: $footerText1, ')
+          ..write('footerText2: $footerText2, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt, ')
-          ..write('rowid: $rowid')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
@@ -3504,330 +2823,31 @@ class ChecklistTasksCompanion extends UpdateCompanion<ChecklistTask> {
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
-  late final $CategoriesTable categories = $CategoriesTable(this);
   late final $ProductsTable products = $ProductsTable(this);
   late final $BankAccountsTable bankAccounts = $BankAccountsTable(this);
   late final $SaleReceiptsTable saleReceipts = $SaleReceiptsTable(this);
   late final $UsersTable users = $UsersTable(this);
-  late final $ChecklistsTable checklists = $ChecklistsTable(this);
-  late final $ChecklistTasksTable checklistTasks = $ChecklistTasksTable(this);
+  late final $PrintSettingsTable printSettings = $PrintSettingsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
-    categories,
     products,
     bankAccounts,
     saleReceipts,
     users,
-    checklists,
-    checklistTasks,
+    printSettings,
   ];
-  @override
-  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
-    WritePropagation(
-      on: TableUpdateQuery.onTableName(
-        'categories',
-        limitUpdateKind: UpdateKind.delete,
-      ),
-      result: [TableUpdate('products', kind: UpdateKind.delete)],
-    ),
-    WritePropagation(
-      on: TableUpdateQuery.onTableName(
-        'categories',
-        limitUpdateKind: UpdateKind.update,
-      ),
-      result: [TableUpdate('products', kind: UpdateKind.update)],
-    ),
-  ]);
   @override
   DriftDatabaseOptions get options =>
       const DriftDatabaseOptions(storeDateTimeAsText: true);
 }
 
-typedef $$CategoriesTableCreateCompanionBuilder =
-    CategoriesCompanion Function({
-      Value<int> id,
-      required String name,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-    });
-typedef $$CategoriesTableUpdateCompanionBuilder =
-    CategoriesCompanion Function({
-      Value<int> id,
-      Value<String> name,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-    });
-
-final class $$CategoriesTableReferences
-    extends BaseReferences<_$AppDatabase, $CategoriesTable, Category> {
-  $$CategoriesTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<$ProductsTable, List<Product>> _productsRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.products,
-    aliasName: $_aliasNameGenerator(db.categories.id, db.products.categoryId),
-  );
-
-  $$ProductsTableProcessedTableManager get productsRefs {
-    final manager = $$ProductsTableTableManager(
-      $_db,
-      $_db.products,
-    ).filter((f) => f.categoryId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_productsRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
-
-class $$CategoriesTableFilterComposer
-    extends Composer<_$AppDatabase, $CategoriesTable> {
-  $$CategoriesTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get name => $composableBuilder(
-    column: $table.name,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  Expression<bool> productsRefs(
-    Expression<bool> Function($$ProductsTableFilterComposer f) f,
-  ) {
-    final $$ProductsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.products,
-      getReferencedColumn: (t) => t.categoryId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ProductsTableFilterComposer(
-            $db: $db,
-            $table: $db.products,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$CategoriesTableOrderingComposer
-    extends Composer<_$AppDatabase, $CategoriesTable> {
-  $$CategoriesTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get name => $composableBuilder(
-    column: $table.name,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-}
-
-class $$CategoriesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $CategoriesTable> {
-  $$CategoriesTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get name =>
-      $composableBuilder(column: $table.name, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get createdAt =>
-      $composableBuilder(column: $table.createdAt, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get updatedAt =>
-      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
-
-  Expression<T> productsRefs<T extends Object>(
-    Expression<T> Function($$ProductsTableAnnotationComposer a) f,
-  ) {
-    final $$ProductsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.products,
-      getReferencedColumn: (t) => t.categoryId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ProductsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.products,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$CategoriesTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $CategoriesTable,
-          Category,
-          $$CategoriesTableFilterComposer,
-          $$CategoriesTableOrderingComposer,
-          $$CategoriesTableAnnotationComposer,
-          $$CategoriesTableCreateCompanionBuilder,
-          $$CategoriesTableUpdateCompanionBuilder,
-          (Category, $$CategoriesTableReferences),
-          Category,
-          PrefetchHooks Function({bool productsRefs})
-        > {
-  $$CategoriesTableTableManager(_$AppDatabase db, $CategoriesTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$CategoriesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$CategoriesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$CategoriesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                Value<String> name = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-              }) => CategoriesCompanion(
-                id: id,
-                name: name,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-              ),
-          createCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                required String name,
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-              }) => CategoriesCompanion.insert(
-                id: id,
-                name: name,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable(table),
-                  $$CategoriesTableReferences(db, table, e),
-                ),
-              )
-              .toList(),
-          prefetchHooksCallback: ({productsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (productsRefs) db.products],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (productsRefs)
-                    await $_getPrefetchedData<
-                      Category,
-                      $CategoriesTable,
-                      Product
-                    >(
-                      currentTable: table,
-                      referencedTable: $$CategoriesTableReferences
-                          ._productsRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$CategoriesTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).productsRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.categoryId == item.id),
-                      typedResults: items,
-                    ),
-                ];
-              },
-            );
-          },
-        ),
-      );
-}
-
-typedef $$CategoriesTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $CategoriesTable,
-      Category,
-      $$CategoriesTableFilterComposer,
-      $$CategoriesTableOrderingComposer,
-      $$CategoriesTableAnnotationComposer,
-      $$CategoriesTableCreateCompanionBuilder,
-      $$CategoriesTableUpdateCompanionBuilder,
-      (Category, $$CategoriesTableReferences),
-      Category,
-      PrefetchHooks Function({bool productsRefs})
-    >;
 typedef $$ProductsTableCreateCompanionBuilder =
     ProductsCompanion Function({
       Value<int> id,
       required String name,
-      required int categoryId,
       required String price,
       required int priority,
       Value<DateTime> createdAt,
@@ -3837,36 +2857,11 @@ typedef $$ProductsTableUpdateCompanionBuilder =
     ProductsCompanion Function({
       Value<int> id,
       Value<String> name,
-      Value<int> categoryId,
       Value<String> price,
       Value<int> priority,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
     });
-
-final class $$ProductsTableReferences
-    extends BaseReferences<_$AppDatabase, $ProductsTable, Product> {
-  $$ProductsTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $CategoriesTable _categoryIdTable(_$AppDatabase db) =>
-      db.categories.createAlias(
-        $_aliasNameGenerator(db.products.categoryId, db.categories.id),
-      );
-
-  $$CategoriesTableProcessedTableManager get categoryId {
-    final $_column = $_itemColumn<int>('category_id')!;
-
-    final manager = $$CategoriesTableTableManager(
-      $_db,
-      $_db.categories,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_categoryIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-}
 
 class $$ProductsTableFilterComposer
     extends Composer<_$AppDatabase, $ProductsTable> {
@@ -3906,29 +2901,6 @@ class $$ProductsTableFilterComposer
     column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
-
-  $$CategoriesTableFilterComposer get categoryId {
-    final $$CategoriesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.categoryId,
-      referencedTable: $db.categories,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$CategoriesTableFilterComposer(
-            $db: $db,
-            $table: $db.categories,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$ProductsTableOrderingComposer
@@ -3969,29 +2941,6 @@ class $$ProductsTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
-
-  $$CategoriesTableOrderingComposer get categoryId {
-    final $$CategoriesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.categoryId,
-      referencedTable: $db.categories,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$CategoriesTableOrderingComposer(
-            $db: $db,
-            $table: $db.categories,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$ProductsTableAnnotationComposer
@@ -4020,29 +2969,6 @@ class $$ProductsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
-
-  $$CategoriesTableAnnotationComposer get categoryId {
-    final $$CategoriesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.categoryId,
-      referencedTable: $db.categories,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$CategoriesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.categories,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$ProductsTableTableManager
@@ -4056,9 +2982,9 @@ class $$ProductsTableTableManager
           $$ProductsTableAnnotationComposer,
           $$ProductsTableCreateCompanionBuilder,
           $$ProductsTableUpdateCompanionBuilder,
-          (Product, $$ProductsTableReferences),
+          (Product, BaseReferences<_$AppDatabase, $ProductsTable, Product>),
           Product,
-          PrefetchHooks Function({bool categoryId})
+          PrefetchHooks Function()
         > {
   $$ProductsTableTableManager(_$AppDatabase db, $ProductsTable table)
     : super(
@@ -4075,7 +3001,6 @@ class $$ProductsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
-                Value<int> categoryId = const Value.absent(),
                 Value<String> price = const Value.absent(),
                 Value<int> priority = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -4083,7 +3008,6 @@ class $$ProductsTableTableManager
               }) => ProductsCompanion(
                 id: id,
                 name: name,
-                categoryId: categoryId,
                 price: price,
                 priority: priority,
                 createdAt: createdAt,
@@ -4093,7 +3017,6 @@ class $$ProductsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 required String name,
-                required int categoryId,
                 required String price,
                 required int priority,
                 Value<DateTime> createdAt = const Value.absent(),
@@ -4101,61 +3024,15 @@ class $$ProductsTableTableManager
               }) => ProductsCompanion.insert(
                 id: id,
                 name: name,
-                categoryId: categoryId,
                 price: price,
                 priority: priority,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),
           withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable(table),
-                  $$ProductsTableReferences(db, table, e),
-                ),
-              )
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({categoryId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (categoryId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.categoryId,
-                                referencedTable: $$ProductsTableReferences
-                                    ._categoryIdTable(db),
-                                referencedColumn: $$ProductsTableReferences
-                                    ._categoryIdTable(db)
-                                    .id,
-                              )
-                              as T;
-                    }
-
-                    return state;
-                  },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -4170,9 +3047,9 @@ typedef $$ProductsTableProcessedTableManager =
       $$ProductsTableAnnotationComposer,
       $$ProductsTableCreateCompanionBuilder,
       $$ProductsTableUpdateCompanionBuilder,
-      (Product, $$ProductsTableReferences),
+      (Product, BaseReferences<_$AppDatabase, $ProductsTable, Product>),
       Product,
-      PrefetchHooks Function({bool categoryId})
+      PrefetchHooks Function()
     >;
 typedef $$BankAccountsTableCreateCompanionBuilder =
     BankAccountsCompanion Function({
@@ -4451,7 +3328,7 @@ typedef $$SaleReceiptsTableCreateCompanionBuilder =
       required String id,
       Value<String?> customerName,
       Value<String?> preparedBy,
-      required String orederNo,
+      required String orderNo,
       required String billItems,
       Value<String> paymentMode,
       Value<String> paymentStatus,
@@ -4466,7 +3343,7 @@ typedef $$SaleReceiptsTableUpdateCompanionBuilder =
       Value<String> id,
       Value<String?> customerName,
       Value<String?> preparedBy,
-      Value<String> orederNo,
+      Value<String> orderNo,
       Value<String> billItems,
       Value<String> paymentMode,
       Value<String> paymentStatus,
@@ -4501,8 +3378,8 @@ class $$SaleReceiptsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get orederNo => $composableBuilder(
-    column: $table.orederNo,
+  ColumnFilters<String> get orderNo => $composableBuilder(
+    column: $table.orderNo,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4566,8 +3443,8 @@ class $$SaleReceiptsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get orederNo => $composableBuilder(
-    column: $table.orederNo,
+  ColumnOrderings<String> get orderNo => $composableBuilder(
+    column: $table.orderNo,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4629,8 +3506,8 @@ class $$SaleReceiptsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get orederNo =>
-      $composableBuilder(column: $table.orederNo, builder: (column) => column);
+  GeneratedColumn<String> get orderNo =>
+      $composableBuilder(column: $table.orderNo, builder: (column) => column);
 
   GeneratedColumn<String> get billItems =>
       $composableBuilder(column: $table.billItems, builder: (column) => column);
@@ -4696,7 +3573,7 @@ class $$SaleReceiptsTableTableManager
                 Value<String> id = const Value.absent(),
                 Value<String?> customerName = const Value.absent(),
                 Value<String?> preparedBy = const Value.absent(),
-                Value<String> orederNo = const Value.absent(),
+                Value<String> orderNo = const Value.absent(),
                 Value<String> billItems = const Value.absent(),
                 Value<String> paymentMode = const Value.absent(),
                 Value<String> paymentStatus = const Value.absent(),
@@ -4709,7 +3586,7 @@ class $$SaleReceiptsTableTableManager
                 id: id,
                 customerName: customerName,
                 preparedBy: preparedBy,
-                orederNo: orederNo,
+                orderNo: orderNo,
                 billItems: billItems,
                 paymentMode: paymentMode,
                 paymentStatus: paymentStatus,
@@ -4724,7 +3601,7 @@ class $$SaleReceiptsTableTableManager
                 required String id,
                 Value<String?> customerName = const Value.absent(),
                 Value<String?> preparedBy = const Value.absent(),
-                required String orederNo,
+                required String orderNo,
                 required String billItems,
                 Value<String> paymentMode = const Value.absent(),
                 Value<String> paymentStatus = const Value.absent(),
@@ -4737,7 +3614,7 @@ class $$SaleReceiptsTableTableManager
                 id: id,
                 customerName: customerName,
                 preparedBy: preparedBy,
-                orederNo: orederNo,
+                orderNo: orderNo,
                 billItems: billItems,
                 paymentMode: paymentMode,
                 paymentStatus: paymentStatus,
@@ -5024,74 +3901,86 @@ typedef $$UsersTableProcessedTableManager =
       User,
       PrefetchHooks Function()
     >;
-typedef $$ChecklistsTableCreateCompanionBuilder =
-    ChecklistsCompanion Function({
-      required String id,
-      required String title,
-      Value<int> completed,
-      Value<int> total,
-      Value<int> colorValue,
-      Value<String?> iconName,
-      Value<bool> isActive,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-      Value<int> rowid,
+typedef $$PrintSettingsTableCreateCompanionBuilder =
+    PrintSettingsCompanion Function({
+      Value<int> id,
+      Value<String?> businessName,
+      Value<String?> placeAddress,
+      Value<String?> headerText1,
+      Value<String?> headerText2,
+      Value<String?> gstNo,
+      Value<String?> invoiceTitle,
+      Value<String?> footerText1,
+      Value<String?> footerText2,
+      required DateTime createdAt,
+      required DateTime updatedAt,
     });
-typedef $$ChecklistsTableUpdateCompanionBuilder =
-    ChecklistsCompanion Function({
-      Value<String> id,
-      Value<String> title,
-      Value<int> completed,
-      Value<int> total,
-      Value<int> colorValue,
-      Value<String?> iconName,
-      Value<bool> isActive,
+typedef $$PrintSettingsTableUpdateCompanionBuilder =
+    PrintSettingsCompanion Function({
+      Value<int> id,
+      Value<String?> businessName,
+      Value<String?> placeAddress,
+      Value<String?> headerText1,
+      Value<String?> headerText2,
+      Value<String?> gstNo,
+      Value<String?> invoiceTitle,
+      Value<String?> footerText1,
+      Value<String?> footerText2,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
-      Value<int> rowid,
     });
 
-class $$ChecklistsTableFilterComposer
-    extends Composer<_$AppDatabase, $ChecklistsTable> {
-  $$ChecklistsTableFilterComposer({
+class $$PrintSettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $PrintSettingsTable> {
+  $$PrintSettingsTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get id => $composableBuilder(
+  ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get title => $composableBuilder(
-    column: $table.title,
+  ColumnFilters<String> get businessName => $composableBuilder(
+    column: $table.businessName,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get completed => $composableBuilder(
-    column: $table.completed,
+  ColumnFilters<String> get placeAddress => $composableBuilder(
+    column: $table.placeAddress,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get total => $composableBuilder(
-    column: $table.total,
+  ColumnFilters<String> get headerText1 => $composableBuilder(
+    column: $table.headerText1,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get colorValue => $composableBuilder(
-    column: $table.colorValue,
+  ColumnFilters<String> get headerText2 => $composableBuilder(
+    column: $table.headerText2,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get iconName => $composableBuilder(
-    column: $table.iconName,
+  ColumnFilters<String> get gstNo => $composableBuilder(
+    column: $table.gstNo,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get isActive => $composableBuilder(
-    column: $table.isActive,
+  ColumnFilters<String> get invoiceTitle => $composableBuilder(
+    column: $table.invoiceTitle,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get footerText1 => $composableBuilder(
+    column: $table.footerText1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get footerText2 => $composableBuilder(
+    column: $table.footerText2,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5106,47 +3995,57 @@ class $$ChecklistsTableFilterComposer
   );
 }
 
-class $$ChecklistsTableOrderingComposer
-    extends Composer<_$AppDatabase, $ChecklistsTable> {
-  $$ChecklistsTableOrderingComposer({
+class $$PrintSettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PrintSettingsTable> {
+  $$PrintSettingsTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get id => $composableBuilder(
+  ColumnOrderings<int> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get title => $composableBuilder(
-    column: $table.title,
+  ColumnOrderings<String> get businessName => $composableBuilder(
+    column: $table.businessName,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get completed => $composableBuilder(
-    column: $table.completed,
+  ColumnOrderings<String> get placeAddress => $composableBuilder(
+    column: $table.placeAddress,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get total => $composableBuilder(
-    column: $table.total,
+  ColumnOrderings<String> get headerText1 => $composableBuilder(
+    column: $table.headerText1,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get colorValue => $composableBuilder(
-    column: $table.colorValue,
+  ColumnOrderings<String> get headerText2 => $composableBuilder(
+    column: $table.headerText2,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get iconName => $composableBuilder(
-    column: $table.iconName,
+  ColumnOrderings<String> get gstNo => $composableBuilder(
+    column: $table.gstNo,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get isActive => $composableBuilder(
-    column: $table.isActive,
+  ColumnOrderings<String> get invoiceTitle => $composableBuilder(
+    column: $table.invoiceTitle,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get footerText1 => $composableBuilder(
+    column: $table.footerText1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get footerText2 => $composableBuilder(
+    column: $table.footerText2,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -5161,37 +4060,55 @@ class $$ChecklistsTableOrderingComposer
   );
 }
 
-class $$ChecklistsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ChecklistsTable> {
-  $$ChecklistsTableAnnotationComposer({
+class $$PrintSettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PrintSettingsTable> {
+  $$PrintSettingsTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get id =>
+  GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get title =>
-      $composableBuilder(column: $table.title, builder: (column) => column);
-
-  GeneratedColumn<int> get completed =>
-      $composableBuilder(column: $table.completed, builder: (column) => column);
-
-  GeneratedColumn<int> get total =>
-      $composableBuilder(column: $table.total, builder: (column) => column);
-
-  GeneratedColumn<int> get colorValue => $composableBuilder(
-    column: $table.colorValue,
+  GeneratedColumn<String> get businessName => $composableBuilder(
+    column: $table.businessName,
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get iconName =>
-      $composableBuilder(column: $table.iconName, builder: (column) => column);
+  GeneratedColumn<String> get placeAddress => $composableBuilder(
+    column: $table.placeAddress,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<bool> get isActive =>
-      $composableBuilder(column: $table.isActive, builder: (column) => column);
+  GeneratedColumn<String> get headerText1 => $composableBuilder(
+    column: $table.headerText1,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get headerText2 => $composableBuilder(
+    column: $table.headerText2,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get gstNo =>
+      $composableBuilder(column: $table.gstNo, builder: (column) => column);
+
+  GeneratedColumn<String> get invoiceTitle => $composableBuilder(
+    column: $table.invoiceTitle,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get footerText1 => $composableBuilder(
+    column: $table.footerText1,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get footerText2 => $composableBuilder(
+    column: $table.footerText2,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -5200,82 +4117,86 @@ class $$ChecklistsTableAnnotationComposer
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
-class $$ChecklistsTableTableManager
+class $$PrintSettingsTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $ChecklistsTable,
-          Checklist,
-          $$ChecklistsTableFilterComposer,
-          $$ChecklistsTableOrderingComposer,
-          $$ChecklistsTableAnnotationComposer,
-          $$ChecklistsTableCreateCompanionBuilder,
-          $$ChecklistsTableUpdateCompanionBuilder,
+          $PrintSettingsTable,
+          PrintSetting,
+          $$PrintSettingsTableFilterComposer,
+          $$PrintSettingsTableOrderingComposer,
+          $$PrintSettingsTableAnnotationComposer,
+          $$PrintSettingsTableCreateCompanionBuilder,
+          $$PrintSettingsTableUpdateCompanionBuilder,
           (
-            Checklist,
-            BaseReferences<_$AppDatabase, $ChecklistsTable, Checklist>,
+            PrintSetting,
+            BaseReferences<_$AppDatabase, $PrintSettingsTable, PrintSetting>,
           ),
-          Checklist,
+          PrintSetting,
           PrefetchHooks Function()
         > {
-  $$ChecklistsTableTableManager(_$AppDatabase db, $ChecklistsTable table)
+  $$PrintSettingsTableTableManager(_$AppDatabase db, $PrintSettingsTable table)
     : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$ChecklistsTableFilterComposer($db: db, $table: table),
+              $$PrintSettingsTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$ChecklistsTableOrderingComposer($db: db, $table: table),
+              $$PrintSettingsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$ChecklistsTableAnnotationComposer($db: db, $table: table),
+              $$PrintSettingsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<String> id = const Value.absent(),
-                Value<String> title = const Value.absent(),
-                Value<int> completed = const Value.absent(),
-                Value<int> total = const Value.absent(),
-                Value<int> colorValue = const Value.absent(),
-                Value<String?> iconName = const Value.absent(),
-                Value<bool> isActive = const Value.absent(),
+                Value<int> id = const Value.absent(),
+                Value<String?> businessName = const Value.absent(),
+                Value<String?> placeAddress = const Value.absent(),
+                Value<String?> headerText1 = const Value.absent(),
+                Value<String?> headerText2 = const Value.absent(),
+                Value<String?> gstNo = const Value.absent(),
+                Value<String?> invoiceTitle = const Value.absent(),
+                Value<String?> footerText1 = const Value.absent(),
+                Value<String?> footerText2 = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => ChecklistsCompanion(
+              }) => PrintSettingsCompanion(
                 id: id,
-                title: title,
-                completed: completed,
-                total: total,
-                colorValue: colorValue,
-                iconName: iconName,
-                isActive: isActive,
+                businessName: businessName,
+                placeAddress: placeAddress,
+                headerText1: headerText1,
+                headerText2: headerText2,
+                gstNo: gstNo,
+                invoiceTitle: invoiceTitle,
+                footerText1: footerText1,
+                footerText2: footerText2,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
-                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                required String id,
-                required String title,
-                Value<int> completed = const Value.absent(),
-                Value<int> total = const Value.absent(),
-                Value<int> colorValue = const Value.absent(),
-                Value<String?> iconName = const Value.absent(),
-                Value<bool> isActive = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => ChecklistsCompanion.insert(
+                Value<int> id = const Value.absent(),
+                Value<String?> businessName = const Value.absent(),
+                Value<String?> placeAddress = const Value.absent(),
+                Value<String?> headerText1 = const Value.absent(),
+                Value<String?> headerText2 = const Value.absent(),
+                Value<String?> gstNo = const Value.absent(),
+                Value<String?> invoiceTitle = const Value.absent(),
+                Value<String?> footerText1 = const Value.absent(),
+                Value<String?> footerText2 = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+              }) => PrintSettingsCompanion.insert(
                 id: id,
-                title: title,
-                completed: completed,
-                total: total,
-                colorValue: colorValue,
-                iconName: iconName,
-                isActive: isActive,
+                businessName: businessName,
+                placeAddress: placeAddress,
+                headerText1: headerText1,
+                headerText2: headerText2,
+                gstNo: gstNo,
+                invoiceTitle: invoiceTitle,
+                footerText1: footerText1,
+                footerText2: footerText2,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
-                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -5285,268 +4206,27 @@ class $$ChecklistsTableTableManager
       );
 }
 
-typedef $$ChecklistsTableProcessedTableManager =
+typedef $$PrintSettingsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $ChecklistsTable,
-      Checklist,
-      $$ChecklistsTableFilterComposer,
-      $$ChecklistsTableOrderingComposer,
-      $$ChecklistsTableAnnotationComposer,
-      $$ChecklistsTableCreateCompanionBuilder,
-      $$ChecklistsTableUpdateCompanionBuilder,
-      (Checklist, BaseReferences<_$AppDatabase, $ChecklistsTable, Checklist>),
-      Checklist,
-      PrefetchHooks Function()
-    >;
-typedef $$ChecklistTasksTableCreateCompanionBuilder =
-    ChecklistTasksCompanion Function({
-      required String id,
-      required String checklistId,
-      required String taskText,
-      Value<bool> done,
-      Value<int> position,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-      Value<int> rowid,
-    });
-typedef $$ChecklistTasksTableUpdateCompanionBuilder =
-    ChecklistTasksCompanion Function({
-      Value<String> id,
-      Value<String> checklistId,
-      Value<String> taskText,
-      Value<bool> done,
-      Value<int> position,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-      Value<int> rowid,
-    });
-
-class $$ChecklistTasksTableFilterComposer
-    extends Composer<_$AppDatabase, $ChecklistTasksTable> {
-  $$ChecklistTasksTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get checklistId => $composableBuilder(
-    column: $table.checklistId,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get taskText => $composableBuilder(
-    column: $table.taskText,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<bool> get done => $composableBuilder(
-    column: $table.done,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get position => $composableBuilder(
-    column: $table.position,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnFilters(column),
-  );
-}
-
-class $$ChecklistTasksTableOrderingComposer
-    extends Composer<_$AppDatabase, $ChecklistTasksTable> {
-  $$ChecklistTasksTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get checklistId => $composableBuilder(
-    column: $table.checklistId,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get taskText => $composableBuilder(
-    column: $table.taskText,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<bool> get done => $composableBuilder(
-    column: $table.done,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get position => $composableBuilder(
-    column: $table.position,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-}
-
-class $$ChecklistTasksTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ChecklistTasksTable> {
-  $$ChecklistTasksTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<String> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get checklistId => $composableBuilder(
-    column: $table.checklistId,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get taskText =>
-      $composableBuilder(column: $table.taskText, builder: (column) => column);
-
-  GeneratedColumn<bool> get done =>
-      $composableBuilder(column: $table.done, builder: (column) => column);
-
-  GeneratedColumn<int> get position =>
-      $composableBuilder(column: $table.position, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get createdAt =>
-      $composableBuilder(column: $table.createdAt, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get updatedAt =>
-      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
-}
-
-class $$ChecklistTasksTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $ChecklistTasksTable,
-          ChecklistTask,
-          $$ChecklistTasksTableFilterComposer,
-          $$ChecklistTasksTableOrderingComposer,
-          $$ChecklistTasksTableAnnotationComposer,
-          $$ChecklistTasksTableCreateCompanionBuilder,
-          $$ChecklistTasksTableUpdateCompanionBuilder,
-          (
-            ChecklistTask,
-            BaseReferences<_$AppDatabase, $ChecklistTasksTable, ChecklistTask>,
-          ),
-          ChecklistTask,
-          PrefetchHooks Function()
-        > {
-  $$ChecklistTasksTableTableManager(
-    _$AppDatabase db,
-    $ChecklistTasksTable table,
-  ) : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$ChecklistTasksTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$ChecklistTasksTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$ChecklistTasksTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<String> id = const Value.absent(),
-                Value<String> checklistId = const Value.absent(),
-                Value<String> taskText = const Value.absent(),
-                Value<bool> done = const Value.absent(),
-                Value<int> position = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => ChecklistTasksCompanion(
-                id: id,
-                checklistId: checklistId,
-                taskText: taskText,
-                done: done,
-                position: position,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-                rowid: rowid,
-              ),
-          createCompanionCallback:
-              ({
-                required String id,
-                required String checklistId,
-                required String taskText,
-                Value<bool> done = const Value.absent(),
-                Value<int> position = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => ChecklistTasksCompanion.insert(
-                id: id,
-                checklistId: checklistId,
-                taskText: taskText,
-                done: done,
-                position: position,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-                rowid: rowid,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
-          prefetchHooksCallback: null,
-        ),
-      );
-}
-
-typedef $$ChecklistTasksTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $ChecklistTasksTable,
-      ChecklistTask,
-      $$ChecklistTasksTableFilterComposer,
-      $$ChecklistTasksTableOrderingComposer,
-      $$ChecklistTasksTableAnnotationComposer,
-      $$ChecklistTasksTableCreateCompanionBuilder,
-      $$ChecklistTasksTableUpdateCompanionBuilder,
+      $PrintSettingsTable,
+      PrintSetting,
+      $$PrintSettingsTableFilterComposer,
+      $$PrintSettingsTableOrderingComposer,
+      $$PrintSettingsTableAnnotationComposer,
+      $$PrintSettingsTableCreateCompanionBuilder,
+      $$PrintSettingsTableUpdateCompanionBuilder,
       (
-        ChecklistTask,
-        BaseReferences<_$AppDatabase, $ChecklistTasksTable, ChecklistTask>,
+        PrintSetting,
+        BaseReferences<_$AppDatabase, $PrintSettingsTable, PrintSetting>,
       ),
-      ChecklistTask,
+      PrintSetting,
       PrefetchHooks Function()
     >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
-  $$CategoriesTableTableManager get categories =>
-      $$CategoriesTableTableManager(_db, _db.categories);
   $$ProductsTableTableManager get products =>
       $$ProductsTableTableManager(_db, _db.products);
   $$BankAccountsTableTableManager get bankAccounts =>
@@ -5555,8 +4235,6 @@ class $AppDatabaseManager {
       $$SaleReceiptsTableTableManager(_db, _db.saleReceipts);
   $$UsersTableTableManager get users =>
       $$UsersTableTableManager(_db, _db.users);
-  $$ChecklistsTableTableManager get checklists =>
-      $$ChecklistsTableTableManager(_db, _db.checklists);
-  $$ChecklistTasksTableTableManager get checklistTasks =>
-      $$ChecklistTasksTableTableManager(_db, _db.checklistTasks);
+  $$PrintSettingsTableTableManager get printSettings =>
+      $$PrintSettingsTableTableManager(_db, _db.printSettings);
 }

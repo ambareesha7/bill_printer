@@ -8,8 +8,8 @@ import 'package:bill_printer/data/models/users/user_model.dart';
 import 'package:bill_printer/ui/auth/providers/auth_provider.dart';
 import 'package:bill_printer/ui/bill_views/providers/bill_provider.dart';
 import 'package:bill_printer/ui/bill_views/providers/order_num_provider.dart';
-import 'package:bill_printer/ui/category/product_provider.dart';
 import 'package:bill_printer/ui/printer/providers/printer_provider.dart';
+import 'package:bill_printer/ui/products/providers/products_provider.dart';
 import 'package:bill_printer/ui/utils/app_colors.dart';
 import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:bill_printer/ui/utils/ui_utils.dart';
@@ -20,10 +20,10 @@ import 'package:go_router/go_router.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 
 import '../../data/models/bank_account/bank_account_model.dart';
-import '../widgets/nav_btn.dart';
 
 class BillView extends ConsumerStatefulWidget {
-  const BillView({super.key});
+  final String title;
+  const BillView({super.key, required this.title});
 
   @override
   ConsumerState<BillView> createState() => _BillViewState();
@@ -33,6 +33,15 @@ class _BillViewState extends ConsumerState<BillView> {
   final double btnPadding = 4;
   final double bodyPadding = 8;
   DBUtils dbUtils = DBUtils.instance;
+  final TextEditingController _searchController = TextEditingController();
+  bool _isSearching = false;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final itemHeadStyle = TextStyle(fontWeight: FontWeight.bold);
@@ -42,9 +51,36 @@ class _BillViewState extends ConsumerState<BillView> {
     var listItems = ref.watch(tempBillListProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text("MoonLight Cafe"),
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                onChanged: (_) => setState(() {}),
+                decoration: const InputDecoration(
+                  hintText: 'Search products',
+                  border: InputBorder.none,
+                ),
+              )
+            : Text(widget.title),
         centerTitle: true,
-        actions: [NavBtn(path: RouterPaths.reports.name)],
+        actions: [
+          IconButton(
+            tooltip: _isSearching ? 'Close search' : 'Search products',
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+                if (!_isSearching) _searchController.clear();
+              });
+            },
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+          ),
+          TextButton(
+            onPressed: () {
+              context.push("/${RouterPaths.reports.name}");
+            },
+            child: Text("Reports"),
+          ),
+        ],
       ),
       resizeToAvoidBottomInset: true,
       body: Padding(
@@ -57,9 +93,14 @@ class _BillViewState extends ConsumerState<BillView> {
           children: [
             Consumer(
               builder: (context, ref, child) {
-                return Text(
-                  "Order No: $orderNo",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      "Order No: $orderNo",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
                 );
               },
             ),
@@ -163,7 +204,7 @@ class _BillViewState extends ConsumerState<BillView> {
                     bgColor: AppColors.blue,
                     onPressed: () {
                       ref
-                          .read(productsListProvider.notifier)
+                          .read(productsProvider.notifier)
                           .openProductDialog(
                             context: context,
                             operationType: OperationType.add,
@@ -182,7 +223,7 @@ class _BillViewState extends ConsumerState<BillView> {
                     },
                   ),
                   AppBtn1(
-                    name: "Open Temp",
+                    name: "OpenTemp",
                     onPressed: () {
                       if (listItems.isEmpty) {
                         UIUtils.showSnackBar(
@@ -275,7 +316,7 @@ class _BillViewState extends ConsumerState<BillView> {
                     },
                   ),
                   AppBtn1(
-                    name: "Bill No Print",
+                    name: "Bill NoPrint",
                     bgColor: AppColors.blueGrey,
                     onPressed: () async {
                       int amount = ref
@@ -306,22 +347,34 @@ class _BillViewState extends ConsumerState<BillView> {
               flex: 6,
               child: Consumer(
                 builder: (context, ref, child) {
-                  final productsList = ref.watch(productsListProvider);
+                  final productsList = ref.watch(productsProvider);
+                  final searchQuery = _searchController.text
+                      .trim()
+                      .toLowerCase();
+                  final filteredProducts = searchQuery.isEmpty
+                      ? productsList
+                      : productsList
+                            .where(
+                              (product) => (product.name ?? '')
+                                  .toLowerCase()
+                                  .contains(searchQuery),
+                            )
+                            .toList();
                   return GridView.builder(
-                    itemCount: productsList.length,
+                    itemCount: filteredProducts.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       childAspectRatio: 1.2,
                     ),
                     itemBuilder: (context, index) {
                       return ProductCard(
-                        name: productsList[index].name ?? "",
-                        price: productsList[index].price ?? "0",
+                        name: filteredProducts[index].name ?? "",
+                        price: filteredProducts[index].price ?? "0",
 
                         onTap: () {
                           ref
                               .read(billListProvider.notifier)
-                              .addItem(productsList[index]);
+                              .addItem(filteredProducts[index]);
                         },
                       );
                     },
@@ -337,6 +390,7 @@ class _BillViewState extends ConsumerState<BillView> {
 
   Widget _buildActionButtons(UserModel user) {
     String orderNo = ref.watch(orderNumProvider);
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -384,11 +438,11 @@ class _BillViewState extends ConsumerState<BillView> {
           cashBtn(
             user: user,
             orderNo: orderNo,
-            btnName: "Cash no print",
+            btnName: "Cash NoPrint",
             billPrint: false,
           ),
           AppBtn1(
-            name: "Received in Bank",
+            name: "Received",
             bgColor: AppColors.blueGrey,
             onPressed: () async {
               int amount = ref.read(billListProvider.notifier).getTotalAmount();
@@ -473,6 +527,7 @@ class _BillViewState extends ConsumerState<BillView> {
             paymentStatus: PaymentStatus.received,
             preparedBy: user.fullName,
             orderNo: orderNo,
+            // unitId: unitId,
             print: billPrint,
           );
         } else {

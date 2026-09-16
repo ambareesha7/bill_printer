@@ -40,7 +40,7 @@ final class OrderNumProvider extends $NotifierProvider<OrderNum, String> {
   }
 }
 
-String _$orderNumHash() => r'831dd6cf997e10064e89c4817ad5a81ced113243';
+String _$orderNumHash() => r'a16e1c69e495271f6938a95b975dee3b7d72b0d5';
 
 abstract class _$OrderNum extends $Notifier<String> {
   String build();

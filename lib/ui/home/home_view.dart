@@ -1,4 +1,5 @@
 import 'package:bill_printer/app_router.dart';
+import 'package:bill_printer/ui/print_settings/providers/print_settings_provider.dart';
 import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:bill_printer/ui/utils/ui_utils.dart';
 import 'package:bill_printer/ui/widgets/menu_item.dart';
@@ -18,21 +19,21 @@ class HomeView extends ConsumerStatefulWidget {
 
 class _MyHomePageState extends ConsumerState<HomeView> {
   List navList = [
-    RouterPaths.category.name,
+    RouterPaths.products.name,
     RouterPaths.bankAccount.name,
     RouterPaths.reportsMain.name,
     RouterPaths.signUp.name,
     RouterPaths.users.name,
     RouterPaths.printer.name,
-    RouterPaths.checklists.name,
-
-    // const Icon(Icons.info_outline),
     RouterPaths.about.name,
+    RouterPaths.printSettings.name,
   ];
 
   @override
   Widget build(BuildContext context) {
     bool isLoggedIn = ref.watch(isUserLoggedInProvider);
+    final printSettings = ref.watch(printSettingsProvider);
+    String name = "Unknown";
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -42,15 +43,20 @@ class _MyHomePageState extends ConsumerState<HomeView> {
             BillHeaderWidget(),
             SizedBox(height: 15),
             ListTile(
-              onTap: () {
-                if (isLoggedIn) {
-                  context.push("/${RouterPaths.createBill.name}");
-                } else {
+              onTap: () async {
+                if (!isLoggedIn) {
                   UIUtils.showSnackBar(
                     context: context,
-                    text: "Please setup a User to create bills",
+                    text: "Please create a User to create bills",
                   );
                   context.push("/${RouterPaths.signUp.name}");
+                } else {
+                  if (printSettings != null &&
+                      printSettings.businessName != null) {
+                    name = printSettings.businessName!;
+                  }
+
+                  context.push("/${RouterPaths.createBill.name}/$name");
                 }
               },
               title: Center(
@@ -70,7 +76,7 @@ class _MyHomePageState extends ConsumerState<HomeView> {
                   return MenuItem(
                     name: navList[index],
                     onTap: () {
-                      debugLog(name, tag: "name");
+                      debugLog(name, tag: "Current Path");
                       context.push("/$name");
                     },
                   );

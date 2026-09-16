@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:bill_printer/data/app_enums.dart';
+import 'package:bill_printer/data/models/print_settings_model.dart';
 import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:bill_printer/data/database.dart';
 import 'package:bill_printer/data/models/bill_item_model.dart';
@@ -39,42 +40,9 @@ class DBUtils {
   /// deletes all tables and recreates them
   /// USE WITH CAUTION - this will delete all data in the database
   Future<void> reCreateDB() async => await db.reCreateDB();
-
-  // ======================== Category CRUD operations =====================
-  Future<void> insertCategory({required String name}) async {
-    final categoryCompanion = CategoriesCompanion.insert(
-      name: name,
-      createdAt: Value(DateTime.now()),
-      updatedAt: Value(DateTime.now()),
-    );
-    try {
-      await db.into(db.categories).insert(categoryCompanion);
-    } catch (e) {
-      debugLog("Error inserting category: $e");
-    }
-  }
-
-  Future<void> updateCategory(int id, String name) async {
-    final categoryCompanion = CategoriesCompanion(
-      id: Value(id),
-      name: Value(name),
-      updatedAt: Value(DateTime.now()),
-    );
-    await db.update(db.categories).replace(categoryCompanion);
-  }
-
-  Future<void> deleteCategory(int id) async {
-    await (db.delete(db.categories)..where((tbl) => tbl.id.equals(id))).go();
-  }
-
-  Future<List<Category>> getCategories() async {
-    return await db.select(db.categories).get();
-  }
-
   // ======================== Product CRUD operations =====================
   Future<void> insertProduct({
     required String name,
-    required int categoryId,
     required String price,
     int priority = 1,
   }) async {
@@ -82,7 +50,6 @@ class DBUtils {
       name: name,
       createdAt: Value(DateTime.now()),
       updatedAt: Value(DateTime.now()),
-      categoryId: categoryId,
       price: price,
       priority: priority,
     );
@@ -96,7 +63,6 @@ class DBUtils {
   Future<void> updateProduct({
     required int id,
     String? name,
-    int? categoryId,
     String? price,
     int? priority,
   }) async {
@@ -104,7 +70,6 @@ class DBUtils {
       id: Value(id),
       name: name != null ? Value(name) : const Value.absent(),
       updatedAt: Value(DateTime.now()),
-      categoryId: categoryId != null ? Value(categoryId) : const Value.absent(),
       price: price != null ? Value(price) : const Value.absent(),
       priority: priority != null ? Value(priority) : const Value.absent(),
     );
@@ -128,17 +93,6 @@ class DBUtils {
       return await db.select(db.products).get();
     } catch (e) {
       debugLog("Error fetching products: $e");
-      return [];
-    }
-  }
-
-  Future<List<Product>> getProductsByCategory(int categoryId) async {
-    try {
-      return await (db.select(
-        db.products,
-      )..where((tbl) => tbl.categoryId.equals(categoryId))).get();
-    } catch (e) {
-      debugLog("Error fetching products by category: $e");
       return [];
     }
   }
@@ -263,7 +217,7 @@ class DBUtils {
       totalAmount: totalAmount,
       customerName: Value(customerName),
       preparedBy: Value(preparedBy),
-      orederNo: orderNo,
+      orderNo: orderNo,
       paymentMode: paymentMode == null
           ? Value(PaymentMode.cash.name)
           : Value(paymentMode),
@@ -297,7 +251,7 @@ class DBUtils {
               totalAmount: i.totalAmount,
               customerName: Value(i.customerName),
               preparedBy: Value(i.preparedBy),
-              orederNo: i.orederNo,
+              orderNo: i.orderNo,
               paymentMode: Value(i.paymentMode),
               paymentStatus: Value(i.paymentStatus),
               paymentRef: Value(i.paymentRef),
@@ -336,7 +290,7 @@ class DBUtils {
           ? Value("cash")
           : Value(saleReceipt.paymentMode!),
       paymentStatus: Value(saleReceipt.paymentStatus.name),
-      orederNo: Value(saleReceipt.orederNo ?? "0"),
+      orderNo: Value(saleReceipt.orderNo ?? "0"),
       paymentRef: saleReceipt.paymentRef != null
           ? Value(saleReceipt.paymentRef)
           : const Value.absent(),
@@ -387,7 +341,7 @@ class DBUtils {
               (e) => e.name == b.paymentStatus,
             ),
             paymentRef: b.paymentRef,
-            orederNo: b.orederNo,
+            orderNo: b.orderNo,
             createdAt: b.createdAt,
             updatedAt: b.updatedAt,
           ),
@@ -439,5 +393,95 @@ class DBUtils {
       debugLog("Error getLastBillFromDB: $e");
       return null;
     }
+  }
+
+
+  // ======================== Print settings CRUD operations =====================
+  Future<PrintSetting?> getPrintSettings() async {
+    try {
+      return await (db.select(db.printSettings)
+            ..orderBy([(table) => OrderingTerm.asc(table.id)])
+            ..limit(1))
+          .getSingleOrNull();
+    } catch (e) {
+      debugLog("Error in getPrintSettings: $e");
+      return null;
+    }
+  }
+
+  Future<void> insertPrintSettings({
+    required PrintSettingsModel settings,
+  }) async {
+    try {
+      await db
+          .into(db.printSettings)
+          .insert(
+            PrintSettingsCompanion.insert(
+              businessName: Value(settings.businessName),
+              placeAddress: Value(settings.placeAddress),
+              headerText1: Value(settings.headerText1),
+              headerText2: Value(settings.headerText2),
+              gstNo: Value(settings.gstNo),
+              invoiceTitle: Value(settings.invoiceTitle),
+              footerText1: Value(settings.footerText1),
+              footerText2: Value(settings.footerText2),
+              createdAt: settings.createdAt ?? DateTime.now(),
+              updatedAt: settings.updatedAt ?? DateTime.now(),
+            ),
+          );
+    } catch (e) {
+      debugLog("Error insertPrintSettings: $e");
+    }
+  }
+
+  Future<void> updatePrintSettings({
+    required PrintSettingsModel settings,
+  }) async {
+    if (settings.id == null) return;
+    try {
+      await db
+          .update(db.printSettings)
+          .replace(
+            PrintSettingsCompanion(
+              id: Value(settings.id!),
+              businessName: Value(settings.businessName),
+              placeAddress: Value(settings.placeAddress),
+              headerText1: Value(settings.headerText1),
+              headerText2: Value(settings.headerText2),
+              gstNo: Value(settings.gstNo),
+              invoiceTitle: Value(settings.invoiceTitle),
+              footerText1: Value(settings.footerText1),
+              footerText2: Value(settings.footerText2),
+              createdAt: Value(settings.createdAt ?? DateTime.now()),
+              updatedAt: Value(settings.updatedAt ?? DateTime.now()),
+            ),
+          );
+    } catch (e) {
+      debugLog("Error in updatePrintSettings: $e");
+    }
+  }
+
+  Future<void> deletePrintSettings() async {
+    try {
+      await db.delete(db.printSettings).go();
+    } catch (e) {
+      debugLog("Error in deletePrintSettings: $e");
+    }
+  }
+
+  PrintSettingsModel printSettingsToModel(PrintSetting settings) {
+    return PrintSettingsModel(
+      id: settings.id,
+      businessName: settings.businessName,
+      placeAddress: settings.placeAddress,
+      headerText1: settings.headerText1,
+      headerText2: settings.headerText2,
+      gstNo: settings.gstNo,
+      invoiceTitle: settings.invoiceTitle,
+      footerText1: settings.footerText1,
+      footerText2: settings.footerText2,
+      createdAt: settings.createdAt,
+      updatedAt: settings.updatedAt,
+    );
   }
 }

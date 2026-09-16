@@ -41,7 +41,7 @@ final class TempBillListProvider
   }
 }
 
-String _$tempBillListHash() => r'8391add452a50c7f4e8ec2cbaa2c8c075d1de023';
+String _$tempBillListHash() => r'3801f1493c342c9eda223dfd20970d8fdb96e0b8';
 
 abstract class _$TempBillList extends $Notifier<List<List<BillItemModel>>> {
   List<List<BillItemModel>> build();
