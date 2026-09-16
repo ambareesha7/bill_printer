@@ -1,5 +1,4 @@
 import 'package:bill_printer/ui/utils/common_utils.dart';
-import 'package:bill_printer/ui/widgets/bill_header_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -13,9 +12,8 @@ class AboutView extends StatefulWidget {
 
 class _AboutViewState extends State<AboutView> {
   String _version = "-";
-  String _buildNumber = "-";
 
-  final String _supportEmail = "ambareesha7@gmail.com";
+  final String _supportEmail = "ashwa22in@gmail.com";
   final String _supportPhone = "9141809886";
 
   @override
@@ -30,7 +28,6 @@ class _AboutViewState extends State<AboutView> {
       if (!mounted) return;
       setState(() {
         _version = info.version;
-        _buildNumber = info.buildNumber;
       });
     } catch (e) {
       // keep defaults on error
@@ -56,9 +53,9 @@ class _AboutViewState extends State<AboutView> {
 
   @override
   Widget build(BuildContext context) {
-    final versionDisplay = '$_version (build $_buildNumber)';
+    final versionDisplay = _version;
     return Scaffold(
-      appBar: AppBar(title: const Text('About')),
+      appBar: AppBar(title: const Text('Bill Printer'), centerTitle: true),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -66,7 +63,6 @@ class _AboutViewState extends State<AboutView> {
           Center(
             child: Column(
               children: [
-                BillHeaderWidget(),
                 const SizedBox(height: 12),
                 Text(
                   'Version: $versionDisplay',
@@ -81,7 +77,6 @@ class _AboutViewState extends State<AboutView> {
               leading: const Icon(Icons.email),
               title: const Text('Support Email'),
               subtitle: Text(_supportEmail),
-              onTap: () => _copyToClipboard(_supportEmail, 'Email'),
               trailing: IconButton(
                 icon: const Icon(Icons.copy),
                 onPressed: () => _copyToClipboard(_supportEmail, 'Email'),
@@ -95,12 +90,32 @@ class _AboutViewState extends State<AboutView> {
               leading: const Icon(Icons.phone),
               title: const Text('Support Phone'),
               subtitle: Text(_supportPhone),
-              onTap: () => _copyToClipboard(_supportPhone, 'Phone number'),
               trailing: IconButton(
                 icon: const Icon(Icons.copy),
                 onPressed: () =>
                     _copyToClipboard(_supportPhone, 'Phone number'),
                 tooltip: 'Copy phone number',
+              ),
+            ),
+          ),
+          const SizedBox(height: 38),
+          Center(
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(text: 'Bill Printer '),
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: Transform.translate(
+                      offset: const Offset(2, 4),
+                      child: Text(
+                        'By Ashwa Technologies',
+                        textScaler: TextScaler.linear(0.7),
+                        style: TextStyle(color: Colors.blue),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
