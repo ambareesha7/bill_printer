@@ -21,6 +21,7 @@ class _MyHomePageState extends ConsumerState<HomeView> {
   List navList = [
     RouterPaths.products.name,
     RouterPaths.bankAccount.name,
+    RouterPaths.expenses.name,
     RouterPaths.reportsMain.name,
     RouterPaths.signUp.name,
     RouterPaths.users.name,

@@ -1,7 +1,4 @@
 ## Code change logs
-#### 29-6-2026
- -  schema changes added unit ID to sale_receipt, modified orederNo to orderNo
+#### 22-9-2026
+ added expense tracker feature
  
--  add new shop table 
-
--  updated bill_view to show unit ID

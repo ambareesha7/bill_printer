@@ -1,5 +1,6 @@
 import 'package:bill_printer/data/app_enums.dart';
 import 'package:bill_printer/data/tables/bank_accounts.dart';
+import 'package:bill_printer/data/tables/expenses.dart';
 import 'package:bill_printer/data/tables/products_table.dart';
 import 'package:bill_printer/data/tables/sale_receipts.dart';
 import 'package:bill_printer/data/tables/users.dart';
@@ -17,7 +18,14 @@ final databaseProvider = Provider<AppDatabase>((ref) {
 });
 
 @DriftDatabase(
-  tables: [Products, BankAccounts, SaleReceipts, Users, PrintSettings],
+  tables: [
+    Products,
+    BankAccounts,
+    SaleReceipts,
+    Users,
+    PrintSettings,
+    Expenses,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   // After generating code, this class needs to define a `schemaVersion` getter
@@ -26,7 +34,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   /// USE FOR DEBUGGING PURPOSES ONLY, IT WORKS ONLY IN DEBUG MODE
   ///
@@ -61,11 +69,13 @@ class AppDatabase extends _$AppDatabase {
         return m.createAll();
       },
       onUpgrade: (m, from, to) async {
-        // if (from < 2) {
-        //   await m.createTable(printSettings);
-        // }
-        // if (from < 3) {
-        //   await m.alterTable(TableMigration(printSettings));
+        if (from < 2) {
+          await m.createTable(expenses);
+        }
+        // if (from >= 2 && from < 3) {
+        //   await customStatement(
+        //     'ALTER TABLE expenses ADD COLUMN payment_reference TEXT',
+        //   );
         // }
       },
     );

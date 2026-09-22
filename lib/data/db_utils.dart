@@ -97,6 +97,106 @@ class DBUtils {
     }
   }
 
+  // ======================== Expense CRUD operations =====================
+  Future<void> insertExpense({
+    required String title,
+    required String category,
+    required int amount,
+    required DateTime spentAt,
+    String? notes,
+    String? paymentReference,
+  }) async {
+    try {
+      await db
+          .into(db.expenses)
+          .insert(
+            ExpensesCompanion.insert(
+              id: UuidV7().generate(),
+              title: title,
+              category: category,
+              amount: amount,
+              notes: Value(notes),
+              paymentReference: Value(paymentReference),
+              spentAt: spentAt,
+              createdAt: Value(DateTime.now()),
+              updatedAt: Value(DateTime.now()),
+            ),
+          );
+    } catch (e) {
+      debugLog("Error inserting expense: $e");
+    }
+  }
+
+  Future<void> updateExpense({
+    required String id,
+    required String title,
+    required String category,
+    required int amount,
+    required DateTime spentAt,
+    String? notes,
+    String? paymentReference,
+  }) async {
+    try {
+      await db
+          .update(db.expenses)
+          .replace(
+            ExpensesCompanion(
+              id: Value(id),
+              title: Value(title),
+              category: Value(category),
+              amount: Value(amount),
+              notes: Value(notes),
+              paymentReference: Value(paymentReference),
+              spentAt: Value(spentAt),
+              updatedAt: Value(DateTime.now()),
+            ),
+          );
+    } catch (e) {
+      debugLog("Error updating expense: $e");
+    }
+  }
+
+  Future<void> deleteExpense(String id) async {
+    try {
+      await (db.delete(db.expenses)..where((tbl) => tbl.id.equals(id))).go();
+    } catch (e) {
+      debugLog("Error deleting expense: $e");
+    }
+  }
+
+  Future<bool> insertAllExpenses(List<Expense> expenses) async {
+    try {
+      for (final expense in expenses) {
+        await db
+            .into(db.expenses)
+            .insert(expense, mode: InsertMode.insertOrIgnore);
+      }
+      return true;
+    } catch (e) {
+      debugLog("Error importing expenses: $e");
+      return false;
+    }
+  }
+
+  Future<List<Expense>> getExpenses({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    try {
+      final query = db.select(db.expenses)
+        ..orderBy([(table) => OrderingTerm.desc(table.spentAt)]);
+      if (startDate != null && endDate != null) {
+        query.where(
+          (table) => table.spentAt.isBetweenValues(startDate, endDate),
+        );
+      }
+      return await query.get();
+    } catch (e) {
+      debugLog("Error fetching expenses: $e");
+      return [];
+    }
+  }
+
   // ======================== BankAccount CRUD operations =====================
   Future<void> insertBankAccount({
     required String name,
@@ -394,7 +494,6 @@ class DBUtils {
       return null;
     }
   }
-
 
   // ======================== Print settings CRUD operations =====================
   Future<PrintSetting?> getPrintSettings() async {
