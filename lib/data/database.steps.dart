@@ -12,10 +12,8 @@ final class Schema2 extends i0.VersionedSchema {
     bankAccounts,
     saleReceipts,
     users,
-    checklists,
-    checklistTasks,
-    shops,
     printSettings,
+    expenses,
   ];
   late final Shape0 products = Shape0(
     source: i0.VersionedTable(
@@ -72,7 +70,6 @@ final class Schema2 extends i0.VersionedSchema {
         _column_18,
         _column_19,
         _column_20,
-        _column_21,
         _column_4,
         _column_5,
       ],
@@ -88,79 +85,19 @@ final class Schema2 extends i0.VersionedSchema {
       tableConstraints: ['PRIMARY KEY(id)'],
       columns: [
         _column_12,
+        _column_21,
         _column_22,
         _column_23,
         _column_24,
         _column_25,
         _column_26,
         _column_27,
-        _column_28,
       ],
       attachedDatabase: database,
     ),
     alias: null,
   );
-  late final Shape4 checklists = Shape4(
-    source: i0.VersionedTable(
-      entityName: 'checklists',
-      withoutRowId: false,
-      isStrict: false,
-      tableConstraints: ['PRIMARY KEY(id)'],
-      columns: [
-        _column_12,
-        _column_29,
-        _column_30,
-        _column_31,
-        _column_32,
-        _column_33,
-        _column_28,
-        _column_26,
-        _column_27,
-      ],
-      attachedDatabase: database,
-    ),
-    alias: null,
-  );
-  late final Shape5 checklistTasks = Shape5(
-    source: i0.VersionedTable(
-      entityName: 'checklist_tasks',
-      withoutRowId: false,
-      isStrict: false,
-      tableConstraints: ['PRIMARY KEY(id)'],
-      columns: [
-        _column_12,
-        _column_34,
-        _column_35,
-        _column_36,
-        _column_37,
-        _column_26,
-        _column_27,
-      ],
-      attachedDatabase: database,
-    ),
-    alias: null,
-  );
-  late final Shape6 shops = Shape6(
-    source: i0.VersionedTable(
-      entityName: 'shops',
-      withoutRowId: false,
-      isStrict: false,
-      tableConstraints: [],
-      columns: [
-        _column_0,
-        _column_1,
-        _column_8,
-        _column_38,
-        _column_39,
-        _column_40,
-        _column_4,
-        _column_5,
-      ],
-      attachedDatabase: database,
-    ),
-    alias: null,
-  );
-  late final Shape7 printSettings = Shape7(
+  late final Shape4 printSettings = Shape4(
     source: i0.VersionedTable(
       entityName: 'print_settings',
       withoutRowId: false,
@@ -168,14 +105,35 @@ final class Schema2 extends i0.VersionedSchema {
       tableConstraints: [],
       columns: [
         _column_0,
+        _column_28,
+        _column_29,
+        _column_30,
+        _column_31,
+        _column_32,
+        _column_33,
+        _column_34,
+        _column_35,
+        _column_4,
+        _column_5,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape5 expenses = Shape5(
+    source: i0.VersionedTable(
+      entityName: 'expenses',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_12,
+        _column_36,
+        _column_37,
+        _column_38,
+        _column_39,
+        _column_40,
         _column_41,
-        _column_42,
-        _column_43,
-        _column_44,
-        _column_45,
-        _column_46,
-        _column_47,
-        _column_48,
         _column_4,
         _column_5,
       ],
@@ -333,8 +291,6 @@ class Shape2 extends i0.VersionedTable {
       columnsByName['prepared_by']! as i1.GeneratedColumn<String>;
   i1.GeneratedColumn<String> get orderNo =>
       columnsByName['order_no']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<String> get unitId =>
-      columnsByName['unit_id']! as i1.GeneratedColumn<String>;
   i1.GeneratedColumn<String> get billItems =>
       columnsByName['bill_items']! as i1.GeneratedColumn<String>;
   i1.GeneratedColumn<String> get paymentMode =>
@@ -381,19 +337,12 @@ i1.GeneratedColumn<String> _column_15(String aliasedName) =>
     );
 i1.GeneratedColumn<String> _column_16(String aliasedName) =>
     i1.GeneratedColumn<String>(
-      'unit_id',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.string,
-    );
-i1.GeneratedColumn<String> _column_17(String aliasedName) =>
-    i1.GeneratedColumn<String>(
       'bill_items',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_18(String aliasedName) =>
+i1.GeneratedColumn<String> _column_17(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'payment_mode',
       aliasedName,
@@ -401,7 +350,7 @@ i1.GeneratedColumn<String> _column_18(String aliasedName) =>
       type: i1.DriftSqlType.string,
       defaultValue: const CustomExpression('\'cash\''),
     );
-i1.GeneratedColumn<String> _column_19(String aliasedName) =>
+i1.GeneratedColumn<String> _column_18(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'payment_status',
       aliasedName,
@@ -409,14 +358,14 @@ i1.GeneratedColumn<String> _column_19(String aliasedName) =>
       type: i1.DriftSqlType.string,
       defaultValue: const CustomExpression('\'receivable\''),
     );
-i1.GeneratedColumn<String> _column_20(String aliasedName) =>
+i1.GeneratedColumn<String> _column_19(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'payment_ref',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<int> _column_21(String aliasedName) =>
+i1.GeneratedColumn<int> _column_20(String aliasedName) =>
     i1.GeneratedColumn<int>(
       'total_amount',
       aliasedName,
@@ -444,7 +393,7 @@ class Shape3 extends i0.VersionedTable {
       columnsByName['is_active']! as i1.GeneratedColumn<bool>;
 }
 
-i1.GeneratedColumn<String> _column_22(String aliasedName) =>
+i1.GeneratedColumn<String> _column_21(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'email',
       aliasedName,
@@ -452,28 +401,28 @@ i1.GeneratedColumn<String> _column_22(String aliasedName) =>
       type: i1.DriftSqlType.string,
       defaultConstraints: i1.GeneratedColumn.constraintIsAlways('UNIQUE'),
     );
-i1.GeneratedColumn<String> _column_23(String aliasedName) =>
+i1.GeneratedColumn<String> _column_22(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'password',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_24(String aliasedName) =>
+i1.GeneratedColumn<String> _column_23(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'full_name',
       aliasedName,
       false,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_25(String aliasedName) =>
+i1.GeneratedColumn<String> _column_24(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'phone_number',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<DateTime> _column_26(String aliasedName) =>
+i1.GeneratedColumn<DateTime> _column_25(String aliasedName) =>
     i1.GeneratedColumn<DateTime>(
       'created_at',
       aliasedName,
@@ -481,7 +430,7 @@ i1.GeneratedColumn<DateTime> _column_26(String aliasedName) =>
       type: i1.DriftSqlType.dateTime,
       defaultValue: const CustomExpression('CURRENT_TIMESTAMP'),
     );
-i1.GeneratedColumn<DateTime> _column_27(String aliasedName) =>
+i1.GeneratedColumn<DateTime> _column_26(String aliasedName) =>
     i1.GeneratedColumn<DateTime>(
       'updated_at',
       aliasedName,
@@ -489,7 +438,7 @@ i1.GeneratedColumn<DateTime> _column_27(String aliasedName) =>
       type: i1.DriftSqlType.dateTime,
       defaultValue: const CustomExpression('CURRENT_TIMESTAMP'),
     );
-i1.GeneratedColumn<bool> _column_28(String aliasedName) =>
+i1.GeneratedColumn<bool> _column_27(String aliasedName) =>
     i1.GeneratedColumn<bool>(
       'is_active',
       aliasedName,
@@ -503,167 +452,6 @@ i1.GeneratedColumn<bool> _column_28(String aliasedName) =>
 
 class Shape4 extends i0.VersionedTable {
   Shape4({required super.source, required super.alias}) : super.aliased();
-  i1.GeneratedColumn<String> get id =>
-      columnsByName['id']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<String> get title =>
-      columnsByName['title']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<int> get completed =>
-      columnsByName['completed']! as i1.GeneratedColumn<int>;
-  i1.GeneratedColumn<int> get total =>
-      columnsByName['total']! as i1.GeneratedColumn<int>;
-  i1.GeneratedColumn<int> get colorValue =>
-      columnsByName['color_value']! as i1.GeneratedColumn<int>;
-  i1.GeneratedColumn<String> get iconName =>
-      columnsByName['icon_name']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<bool> get isActive =>
-      columnsByName['is_active']! as i1.GeneratedColumn<bool>;
-  i1.GeneratedColumn<DateTime> get createdAt =>
-      columnsByName['created_at']! as i1.GeneratedColumn<DateTime>;
-  i1.GeneratedColumn<DateTime> get updatedAt =>
-      columnsByName['updated_at']! as i1.GeneratedColumn<DateTime>;
-}
-
-i1.GeneratedColumn<String> _column_29(String aliasedName) =>
-    i1.GeneratedColumn<String>(
-      'title',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.string,
-    );
-i1.GeneratedColumn<int> _column_30(String aliasedName) =>
-    i1.GeneratedColumn<int>(
-      'completed',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.int,
-      defaultValue: const CustomExpression('0'),
-    );
-i1.GeneratedColumn<int> _column_31(String aliasedName) =>
-    i1.GeneratedColumn<int>(
-      'total',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.int,
-      defaultValue: const CustomExpression('0'),
-    );
-i1.GeneratedColumn<int> _column_32(String aliasedName) =>
-    i1.GeneratedColumn<int>(
-      'color_value',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.int,
-      defaultValue: const CustomExpression('0'),
-    );
-i1.GeneratedColumn<String> _column_33(String aliasedName) =>
-    i1.GeneratedColumn<String>(
-      'icon_name',
-      aliasedName,
-      true,
-      additionalChecks: i1.GeneratedColumn.checkTextLength(
-        minTextLength: 0,
-        maxTextLength: 64,
-      ),
-      type: i1.DriftSqlType.string,
-    );
-
-class Shape5 extends i0.VersionedTable {
-  Shape5({required super.source, required super.alias}) : super.aliased();
-  i1.GeneratedColumn<String> get id =>
-      columnsByName['id']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<String> get checklistId =>
-      columnsByName['checklist_id']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<String> get taskText =>
-      columnsByName['task_text']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<bool> get done =>
-      columnsByName['done']! as i1.GeneratedColumn<bool>;
-  i1.GeneratedColumn<int> get position =>
-      columnsByName['position']! as i1.GeneratedColumn<int>;
-  i1.GeneratedColumn<DateTime> get createdAt =>
-      columnsByName['created_at']! as i1.GeneratedColumn<DateTime>;
-  i1.GeneratedColumn<DateTime> get updatedAt =>
-      columnsByName['updated_at']! as i1.GeneratedColumn<DateTime>;
-}
-
-i1.GeneratedColumn<String> _column_34(String aliasedName) =>
-    i1.GeneratedColumn<String>(
-      'checklist_id',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.string,
-      $customConstraints: 'NOT NULL REFERENCES checklists(id)',
-    );
-i1.GeneratedColumn<String> _column_35(String aliasedName) =>
-    i1.GeneratedColumn<String>(
-      'task_text',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.string,
-    );
-i1.GeneratedColumn<bool> _column_36(String aliasedName) =>
-    i1.GeneratedColumn<bool>(
-      'done',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.bool,
-      defaultConstraints: i1.GeneratedColumn.constraintIsAlways(
-        'CHECK ("done" IN (0, 1))',
-      ),
-      defaultValue: const CustomExpression('0'),
-    );
-i1.GeneratedColumn<int> _column_37(String aliasedName) =>
-    i1.GeneratedColumn<int>(
-      'position',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.int,
-      defaultValue: const CustomExpression('0'),
-    );
-
-class Shape6 extends i0.VersionedTable {
-  Shape6({required super.source, required super.alias}) : super.aliased();
-  i1.GeneratedColumn<int> get id =>
-      columnsByName['id']! as i1.GeneratedColumn<int>;
-  i1.GeneratedColumn<String> get name =>
-      columnsByName['name']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<bool> get isPrime =>
-      columnsByName['is_prime']! as i1.GeneratedColumn<bool>;
-  i1.GeneratedColumn<String> get shopId =>
-      columnsByName['shop_id']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<String> get address =>
-      columnsByName['address']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<String> get mapAddress =>
-      columnsByName['map_address']! as i1.GeneratedColumn<String>;
-  i1.GeneratedColumn<DateTime> get createdAt =>
-      columnsByName['created_at']! as i1.GeneratedColumn<DateTime>;
-  i1.GeneratedColumn<DateTime> get updatedAt =>
-      columnsByName['updated_at']! as i1.GeneratedColumn<DateTime>;
-}
-
-i1.GeneratedColumn<String> _column_38(String aliasedName) =>
-    i1.GeneratedColumn<String>(
-      'shop_id',
-      aliasedName,
-      false,
-      type: i1.DriftSqlType.string,
-      defaultConstraints: i1.GeneratedColumn.constraintIsAlways('UNIQUE'),
-    );
-i1.GeneratedColumn<String> _column_39(String aliasedName) =>
-    i1.GeneratedColumn<String>(
-      'address',
-      aliasedName,
-      true,
-      type: i1.DriftSqlType.string,
-    );
-i1.GeneratedColumn<String> _column_40(String aliasedName) =>
-    i1.GeneratedColumn<String>(
-      'map_address',
-      aliasedName,
-      true,
-      type: i1.DriftSqlType.string,
-    );
-
-class Shape7 extends i0.VersionedTable {
-  Shape7({required super.source, required super.alias}) : super.aliased();
   i1.GeneratedColumn<int> get id =>
       columnsByName['id']! as i1.GeneratedColumn<int>;
   i1.GeneratedColumn<String> get businessName =>
@@ -688,61 +476,135 @@ class Shape7 extends i0.VersionedTable {
       columnsByName['updated_at']! as i1.GeneratedColumn<DateTime>;
 }
 
-i1.GeneratedColumn<String> _column_41(String aliasedName) =>
+i1.GeneratedColumn<String> _column_28(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'business_name',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_42(String aliasedName) =>
+i1.GeneratedColumn<String> _column_29(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'place_address',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_43(String aliasedName) =>
+i1.GeneratedColumn<String> _column_30(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'header_text1',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_44(String aliasedName) =>
+i1.GeneratedColumn<String> _column_31(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'header_text2',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_45(String aliasedName) =>
+i1.GeneratedColumn<String> _column_32(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'gst_no',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_46(String aliasedName) =>
+i1.GeneratedColumn<String> _column_33(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'invoice_title',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_47(String aliasedName) =>
+i1.GeneratedColumn<String> _column_34(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'footer_text1',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
     );
-i1.GeneratedColumn<String> _column_48(String aliasedName) =>
+i1.GeneratedColumn<String> _column_35(String aliasedName) =>
     i1.GeneratedColumn<String>(
       'footer_text2',
       aliasedName,
       true,
       type: i1.DriftSqlType.string,
+    );
+
+class Shape5 extends i0.VersionedTable {
+  Shape5({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get title =>
+      columnsByName['title']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get category =>
+      columnsByName['category']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get amount =>
+      columnsByName['amount']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get notes =>
+      columnsByName['notes']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get paymentReference =>
+      columnsByName['payment_reference']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<DateTime> get spentAt =>
+      columnsByName['spent_at']! as i1.GeneratedColumn<DateTime>;
+  i1.GeneratedColumn<DateTime> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<DateTime>;
+  i1.GeneratedColumn<DateTime> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<DateTime>;
+}
+
+i1.GeneratedColumn<String> _column_36(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'title',
+      aliasedName,
+      false,
+      additionalChecks: i1.GeneratedColumn.checkTextLength(
+        minTextLength: 1,
+        maxTextLength: 120,
+      ),
+      type: i1.DriftSqlType.string,
+    );
+i1.GeneratedColumn<String> _column_37(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'category',
+      aliasedName,
+      false,
+      additionalChecks: i1.GeneratedColumn.checkTextLength(
+        minTextLength: 1,
+        maxTextLength: 60,
+      ),
+      type: i1.DriftSqlType.string,
+    );
+i1.GeneratedColumn<int> _column_38(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'amount',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+    );
+i1.GeneratedColumn<String> _column_39(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'notes',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+    );
+i1.GeneratedColumn<String> _column_40(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'payment_reference',
+      aliasedName,
+      true,
+      additionalChecks: i1.GeneratedColumn.checkTextLength(maxTextLength: 120),
+      type: i1.DriftSqlType.string,
+    );
+i1.GeneratedColumn<DateTime> _column_41(String aliasedName) =>
+    i1.GeneratedColumn<DateTime>(
+      'spent_at',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.dateTime,
     );
 i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
