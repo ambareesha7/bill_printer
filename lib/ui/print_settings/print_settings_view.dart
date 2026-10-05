@@ -18,11 +18,11 @@ class _PrintSettingsViewState extends ConsumerState<PrintSettingsView> {
   static const _fields = [
     ('businessName', 'Business Name'),
     ('placeAddress', 'Place/Address'),
-    ('headerText1', 'Header Text (Contact No, Etc...)'),
-    ('headerText2', 'Header Text 2 (Email, FSSAI, Etc...)'),
+    ('headerText1', 'Header 1 (Contact No, Etc...)'),
+    ('headerText2', 'Header 2 (Email, FSSAI, Etc...)'),
     ('gstNo', 'GST No'),
     ('invoiceTitle', 'Invoice Title'),
-    ('footerText1', 'Footer Text'),
+    ('footerText1', 'Footer Text 1'),
     ('footerText2', 'Footer Text 2'),
   ];
 
@@ -51,10 +51,7 @@ class _PrintSettingsViewState extends ConsumerState<PrintSettingsView> {
     if (settings != null) _fill(settings);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Print Settings'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Print Settings'), centerTitle: true),
       body: Form(
         key: _formKey,
         child: ListView(
