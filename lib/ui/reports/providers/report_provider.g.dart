@@ -268,7 +268,7 @@ final class DateRangeReportProvider
   }
 }
 
-String _$dateRangeReportHash() => r'1753d350f91e0a975ee6db7a9ae1326d74cbda74';
+String _$dateRangeReportHash() => r'ff89fb053caacec04249c499a372dad6fb98d8fd';
 
 abstract class _$DateRangeReport extends $Notifier<List<SaleReceiptModel>> {
   List<SaleReceiptModel> build();
