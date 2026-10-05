@@ -6,10 +6,8 @@ import 'package:bill_printer/ui/reports/providers/report_provider.dart';
 import 'package:bill_printer/ui/utils/app_colors.dart';
 import 'package:bill_printer/ui/utils/common_utils.dart';
 import 'package:bill_printer/ui/utils/ui_utils.dart';
-import 'package:bill_printer/ui/widgets/date_range_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 import '../../data/models/bank_account/bank_account_model.dart';
 import '../../data/models/sale_receipts/sale_receipt_model.dart';
@@ -22,19 +20,18 @@ class ReportWidget extends ConsumerWidget {
   final ReportType reportType;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    String selectedMonth = monthFormat(ref.watch(monthlyDateProvider));
-    final dateRange = ref.watch(dateRangeProvider);
     ref.watch(dateRangeReportProvider);
     ref.watch(printerProvider);
     DBUtils dbUtils = DBUtils.instance;
 
-    // TODO: REMOVE MONTHLY REPORT IF IT IS POSSIBLE
-    final List<SaleReceiptModel> allTransactions =
-        (dateRange.startDate != null && dateRange.endDate != null)
-        ? ref.watch(dateRangeReportProvider)
-        : (reportType == ReportType.monthly)
-        ? ref.watch(monthlyReportProvider)
-        : ref.watch(yearlyReportProvider);
+    final List<SaleReceiptModel> allTransactions = ref.watch(
+      dateRangeReportProvider,
+    );
+    // reportType == ReportType.dateRange
+    //     ? ref.watch(dateRangeReportProvider)
+    //     : (dateRange.startDate != null && dateRange.endDate != null)
+    //     ? ref.watch(dateRangeReportProvider)
+    //     : ref.watch(yearlyReportProvider);
 
     List<String> availableFilters = ref.watch(filtersListProvider);
     List<String> appliedFilters = ref.watch(appliedFiltersProvider);
@@ -47,90 +44,6 @@ class ReportWidget extends ConsumerWidget {
 
     return Column(
       children: [
-        // Date Range Selection (only show for custom date range reports)
-        if (reportType == ReportType.yearly)
-          DateRangeWidget(
-            dateRange: dateRange,
-            onFromDateSelect: () async {
-              final pickedDate = await showDatePicker(
-                context: context,
-                initialDate: dateRange.startDate ?? DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime.now(),
-              );
-              if (pickedDate != null && context.mounted) {
-                final pickedTime = await showTimePicker(
-                  context: context,
-                  initialTime: TimeOfDay.fromDateTime(
-                    dateRange.startDate ?? DateTime.now(),
-                  ),
-                );
-                if (pickedTime != null) {
-                  final dateWithTime = pickedDate.copyWith(
-                    hour: pickedTime.hour,
-                    minute: pickedTime.minute,
-                  );
-                  ref
-                      .read(dateRangeProvider.notifier)
-                      .setDateRange(dateWithTime, dateRange.endDate);
-                  if (dateRange.endDate != null) {
-                    await ref
-                        .read(dateRangeReportProvider.notifier)
-                        .getDateRangeTransactions(
-                          dateWithTime,
-                          dateRange.endDate!,
-                        );
-                    ref
-                        .read(appliedFiltersProvider.notifier)
-                        .updateAppliedFilters([]);
-                  }
-                }
-              }
-            },
-            onToDateSelect: () async {
-              final pickedDate = await showDatePicker(
-                context: context,
-                initialDate: dateRange.endDate ?? DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime.now(),
-              );
-              if (pickedDate != null && context.mounted) {
-                final pickedTime = await showTimePicker(
-                  context: context,
-                  initialTime: TimeOfDay.fromDateTime(
-                    dateRange.endDate ?? DateTime.now(),
-                  ),
-                );
-                if (pickedTime != null) {
-                  final dateWithTime = pickedDate.copyWith(
-                    hour: pickedTime.hour,
-                    minute: pickedTime.minute,
-                  );
-                  ref
-                      .read(dateRangeProvider.notifier)
-                      .setDateRange(dateRange.startDate, dateWithTime);
-                  if (dateRange.startDate != null) {
-                    await ref
-                        .read(dateRangeReportProvider.notifier)
-                        .getDateRangeTransactions(
-                          dateRange.startDate!,
-                          dateWithTime,
-                        );
-                    ref
-                        .read(appliedFiltersProvider.notifier)
-                        .updateAppliedFilters([]);
-                  }
-                }
-              }
-            },
-            closeBtnFunc: () {
-              ref.read(dateRangeProvider.notifier).clearDateRange();
-              ref.read(yearlyReportProvider.notifier).getAllTransactions();
-              ref
-                  .read(appliedFiltersProvider.notifier)
-                  .updateAppliedFilters([]);
-            },
-          ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -152,28 +65,6 @@ class ReportWidget extends ConsumerWidget {
               Text(
                 "All transactions",
                 style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            if (reportType == ReportType.monthly)
-              TextButton.icon(
-                onPressed: () {
-                  showMonthPicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                  ).then((date) {
-                    if (date != null) {
-                      ref.read(monthlyDateProvider.notifier).updateDate(date);
-                      ref
-                          .read(monthlyReportProvider.notifier)
-                          .updateTransactions(date);
-                      ref
-                          .read(appliedFiltersProvider.notifier)
-                          .updateAppliedFilters([]);
-                    }
-                  });
-                },
-                label: Text(selectedMonth),
-                icon: Icon(Icons.unfold_more_sharp),
-                iconAlignment: IconAlignment.end,
               ),
             // Filter Button with Badge showing active filters
             Consumer(
@@ -406,8 +297,9 @@ class ReportWidget extends ConsumerWidget {
                                     "Order no: ${transaction.orderNo}\n${getItemNames(transaction.billItems)}",
                                 rightFun: () {
                                   ref
-                                      .read(monthlyReportProvider.notifier)
+                                      .read(dateRangeReportProvider.notifier)
                                       .delete(transaction.id!);
+                                      
                                 },
                               );
                             },

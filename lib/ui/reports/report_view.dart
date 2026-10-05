@@ -14,6 +14,16 @@ import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 import '../../data/models/sale_receipts/sale_receipt_model.dart';
 
+enum _DateRangeSelection {
+  all,
+  today,
+  yesterday,
+  thisWeek,
+  thisMonth,
+  lastMonth,
+  custom,
+}
+
 class ReportView extends ConsumerStatefulWidget {
   const ReportView({super.key});
 
@@ -23,23 +33,33 @@ class ReportView extends ConsumerStatefulWidget {
 
 class _ReportViewState extends ConsumerState<ReportView>
     with TickerProviderStateMixin {
-  final int tabLength = 3;
+  final int tabLength = 2;
   TabController? _tabController;
   String selectedWeek = "W1";
   int touchedIndex = -1;
+  _DateRangeSelection selectedRangeSelection = _DateRangeSelection.thisMonth;
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: tabLength, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _applyCurrentMonth();
+    });
+  }
+
+  Future<void> _applyCurrentMonth() async {
+    final now = DateTime.now();
+    return await _applyDateRange(
+      DateTimeRange(start: DateTime(now.year, now.month), end: now),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     DateTime selectedMonth = ref.watch(weeklyDateProvider);
     ref.watch(weeklyReportProvider);
-    ref.watch(monthlyReportProvider);
-    ref.watch(monthlyDateProvider);
-    ref.watch(yearlyReportProvider);
+    ref.watch(dateRangeReportProvider);
+    final dateRange = ref.watch(dateRangeProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -65,13 +85,7 @@ class _ReportViewState extends ConsumerState<ReportView>
             Tab(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text("Monthly"),
-              ),
-            ),
-            Tab(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text("Yearly"),
+                child: Text("Date range"),
               ),
             ),
           ],
@@ -133,14 +147,209 @@ class _ReportViewState extends ConsumerState<ReportView>
                     ),
                   ],
                 ),
-                ReportWidget(ReportType.monthly),
-                ReportWidget(ReportType.yearly),
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              dateRange.startDate != null &&
+                                      dateRange.endDate != null
+                                  ? "${DateFormat('dd MMM yyyy').format(dateRange.startDate!)} - ${DateFormat('dd MMM yyyy').format(dateRange.endDate!)}"
+                                  : selectedRangeSelection ==
+                                        _DateRangeSelection.all
+                                  ? "All records"
+                                  : "Select a date range",
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ),
+                          IconButton(
+                            tooltip: "Choose date range",
+                            onPressed: _chooseDateRange,
+                            icon: const Icon(Icons.date_range_outlined),
+                          ),
+                          if (dateRange.startDate != null &&
+                              dateRange.endDate != null)
+                            IconButton(
+                              tooltip: "Clear date range",
+                              onPressed: () {
+                                ref
+                                    .read(dateRangeProvider.notifier)
+                                    .clearDateRange();
+                                setState(() {
+                                  selectedRangeSelection =
+                                      _DateRangeSelection.all;
+                                });
+                                ref
+                                    .read(dateRangeReportProvider.notifier)
+                                    .getAllTransactions();
+                                ref
+                                    .read(appliedFiltersProvider.notifier)
+                                    .updateAppliedFilters([]);
+                              },
+                              icon: const Icon(Icons.clear),
+                            ),
+                        ],
+                      ),
+                    ),
+                    Expanded(child: ReportWidget(ReportType.dateRange)),
+                  ],
+                ),
               ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _chooseDateRange() async {
+    final current = ref.read(dateRangeProvider);
+    final selection = await showModalBottomSheet<_DateRangeSelection>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        var selected = selectedRangeSelection;
+        return StatefulBuilder(
+          builder: (context, setSheetState) => SafeArea(
+            child: SizedBox(
+              height: MediaQuery.sizeOf(context).height * 0.7,
+              child: Column(
+                children: [
+                  ListTile(
+                    title: const Text('Date range'),
+                    trailing: IconButton(
+                      tooltip: 'Close',
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close),
+                    ),
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: RadioGroup<_DateRangeSelection>(
+                        groupValue: selected,
+                        onChanged: (value) =>
+                            setSheetState(() => selected = value!),
+                        child: Column(
+                          children: [
+                            RadioListTile<_DateRangeSelection>(
+                              title: const Text('All records'),
+                              value: _DateRangeSelection.all,
+                            ),
+                            RadioListTile<_DateRangeSelection>(
+                              title: const Text('Today'),
+                              value: _DateRangeSelection.today,
+                            ),
+                            RadioListTile<_DateRangeSelection>(
+                              title: const Text('Yesterday'),
+                              value: _DateRangeSelection.yesterday,
+                            ),
+                            RadioListTile<_DateRangeSelection>(
+                              title: const Text('This week'),
+                              value: _DateRangeSelection.thisWeek,
+                            ),
+                            RadioListTile<_DateRangeSelection>(
+                              title: const Text('This month'),
+                              value: _DateRangeSelection.thisMonth,
+                            ),
+                            RadioListTile<_DateRangeSelection>(
+                              title: const Text('Last month'),
+                              value: _DateRangeSelection.lastMonth,
+                            ),
+                            RadioListTile<_DateRangeSelection>(
+                              title: const Text('Custom'),
+                              value: _DateRangeSelection.custom,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                    child: FilledButton(
+                      onPressed: () => Navigator.pop(context, selected),
+                      child: const Text('Apply'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (!mounted || selection == null) return;
+    setState(() => selectedRangeSelection = selection);
+
+    if (selection == _DateRangeSelection.all) {
+      ref.read(dateRangeProvider.notifier).clearDateRange();
+      await ref.read(dateRangeReportProvider.notifier).getAllTransactions();
+      ref.read(appliedFiltersProvider.notifier).updateAppliedFilters([]);
+      return;
+    }
+
+    if (selection == _DateRangeSelection.custom) {
+      final picked = await showDateRangePicker(
+        context: context,
+        firstDate: DateTime(2020),
+        lastDate: DateTime.now(),
+        initialDateRange: current.startDate != null && current.endDate != null
+            ? DateTimeRange(start: current.startDate!, end: current.endDate!)
+            : DateTimeRange(
+                start: DateTime(DateTime.now().year, DateTime.now().month),
+                end: DateTime.now(),
+              ),
+      );
+      if (picked != null && mounted) {
+        await _applyDateRange(picked);
+      }
+      return;
+    }
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final selectedRange = switch (selection) {
+      _DateRangeSelection.all => throw StateError('All records handled above'),
+      _DateRangeSelection.today => DateTimeRange(start: today, end: now),
+      _DateRangeSelection.yesterday => DateTimeRange(
+        start: today.subtract(const Duration(days: 1)),
+        end: today.subtract(const Duration(milliseconds: 1)),
+      ),
+      _DateRangeSelection.thisWeek => DateTimeRange(
+        start: today.subtract(Duration(days: today.weekday - 1)),
+        end: now,
+      ),
+      _DateRangeSelection.thisMonth => DateTimeRange(
+        start: DateTime(today.year, today.month),
+        end: now,
+      ),
+      _DateRangeSelection.lastMonth => DateTimeRange(
+        start: DateTime(today.year, today.month - 1),
+        end: DateTime(
+          today.year,
+          today.month,
+          1,
+        ).subtract(const Duration(milliseconds: 1)),
+      ),
+      _DateRangeSelection.custom => throw StateError('Custom range pending'),
+    };
+    await _applyDateRange(selectedRange);
+  }
+
+  Future<void> _applyDateRange(DateTimeRange range) async {
+    final endOfDay = range.end
+        .add(const Duration(days: 1))
+        .subtract(const Duration(microseconds: 1));
+    ref.read(dateRangeProvider.notifier).setDateRange(range.start, range.end);
+    await ref
+        .read(dateRangeReportProvider.notifier)
+        .getDateRangeTransactions(range.start, endOfDay);
+    if (!mounted) return;
+    ref.read(appliedFiltersProvider.notifier).updateAppliedFilters([]);
   }
 
   List<Color> get availableColors => const <Color>[

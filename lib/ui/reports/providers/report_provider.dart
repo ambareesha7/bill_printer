@@ -101,7 +101,20 @@ class DateRangeReport extends _$DateRangeReport {
       startDate: startDate,
       endDate: endDate,
     );
+    if (!ref.mounted) return;
     state = [...transactions];
+  }
+
+  getAllTransactions() async {
+    final List<SaleReceiptModel> saleTrans = await dbUtils
+        .getNParseSaleReceipts();
+        // getDateRangeTransactions(, )
+    state = [...saleTrans];
+  }
+
+  delete(String id) async {
+    await dbUtils.deleteSaleReceipt(id);
+    // getAllTransactions();
   }
 }
 
